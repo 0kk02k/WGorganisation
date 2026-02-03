@@ -4,18 +4,9 @@ import { api } from "@/lib/api";
 import { ROOMS } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { StayEditDialog } from "@/components/stays/StayEditDialog";
+import { StayChecklistSection } from "@/components/stays/StayChecklistSection";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,13 +18,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { format, parseISO } from "date-fns";
 import { toast } from "sonner";
 
@@ -47,7 +31,6 @@ export default function StayDetail() {
   const navigate = useNavigate();
   const [stay, setStay] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [editForm, setEditForm] = useState(null);
   const [newCheckin, setNewCheckin] = useState("");
   const [newCheckout, setNewCheckout] = useState("");
 
@@ -56,7 +39,6 @@ export default function StayDetail() {
       try {
         const response = await api.get(`/stays/${id}`);
         setStay(response.data);
-        setEditForm(response.data);
       } finally {
         setLoading(false);
       }
@@ -67,7 +49,6 @@ export default function StayDetail() {
   const updateStay = async (payload) => {
     const response = await api.put(`/stays/${id}`, payload);
     setStay(response.data);
-    setEditForm(response.data);
   };
 
   const handleToggle = async (listKey, itemId, checked) => {
@@ -146,140 +127,7 @@ export default function StayDetail() {
           <Badge className={roomStyle} data-testid="stay-detail-room">
             Zimmer {stay.room}
           </Badge>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" data-testid="stay-edit-button">
-                Details bearbeiten
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg" data-testid="stay-edit-dialog">
-              <DialogHeader>
-                <DialogTitle data-testid="stay-edit-title">
-                  Aufenthalt bearbeiten
-                </DialogTitle>
-              </DialogHeader>
-              {editForm && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label
-                      className="text-sm font-medium text-stone-700"
-                      data-testid="stay-edit-name-label"
-                    >
-                      Name
-                    </label>
-                    <Input
-                      value={editForm.occupant_name}
-                      onChange={(event) =>
-                        setEditForm((prev) => ({
-                          ...prev,
-                          occupant_name: event.target.value,
-                        }))
-                      }
-                      data-testid="stay-edit-name"
-                    />
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <label
-                        className="text-sm font-medium text-stone-700"
-                        data-testid="stay-edit-room-label"
-                      >
-                        Zimmer
-                      </label>
-                      <Select
-                        value={editForm.room}
-                        onValueChange={(value) =>
-                          setEditForm((prev) => ({ ...prev, room: value }))
-                        }
-                      >
-                        <SelectTrigger data-testid="stay-edit-room">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {ROOMS.map((room) => (
-                            <SelectItem
-                              key={room.id}
-                              value={room.id}
-                              data-testid={`stay-edit-room-${room.id}`}
-                            >
-                              {room.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        className="text-sm font-medium text-stone-700"
-                        data-testid="stay-edit-start-label"
-                      >
-                        Check-in
-                      </label>
-                      <Input
-                        type="date"
-                        value={editForm.start_date}
-                        onChange={(event) =>
-                          setEditForm((prev) => ({
-                            ...prev,
-                            start_date: event.target.value,
-                          }))
-                        }
-                        data-testid="stay-edit-start"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <label
-                        className="text-sm font-medium text-stone-700"
-                        data-testid="stay-edit-end-label"
-                      >
-                        Check-out
-                      </label>
-                      <Input
-                        type="date"
-                        value={editForm.end_date}
-                        onChange={(event) =>
-                          setEditForm((prev) => ({
-                            ...prev,
-                            end_date: event.target.value,
-                          }))
-                        }
-                        data-testid="stay-edit-end"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label
-                        className="text-sm font-medium text-stone-700"
-                        data-testid="stay-edit-notes-label"
-                      >
-                        Hinweise
-                      </label>
-                      <Textarea
-                        value={editForm.notes || ""}
-                        onChange={(event) =>
-                          setEditForm((prev) => ({
-                            ...prev,
-                            notes: event.target.value,
-                          }))
-                        }
-                        data-testid="stay-edit-notes"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-              <DialogFooter>
-                <Button
-                  onClick={() => updateStay(editForm)}
-                  className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
-                  data-testid="stay-edit-save"
-                >
-                  Änderungen speichern
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <StayEditDialog stay={stay} onSave={updateStay} />
         </div>
       </div>
 
@@ -295,97 +143,34 @@ export default function StayDetail() {
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-stone-200/80" data-testid="stay-checkin-card">
-          <CardHeader>
-            <CardTitle data-testid="stay-checkin-title">Check-in Liste</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {stay.checklist_in.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                data-testid={`stay-checkin-item-${item.id}`}
-              >
-                <Checkbox
-                  checked={item.done}
-                  onCheckedChange={(checked) =>
-                    handleToggle("checklist_in", item.id, checked)
-                  }
-                  data-testid={`stay-checkin-toggle-${item.id}`}
-                />
-                <span
-                  className={`text-sm ${item.done ? "line-through text-stone-400" : "text-stone-700"}`}
-                  data-testid={`stay-checkin-text-${item.id}`}
-                >
-                  {item.text}
-                </span>
-              </div>
-            ))}
-            <div className="flex flex-wrap gap-2">
-              <Input
-                value={newCheckin}
-                onChange={(event) => setNewCheckin(event.target.value)}
-                placeholder="Neuer Check-in Punkt"
-                data-testid="stay-checkin-input"
-              />
-              <Button
-                onClick={() => {
-                  handleAddItem("checklist_in", newCheckin);
-                  setNewCheckin("");
-                }}
-                data-testid="stay-checkin-add"
-              >
-                Hinzufügen
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-stone-200/80" data-testid="stay-checkout-card">
-          <CardHeader>
-            <CardTitle data-testid="stay-checkout-title">Check-out Liste</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {stay.checklist_out.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                data-testid={`stay-checkout-item-${item.id}`}
-              >
-                <Checkbox
-                  checked={item.done}
-                  onCheckedChange={(checked) =>
-                    handleToggle("checklist_out", item.id, checked)
-                  }
-                  data-testid={`stay-checkout-toggle-${item.id}`}
-                />
-                <span
-                  className={`text-sm ${item.done ? "line-through text-stone-400" : "text-stone-700"}`}
-                  data-testid={`stay-checkout-text-${item.id}`}
-                >
-                  {item.text}
-                </span>
-              </div>
-            ))}
-            <div className="flex flex-wrap gap-2">
-              <Input
-                value={newCheckout}
-                onChange={(event) => setNewCheckout(event.target.value)}
-                placeholder="Neuer Check-out Punkt"
-                data-testid="stay-checkout-input"
-              />
-              <Button
-                onClick={() => {
-                  handleAddItem("checklist_out", newCheckout);
-                  setNewCheckout("");
-                }}
-                data-testid="stay-checkout-add"
-              >
-                Hinzufügen
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <StayChecklistSection
+          title="Check-in Liste"
+          items={stay.checklist_in}
+          onToggle={(itemId, checked) =>
+            handleToggle("checklist_in", itemId, checked)
+          }
+          onAdd={() => {
+            handleAddItem("checklist_in", newCheckin);
+            setNewCheckin("");
+          }}
+          inputValue={newCheckin}
+          setInputValue={setNewCheckin}
+          testPrefix="stay-checkin"
+        />
+        <StayChecklistSection
+          title="Check-out Liste"
+          items={stay.checklist_out}
+          onToggle={(itemId, checked) =>
+            handleToggle("checklist_out", itemId, checked)
+          }
+          onAdd={() => {
+            handleAddItem("checklist_out", newCheckout);
+            setNewCheckout("");
+          }}
+          inputValue={newCheckout}
+          setInputValue={setNewCheckout}
+          testPrefix="stay-checkout"
+        />
       </div>
 
       <AlertDialog>
