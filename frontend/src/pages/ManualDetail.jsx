@@ -29,6 +29,11 @@ export default function ManualDetail() {
     );
   }
 
+  const imageSrc =
+    manual.image_data ||
+    manual.image_url ||
+    "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
+
   return (
     <div className="space-y-6" data-testid="manual-detail-page">
       <Button asChild variant="outline" className="rounded-full">
@@ -39,7 +44,7 @@ export default function ManualDetail() {
       <Card className="overflow-hidden border-stone-200/80" data-testid="manual-detail-card">
         <div className="aspect-video overflow-hidden bg-stone-100" data-testid="manual-detail-image">
           <img
-            src={manual.image_data || manual.image_url}
+            src={imageSrc}
             alt={manual.title}
             className="h-full w-full object-cover"
           />
