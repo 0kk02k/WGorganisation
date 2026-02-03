@@ -63,21 +63,26 @@ export default function ManualsPage() {
             </CardContent>
           </Card>
         ) : (
-          manuals.map((manual) => (
-            <Link
-              to={`/anleitungen/${manual.id}`}
-              key={manual.id}
-              className="group"
-              data-testid={`manual-card-${manual.id}`}
-            >
-              <Card className="overflow-hidden border-stone-200/80 transition-colors group-hover:bg-stone-50">
-                <div className="aspect-video overflow-hidden bg-stone-100" data-testid={`manual-image-${manual.id}`}>
-                  <img
-                    src={manual.image_data || manual.image_url}
-                    alt={manual.title}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
+          manuals.map((manual) => {
+            const imageSrc =
+              manual.image_data ||
+              manual.image_url ||
+              "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
+            return (
+              <Link
+                to={`/anleitungen/${manual.id}`}
+                key={manual.id}
+                className="group"
+                data-testid={`manual-card-${manual.id}`}
+              >
+                <Card className="overflow-hidden border-stone-200/80 transition-colors group-hover:bg-stone-50">
+                  <div className="aspect-video overflow-hidden bg-stone-100" data-testid={`manual-image-${manual.id}`}>
+                    <img
+                      src={imageSrc}
+                      alt={manual.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
                 <CardHeader>
                   <CardTitle data-testid={`manual-title-${manual.id}`}>
                     {manual.title}
@@ -88,9 +93,10 @@ export default function ManualsPage() {
                     {manual.description}
                   </p>
                 </CardContent>
-              </Card>
-            </Link>
-          ))
+                </Card>
+              </Link>
+            );
+          })
         )}
       </div>
     </div>
