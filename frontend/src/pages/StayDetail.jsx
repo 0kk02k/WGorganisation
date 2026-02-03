@@ -72,8 +72,9 @@ export default function StayDetail() {
 
   const handleToggle = async (listKey, itemId, checked) => {
     if (!stay) return;
+    const nextValue = checked === true;
     const updatedList = stay[listKey].map((item) =>
-      item.id === itemId ? { ...item, done: checked } : item,
+      item.id === itemId ? { ...item, done: nextValue } : item,
     );
     await updateStay({ [listKey]: updatedList });
   };
