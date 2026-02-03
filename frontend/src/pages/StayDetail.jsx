@@ -105,8 +105,8 @@ export default function StayDetail() {
     return (
       <div className="space-y-4" data-testid="stay-not-found">
         <p className="text-sm text-stone-600">Aufenthalt nicht gefunden.</p>
-        <Button asChild variant="outline" data-testid="stay-back-link">
-          <Link to="/aufenthalte" data-testid="stay-back-link-inner">
+        <Button asChild variant="outline">
+          <Link to="/aufenthalte" data-testid="stay-back-link">
             Zurück zur Übersicht
           </Link>
         </Button>
@@ -160,7 +160,10 @@ export default function StayDetail() {
               {editForm && (
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-stone-700">
+                    <label
+                      className="text-sm font-medium text-stone-700"
+                      data-testid="stay-edit-name-label"
+                    >
                       Name
                     </label>
                     <Input
@@ -176,7 +179,10 @@ export default function StayDetail() {
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label
+                        className="text-sm font-medium text-stone-700"
+                        data-testid="stay-edit-room-label"
+                      >
                         Zimmer
                       </label>
                       <Select
@@ -202,7 +208,10 @@ export default function StayDetail() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label
+                        className="text-sm font-medium text-stone-700"
+                        data-testid="stay-edit-start-label"
+                      >
                         Check-in
                       </label>
                       <Input
@@ -220,7 +229,10 @@ export default function StayDetail() {
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label
+                        className="text-sm font-medium text-stone-700"
+                        data-testid="stay-edit-end-label"
+                      >
                         Check-out
                       </label>
                       <Input
@@ -236,7 +248,10 @@ export default function StayDetail() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-stone-700">
+                      <label
+                        className="text-sm font-medium text-stone-700"
+                        data-testid="stay-edit-notes-label"
+                      >
                         Hinweise
                       </label>
                       <Textarea
