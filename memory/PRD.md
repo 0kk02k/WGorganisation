@@ -1,0 +1,34 @@
+# PRD – Teilzeit-WG Webapp
+
+## Original Problem Statement
+ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-do-listen übernimmt inklusive kalender funktion wann welches der beiden zimmer besetzt ist und einer beienungsanleitungssektion wo die bedienung der einzelnen geräte hinterlegbar ist
+
+## Architektur/Entscheidungen
+- Frontend: React + React Router + Tailwind + shadcn UI + Sonner
+- Backend: FastAPI mit MongoDB (MONGO_URL) und REST-APIs
+- Datenmodelle: Aufenthalte (Zimmer, Zeitraum, Checklisten), Anleitungen (Text + Bild)
+
+## Implementiert
+- Dashboard mit Überblick über Zimmerstatus, aktive Aufenthalte und Anleitungen
+- Kalenderansicht mit Belegungspunkten für beide Zimmer + Monatsnavigation
+- Aufenthalte: Anlegen, Liste, Detailansicht, Check-in/Check-out Checklisten, Bearbeiten, Löschen
+- Bedienungsanleitungen: Anlegen (Bild-Upload oder Bild-URL), Liste, Detailansicht, Beispiel-Seed
+
+## Priorisierter Backlog
+**P0**
+- Benutzerfeedback/Fehlerhinweise bei API-Ausfällen (vollständig abdecken)
+- Kalender: Detailansicht mit Aufenthalts-Links direkt aus dem Tagespanel
+
+**P1**
+- Drag/Range-Auswahl im Kalender für schnellere Belegung
+- Checklisten-Vorlagen editierbar machen
+- Bildkomprimierung für Uploads
+
+**P2**
+- Export/Backup der Daten
+- Benachrichtigungen für anstehende Check-outs
+
+## Nächste Aufgaben
+- Kalender-Detailpanel um direkte Links zum Aufenthalt ergänzen
+- Checklisten-Vorlagen als Einstellungen speicherbar machen
+- Upload-Optimierung (Komprimierung, Größenlimit)
