@@ -82,18 +82,13 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild className="rounded-full" data-testid="dashboard-calendar-button">
+                <Button asChild className="rounded-full">
                   <Link to="/kalender" data-testid="dashboard-calendar-link">
                     <CalendarDays className="mr-2 h-4 w-4" />
                     Kalender öffnen
                   </Link>
                 </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="rounded-full"
-                  data-testid="dashboard-stays-button"
-                >
+                <Button variant="outline" asChild className="rounded-full">
                   <Link to="/aufenthalte" data-testid="dashboard-stays-link">
                     <ClipboardList className="mr-2 h-4 w-4" />
                     Aufenthalte
@@ -248,12 +243,7 @@ export default function Dashboard() {
                 </div>
               ))
             )}
-            <Button
-              variant="ghost"
-              asChild
-              className="justify-start text-emerald-900"
-              data-testid="dashboard-manuals-button"
-            >
+            <Button variant="ghost" asChild className="justify-start text-emerald-900">
               <Link to="/anleitungen" data-testid="dashboard-manuals-link">
                 <BookOpen className="mr-2 h-4 w-4" />
                 Zu den Anleitungen
