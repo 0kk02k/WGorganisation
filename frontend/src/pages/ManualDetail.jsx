@@ -31,12 +31,7 @@ export default function ManualDetail() {
 
   return (
     <div className="space-y-6" data-testid="manual-detail-page">
-      <Button
-        asChild
-        variant="outline"
-        className="rounded-full"
-        data-testid="manual-back-button"
-      >
+      <Button asChild variant="outline" className="rounded-full">
         <Link to="/anleitungen" data-testid="manual-back-link">
           Zurück
         </Link>
