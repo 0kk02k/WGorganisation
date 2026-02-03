@@ -1,0 +1,158 @@
+{
+  "identity": {
+    "persona": "E1",
+    "role": "Creative Designer",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ]
+  },
+  "design_system": {
+    "theme": {
+      "name": "Organic & Earthy",
+      "archetype": "ARCHETYPE 1",
+      "vibe": "Grounded, matte, physical, homey",
+      "mode": "light"
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "name": "Deep Forest",
+          "hex": "#1a4d2e",
+          "tailwind": "bg-emerald-900 text-emerald-50"
+        },
+        "secondary": {
+          "name": "Warm Stone",
+          "hex": "#f5f5f4",
+          "tailwind": "bg-stone-100"
+        },
+        "accent": {
+          "name": "Terracotta",
+          "hex": "#c2410c",
+          "tailwind": "text-orange-700"
+        },
+        "neutral": {
+          "name": "Soft Charcoal",
+          "hex": "#1c1917",
+          "tailwind": "text-stone-900"
+        },
+        "room_a": {
+          "name": "Sage",
+          "hex": "#84cc16",
+          "tailwind": "bg-lime-500"
+        },
+        "room_b": {
+          "name": "Sky",
+          "hex": "#0ea5e9",
+          "tailwind": "bg-sky-500"
+        }
+      },
+      "rules": [
+        "Never use pure black (#000000). Use Stone-900 or Emerald-950.",
+        "Backgrounds should be Stone-50 or Stone-100, not pure white.",
+        "Use 'text-stone-600' for secondary text, not gray-500."
+      ]
+    },
+    "typography": {
+      "headings": {
+        "font_family": "Manrope, sans-serif",
+        "weight": "font-bold",
+        "tracking": "tracking-tight",
+        "usage": "Use for Page Titles, Section Headers. Size text-2xl to text-4xl."
+      },
+      "body": {
+        "font_family": "Inter, sans-serif",
+        "weight": "font-normal",
+        "leading": "leading-relaxed",
+        "usage": "Use for lists, descriptions, manuals."
+      },
+      "ui_elements": {
+        "font_family": "Inter, sans-serif",
+        "weight": "font-medium",
+        "usage": "Buttons, Tabs, Navigation."
+      }
+    },
+    "layout": {
+      "spacing_scale": [
+        "p-4",
+        "p-6",
+        "p-8",
+        "p-12"
+      ],
+      "container": "max-w-md mx-auto md:max-w-2xl lg:max-w-4xl",
+      "border_radius": "rounded-2xl",
+      "mobile_first": true,
+      "grid_strategy": "Bento Grid Mode A for Dashboard, List View for Manuals"
+    },
+    "motion": {
+      "transitions": "transition-all duration-300 ease-out",
+      "hover_effects": "hover:-translate-y-1 hover:shadow-lg",
+      "micro_interactions": "Active states on tabs, checkmark animations on to-do lists."
+    }
+  },
+  "components": {
+    "calendar": {
+      "style": "Clean, card-based month view.",
+      "features": [
+        "Color-coded dots for Room A vs Room B occupancy.",
+        "Tap a day to see details or add booking.",
+        "No complex drag-and-drop on mobile; use tap-to-select range."
+      ]
+    },
+    "checklists": {
+      "style": "Large touch targets, satisfying check animation.",
+      "layout": "Vertical list with generous padding (py-4).",
+      "interaction": "Strikethrough and dim text upon completion."
+    },
+    "manuals": {
+      "style": "Grid of cards with aspect-video images.",
+      "content": "Title, Icon/Image, Short Description.",
+      "detail_view": "Large hero image, step-by-step text instructions."
+    },
+    "navigation": {
+      "mobile": "Bottom fixed tab bar with icons (Home, Calendar, Manuals, Settings).",
+      "desktop": "Top navigation or Sidebar (if screen allows)."
+    }
+  },
+  "assets": {
+    "images": {
+      "dashboard_hero": "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "manual_washing_machine": "https://images.unsplash.com/photo-1610557892470-55d9e80c0bce?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "manual_coffee_maker": "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "manual_wifi": "https://images.unsplash.com/photo-1643233963072-b38c7ff3e512?crop=entropy&cs=srgb&fm=jpg&q=85"
+    },
+    "icons": "Lucide React (Home, Calendar, BookOpen, Settings, CheckCircle, Plus)"
+  },
+  "instructions_to_main_agent": [
+    "Implement the 'Organic & Earthy' theme using Tailwind colors (Stone, Emerald, Orange).",
+    "Create a 'Layout' component that handles the mobile-first container and bottom navigation.",
+    "Use Shadcn UI 'Card', 'Button', 'Input', 'Dialog' but heavily customize them with 'rounded-2xl' and 'border-stone-200'.",
+    "For the Calendar, build a custom view using 'date-fns' logic or customize 'react-day-picker' to show multi-room occupancy clearly.",
+    "Ensure the 'Manuals' section uses the provided image URLs for the demo content.",
+    "Add 'data-testid' to all interactive elements."
+  ],
+  "universal_guidelines": [
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: transition: all. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add .App { text-align: center; } in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use sonner for toasts. Sonner component are located in /app/src/components/ui/sonner.tsx"
+  ]
+}
