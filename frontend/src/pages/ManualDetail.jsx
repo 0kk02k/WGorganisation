@@ -12,6 +12,7 @@ export default function ManualDetail() {
   const [manual, setManual] = useState(null);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const loadManual = async () => {
@@ -41,7 +42,7 @@ export default function ManualDetail() {
     if (!form) return;
     if (!form.title || !form.description || !form.steps) {
       toast.error("Bitte alle Pflichtfelder ausfüllen.");
-      return;
+      return false;
     }
     setSaving(true);
     try {
@@ -49,10 +50,23 @@ export default function ManualDetail() {
       setManual(response.data);
       setForm(response.data);
       toast.success("Anleitung aktualisiert.");
+      return true;
     } catch (error) {
       toast.error("Speichern fehlgeschlagen.");
+      return false;
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleEditToggle = async () => {
+    if (!isEditing) {
+      setIsEditing(true);
+      return;
+    }
+    const saved = await handleSave();
+    if (saved) {
+      setIsEditing(false);
     }
   };
 
@@ -84,87 +98,108 @@ export default function ManualDetail() {
             className="h-full w-full object-cover"
           />
         </div>
-        <CardHeader>
-          <CardTitle data-testid="manual-detail-title">Anleitung bearbeiten</CardTitle>
+        <CardHeader className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {isEditing ? (
+              <div className="flex-1 space-y-2">
+                <label
+                  className="text-sm font-medium text-stone-700"
+                  data-testid="manual-edit-title-label"
+                >
+                  Titel
+                </label>
+                <Input
+                  value={form.title}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, title: event.target.value }))
+                  }
+                  data-testid="manual-edit-title"
+                />
+              </div>
+            ) : (
+              <CardTitle data-testid="manual-detail-title">{manual.title}</CardTitle>
+            )}
+            <Button
+              onClick={handleEditToggle}
+              disabled={saving}
+              className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+              data-testid="manual-edit-toggle"
+            >
+              {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
+            </Button>
+          </div>
+          {isEditing ? (
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-stone-700"
+                data-testid="manual-edit-description-label"
+              >
+                Beschreibung
+              </label>
+              <Input
+                value={form.description}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, description: event.target.value }))
+                }
+                data-testid="manual-edit-description"
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-stone-600" data-testid="manual-detail-description">
+              {manual.description}
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-title-label">
-              Titel
-            </label>
-            <Input
-              value={form.title}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, title: event.target.value }))
-              }
-              data-testid="manual-edit-title"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-description-label">
-              Beschreibung
-            </label>
-            <Input
-              value={form.description}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, description: event.target.value }))
-              }
-              data-testid="manual-edit-description"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-steps-label">
-              Schritte
-            </label>
-            <Textarea
-              rows={5}
-              value={form.steps}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, steps: event.target.value }))
-              }
-              data-testid="manual-edit-steps"
-            />
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
+          {isEditing && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-url-label">
-                Bild-URL
+              <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-steps-label">
+                Schritte
               </label>
-              <Input
-                value={form.image_url || ""}
+              <Textarea
+                rows={5}
+                value={form.steps}
                 onChange={(event) =>
-                  setForm((prev) => ({ ...prev, image_url: event.target.value }))
+                  setForm((prev) => ({ ...prev, steps: event.target.value }))
                 }
-                placeholder="https://..."
-                data-testid="manual-edit-image-url"
+                data-testid="manual-edit-steps"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-file-label">
-                Bild hochladen
-              </label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                data-testid="manual-edit-image-file"
-              />
+          )}
+          {isEditing && (
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-url-label">
+                  Bild-URL
+                </label>
+                <Input
+                  value={form.image_url || ""}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, image_url: event.target.value }))
+                  }
+                  placeholder="https://..."
+                  data-testid="manual-edit-image-url"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-file-label">
+                  Bild hochladen
+                </label>
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  data-testid="manual-edit-image-file"
+                />
+              </div>
             </div>
-          </div>
-          <Button
-            onClick={handleSave}
-            disabled={saving}
-            className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
-            data-testid="manual-edit-save"
-          >
-            {saving ? "Speichern..." : "Änderungen speichern"}
-          </Button>
+          )}
           <div>
             <h3
               className="mb-3 text-sm font-semibold text-stone-900"
               data-testid="manual-detail-steps-title"
             >
-              Vorschau Schritte
+              Schritt-für-Schritt
             </h3>
             <ol className="space-y-2 text-sm text-stone-700">
               {steps.map((step, index) => (
