@@ -1,31 +1,27 @@
 export const HERO_IMAGE =
   "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85";
 
-export const ROOMS = [
+export const DEFAULT_ROOMS = [
   {
     id: "A",
     name: "Zimmer A",
-    badge: "bg-lime-100 text-lime-900",
-    dot: "bg-lime-500",
-    ring: "ring-lime-400/40",
+    color: "#84cc16",
   },
   {
     id: "B",
     name: "Zimmer B",
-    badge: "bg-sky-100 text-sky-900",
-    dot: "bg-sky-500",
-    ring: "ring-sky-400/40",
+    color: "#0ea5e9",
   },
 ];
 
-export const CHECKIN_TEMPLATE = [
+export const DEFAULT_CHECKIN_TEMPLATE = [
   "Schlüsselübergabe prüfen",
   "WLAN-Zugang mitteilen",
   "Fenster und Heizung kurz erklären",
   "Bad & Küche zeigen",
 ];
 
-export const CHECKOUT_TEMPLATE = [
+export const DEFAULT_CHECKOUT_TEMPLATE = [
   "Müll entsorgen",
   "Bettwäsche abziehen",
   "Fenster schließen",
