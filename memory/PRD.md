@@ -16,6 +16,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Bedienungsanleitungen: Anlegen (Bild-Upload oder Bild-URL), Liste, Detailansicht, Beispiel-Seed
 - Detailansicht der Anleitungen ist direkt editierbar (Text + Bild)
 - Pflanzen-Kachel im Dashboard mit Dschungelbild und Reset-Timer
+- Einstellungen: Zimmernamen & Farbcodes sowie Checklisten-Vorlagen editierbar mit Speichern
 
 ## Priorisierter Backlog
 **P0**
