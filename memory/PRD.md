@@ -14,7 +14,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Kalenderansicht mit Belegungspunkten für beide Zimmer + Monatsnavigation
 - Aufenthalte: Anlegen, Liste, Detailansicht, Check-in/Check-out Checklisten, Bearbeiten, Löschen
 - Bedienungsanleitungen: Anlegen (Bild-Upload oder Bild-URL), Liste, Detailansicht, Beispiel-Seed
-- Detailansicht der Anleitungen ist direkt editierbar (Text + Bild)
+- Detailansicht der Anleitungen editierbar per Inline-Bearbeiten/Speichern
 - Pflanzen-Kachel im Dashboard mit Dschungelbild und Reset-Timer
 - Einstellungen: Zimmernamen & Farbcodes sowie Checklisten-Vorlagen editierbar mit Speichern
 
