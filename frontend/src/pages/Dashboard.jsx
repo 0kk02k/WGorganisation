@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
-import { HERO_IMAGE, ROOMS } from "@/lib/constants";
+import { HERO_IMAGE } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -69,11 +69,6 @@ export default function Dashboard() {
         .slice(0, 3),
     [stays, today],
   );
-
-  const roomOverview = ROOMS.map((room) => {
-    const activeStay = activeStays.find((stay) => stay.room === room.id);
-    return { room, activeStay };
-  });
 
   const getWateredLabel = () => {
     if (!lastWatered) return "Noch nicht erfasst";
