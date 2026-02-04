@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
-import { ROOMS } from "@/lib/constants";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { getRoomDotStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StayDialog } from "@/components/stays/StayDialog";
@@ -19,9 +21,13 @@ import {
 } from "date-fns";
 
 export default function CalendarPage() {
+  const { settings } = useSettings();
   const [stays, setStays] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
+  const roomA = rooms.find((room) => room.id === "A");
+  const roomB = rooms.find((room) => room.id === "B");
 
   useEffect(() => {
     const loadStays = async () => {
@@ -133,15 +139,21 @@ export default function CalendarPage() {
                   </div>
                   <div className="mt-2 flex items-center gap-1">
                     <span
-                      className={`h-2 w-2 rounded-full ${
-                        hasRoomA ? ROOMS[0].dot : "bg-stone-200"
-                      }`}
+                      className="h-2 w-2 rounded-full"
+                      style={
+                        hasRoomA
+                          ? getRoomDotStyle(roomA?.color)
+                          : { backgroundColor: "#e7e5e4" }
+                      }
                       data-testid={`calendar-room-a-${format(day, "yyyy-MM-dd")}`}
                     />
                     <span
-                      className={`h-2 w-2 rounded-full ${
-                        hasRoomB ? ROOMS[1].dot : "bg-stone-200"
-                      }`}
+                      className="h-2 w-2 rounded-full"
+                      style={
+                        hasRoomB
+                          ? getRoomDotStyle(roomB?.color)
+                          : { backgroundColor: "#e7e5e4" }
+                      }
                       data-testid={`calendar-room-b-${format(day, "yyyy-MM-dd")}`}
                     />
                   </div>
