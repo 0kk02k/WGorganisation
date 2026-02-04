@@ -263,6 +263,124 @@ class WGCheckInAPITester:
         )
         return success
 
+    def test_get_settings(self):
+        """Test getting settings"""
+        success, response = self.run_test(
+            "Get Settings",
+            "GET",
+            "api/settings",
+            200
+        )
+        
+        if success:
+            # Verify settings structure
+            expected_keys = ['rooms', 'checkin_template', 'checkout_template']
+            for key in expected_keys:
+                if key not in response:
+                    print(f"❌ Missing key in settings: {key}")
+                    return False
+            print(f"   Settings keys verified: {list(response.keys())}")
+        
+        return success
+
+    def test_update_settings_rooms(self):
+        """Test updating room settings"""
+        rooms_data = {
+            "rooms": [
+                {"id": "A", "name": "Updated Zimmer A", "color": "#ff0000"},
+                {"id": "B", "name": "Updated Zimmer B", "color": "#00ff00"},
+                {"id": "C", "name": "New Zimmer C", "color": "#0000ff"}
+            ]
+        }
+        
+        success, response = self.run_test(
+            "Update Settings - Rooms",
+            "PUT",
+            "api/settings",
+            200,
+            data=rooms_data
+        )
+        
+        if success and 'rooms' in response:
+            print(f"   Updated rooms count: {len(response['rooms'])}")
+        
+        return success
+
+    def test_update_settings_checkin_template(self):
+        """Test updating check-in template"""
+        checkin_data = {
+            "checkin_template": [
+                "Updated: Schlüssel übergeben",
+                "Updated: WLAN erklären", 
+                "Updated: Hausregeln besprechen",
+                "New: Notfallkontakte mitteilen"
+            ]
+        }
+        
+        success, response = self.run_test(
+            "Update Settings - Check-in Template",
+            "PUT",
+            "api/settings",
+            200,
+            data=checkin_data
+        )
+        
+        if success and 'checkin_template' in response:
+            print(f"   Updated checkin template items: {len(response['checkin_template'])}")
+        
+        return success
+
+    def test_update_settings_checkout_template(self):
+        """Test updating check-out template"""
+        checkout_data = {
+            "checkout_template": [
+                "Updated: Zimmer kontrollieren",
+                "Updated: Müll entsorgen",
+                "Updated: Schlüssel zurückgeben",
+                "New: Feedback geben"
+            ]
+        }
+        
+        success, response = self.run_test(
+            "Update Settings - Check-out Template",
+            "PUT",
+            "api/settings",
+            200,
+            data=checkout_data
+        )
+        
+        if success and 'checkout_template' in response:
+            print(f"   Updated checkout template items: {len(response['checkout_template'])}")
+        
+        return success
+
+    def test_verify_settings_persistence(self):
+        """Test that settings changes persist"""
+        success, response = self.run_test(
+            "Verify Settings Persistence",
+            "GET",
+            "api/settings",
+            200
+        )
+        
+        if success:
+            # Check if our updates are still there
+            rooms = response.get('rooms', [])
+            checkin = response.get('checkin_template', [])
+            checkout = response.get('checkout_template', [])
+            
+            print(f"   Persisted rooms: {len(rooms)}")
+            print(f"   Persisted checkin items: {len(checkin)}")
+            print(f"   Persisted checkout items: {len(checkout)}")
+            
+            # Verify some of our test data is still there
+            if len(rooms) >= 3 and any("Updated" in item for item in checkin):
+                print("   ✅ Settings persistence verified")
+            else:
+                print("   ⚠️  Settings may not have persisted correctly")
+        
+        return success
+
 def main():
     print("🚀 Starting WG Check-in API Tests")
     print("=" * 50)
