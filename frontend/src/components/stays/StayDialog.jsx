@@ -20,7 +20,12 @@ import {
 import { CalendarDays, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import { CHECKIN_TEMPLATE, CHECKOUT_TEMPLATE, ROOMS } from "@/lib/constants";
+import {
+  DEFAULT_CHECKIN_TEMPLATE,
+  DEFAULT_CHECKOUT_TEMPLATE,
+  DEFAULT_ROOMS,
+} from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
 
 const createId = () =>
   typeof crypto !== "undefined" && crypto.randomUUID
@@ -31,6 +36,7 @@ const buildChecklist = (items) =>
   items.map((text) => ({ id: createId(), text, done: false }));
 
 export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
+  const { settings } = useSettings();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     occupant_name: "",
@@ -58,10 +64,14 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     }
 
     try {
+      const checkinTemplate =
+        settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE;
+      const checkoutTemplate =
+        settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE;
       const payload = {
         ...form,
-        checklist_in: buildChecklist(CHECKIN_TEMPLATE),
-        checklist_out: buildChecklist(CHECKOUT_TEMPLATE),
+        checklist_in: buildChecklist(checkinTemplate),
+        checklist_out: buildChecklist(checkoutTemplate),
       };
       const response = await api.post("/stays", payload);
       toast.success("Aufenthalt angelegt.");
@@ -126,8 +136,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 <SelectTrigger data-testid="stay-form-room-select">
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
-                <SelectContent>
-                  {ROOMS.map((room) => (
+              <SelectContent>
+                  {(settings?.rooms || DEFAULT_ROOMS).map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
@@ -213,14 +223,16 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   Check-in:
                 </p>
                 <ul className="list-disc pl-5">
-                  {CHECKIN_TEMPLATE.map((item, index) => (
+                  {(settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).map(
+                    (item, index) => (
                     <li
                       key={`ci-${index}`}
                       data-testid={`stay-checkin-preview-${index}`}
                     >
                       {item}
                     </li>
-                  ))}
+                  ),
+                  )}
                 </ul>
               </div>
               <div>
@@ -228,14 +240,16 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   Check-out:
                 </p>
                 <ul className="list-disc pl-5">
-                  {CHECKOUT_TEMPLATE.map((item, index) => (
+                  {(settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).map(
+                    (item, index) => (
                     <li
                       key={`co-${index}`}
                       data-testid={`stay-checkout-preview-${index}`}
                     >
                       {item}
                     </li>
-                  ))}
+                  ),
+                  )}
                 </ul>
               </div>
             </div>
