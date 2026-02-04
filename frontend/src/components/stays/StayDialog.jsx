@@ -136,7 +136,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 <SelectTrigger data-testid="stay-form-room-select">
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
-              <SelectContent>
+                <SelectContent>
                   {(settings?.rooms || DEFAULT_ROOMS).map((room) => (
                     <SelectItem
                       key={room.id}
