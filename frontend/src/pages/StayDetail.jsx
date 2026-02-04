@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "@/lib/api";
-import { ROOMS } from "@/lib/constants";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { getRoomBadgeStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -27,6 +29,7 @@ const createId = () =>
     : `${Date.now()}-${Math.random()}`;
 
 export default function StayDetail() {
+  const { settings } = useSettings();
   const { id } = useParams();
   const navigate = useNavigate();
   const [stay, setStay] = useState(null);
@@ -96,9 +99,8 @@ export default function StayDetail() {
     );
   }
 
-  const roomStyle =
-    ROOMS.find((room) => room.id === stay.room)?.badge ||
-    "bg-stone-100 text-stone-900";
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
+  const roomColor = rooms.find((room) => room.id === stay.room)?.color;
 
   return (
     <div className="space-y-6" data-testid="stay-detail-page">
@@ -124,7 +126,11 @@ export default function StayDetail() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className={roomStyle} data-testid="stay-detail-room">
+          <Badge
+            style={getRoomBadgeStyle(roomColor)}
+            className="border border-transparent text-stone-900"
+            data-testid="stay-detail-room"
+          >
             Zimmer {stay.room}
           </Badge>
           <StayEditDialog stay={stay} onSave={updateStay} />
