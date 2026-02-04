@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
-import { HERO_IMAGE, ROOMS } from "@/lib/constants";
+import { HERO_IMAGE, DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { getRoomBadgeStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,6 +17,7 @@ import {
 } from "date-fns";
 
 export default function Dashboard() {
+  const { settings } = useSettings();
   const [stays, setStays] = useState([]);
   const [lastWatered, setLastWatered] = useState(null);
   const [now, setNow] = useState(new Date());
@@ -41,6 +44,7 @@ export default function Dashboard() {
   }, []);
 
   const today = new Date();
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   const activeStays = useMemo(
     () =>
@@ -222,10 +226,10 @@ export default function Dashboard() {
                     </p>
                   </div>
                   <Badge
-                    className={`${
-                      ROOMS.find((room) => room.id === stay.room)?.badge ||
-                      "bg-stone-100 text-stone-900"
-                    }`}
+                    style={getRoomBadgeStyle(
+                      rooms.find((room) => room.id === stay.room)?.color,
+                    )}
+                    className="border border-transparent text-stone-900"
                     data-testid={`dashboard-active-room-${stay.id}`}
                   >
                     Zimmer {stay.room}
