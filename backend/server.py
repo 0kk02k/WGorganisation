@@ -30,6 +30,25 @@ def now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+DEFAULT_ROOMS = [
+    {"id": "A", "name": "Zimmer A", "color": "#84cc16"},
+    {"id": "B", "name": "Zimmer B", "color": "#0ea5e9"},
+]
+DEFAULT_CHECKIN_TEMPLATE = [
+    "Schlüsselübergabe prüfen",
+    "WLAN-Zugang mitteilen",
+    "Fenster und Heizung kurz erklären",
+    "Bad & Küche zeigen",
+]
+DEFAULT_CHECKOUT_TEMPLATE = [
+    "Müll entsorgen",
+    "Bettwäsche abziehen",
+    "Fenster schließen",
+    "Heizung runterdrehen",
+    "Schlüssel zurücklegen",
+]
+
+
 class ChecklistItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -104,6 +123,32 @@ class Manual(ManualBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=now_iso)
     updated_at: str = Field(default_factory=now_iso)
+
+
+class RoomConfig(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str
+    name: str
+    color: str
+
+
+class Settings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = "wg-settings"
+    rooms: List[RoomConfig] = Field(default_factory=lambda: DEFAULT_ROOMS)
+    checkin_template: List[str] = Field(default_factory=lambda: DEFAULT_CHECKIN_TEMPLATE)
+    checkout_template: List[str] = Field(default_factory=lambda: DEFAULT_CHECKOUT_TEMPLATE)
+    updated_at: str = Field(default_factory=now_iso)
+
+
+class SettingsUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    rooms: Optional[List[RoomConfig]] = None
+    checkin_template: Optional[List[str]] = None
+    checkout_template: Optional[List[str]] = None
 
 
 @api_router.get("/")
@@ -197,6 +242,32 @@ async def delete_manual(manual_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Anleitung nicht gefunden")
     return {"ok": True}
+
+
+async def get_or_create_settings() -> Settings:
+    settings = await db.settings.find_one({"id": "wg-settings"}, {"_id": 0})
+    if settings:
+        return Settings(**settings)
+    default_settings = Settings()
+    await db.settings.insert_one(default_settings.model_dump())
+    return default_settings
+
+
+@api_router.get("/settings", response_model=Settings)
+async def get_settings():
+    settings = await get_or_create_settings()
+    return settings
+
+
+@api_router.put("/settings", response_model=Settings)
+async def update_settings(payload: SettingsUpdate):
+    current = await get_or_create_settings()
+    update_data = payload.model_dump(exclude_unset=True)
+    update_data = {key: value for key, value in update_data.items() if value is not None}
+    update_data["updated_at"] = now_iso()
+    await db.settings.update_one({"id": current.id}, {"$set": update_data}, upsert=True)
+    updated = await db.settings.find_one({"id": current.id}, {"_id": 0})
+    return Settings(**updated)
 
 
 # Include the router in the main app
