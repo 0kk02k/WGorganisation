@@ -37,6 +37,11 @@ const buildChecklist = (items) =>
 
 export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
   const { settings } = useSettings();
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
+  const checkinTemplate =
+    settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE;
+  const checkoutTemplate =
+    settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE;
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     occupant_name: "",
@@ -50,12 +55,12 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     if (!open) return;
     setForm({
       occupant_name: "",
-      room: "A",
+      room: rooms[0]?.id || "A",
       start_date: "",
       end_date: "",
       notes: "",
     });
-  }, [open]);
+  }, [open, rooms]);
 
   const handleSubmit = async () => {
     if (!form.occupant_name || !form.start_date || !form.end_date) {
@@ -64,10 +69,6 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     }
 
     try {
-      const checkinTemplate =
-        settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE;
-      const checkoutTemplate =
-        settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE;
       const payload = {
         ...form,
         checklist_in: buildChecklist(checkinTemplate),
@@ -137,7 +138,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(settings?.rooms || DEFAULT_ROOMS).map((room) => (
+                  {rooms.map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
@@ -219,37 +220,39 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             </div>
             <div className="mt-3 grid gap-3 text-sm text-stone-600 md:grid-cols-2">
               <div>
-                <p className="font-medium text-stone-700" data-testid="stay-checkin-preview">
+                <p
+                  className="font-medium text-stone-700"
+                  data-testid="stay-checkin-preview"
+                >
                   Check-in:
                 </p>
                 <ul className="list-disc pl-5">
-                  {(settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).map(
-                    (item, index) => (
-                      <li
-                        key={`ci-${index}`}
-                        data-testid={`stay-checkin-preview-${index}`}
-                      >
-                        {item}
-                      </li>
-                    ),
-                  )}
+                  {checkinTemplate.map((item, index) => (
+                    <li
+                      key={`ci-${index}`}
+                      data-testid={`stay-checkin-preview-${index}`}
+                    >
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
               <div>
-                <p className="font-medium text-stone-700" data-testid="stay-checkout-preview">
+                <p
+                  className="font-medium text-stone-700"
+                  data-testid="stay-checkout-preview"
+                >
                   Check-out:
                 </p>
                 <ul className="list-disc pl-5">
-                  {(settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).map(
-                    (item, index) => (
-                      <li
-                        key={`co-${index}`}
-                        data-testid={`stay-checkout-preview-${index}`}
-                      >
-                        {item}
-                      </li>
-                    ),
-                  )}
+                  {checkoutTemplate.map((item, index) => (
+                    <li
+                      key={`co-${index}`}
+                      data-testid={`stay-checkout-preview-${index}`}
+                    >
+                      {item}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
