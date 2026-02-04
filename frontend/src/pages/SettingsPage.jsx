@@ -181,7 +181,7 @@ export default function SettingsPage() {
                   </div>
                   <span
                     className="h-8 w-8 rounded-full border"
-                    style={getRoomBadgeStyle(room.color)}
+                    style={{ backgroundColor: room.color }}
                     data-testid={`settings-room-color-${room.id}`}
                   />
                 </div>
