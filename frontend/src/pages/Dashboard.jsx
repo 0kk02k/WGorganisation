@@ -5,12 +5,20 @@ import { HERO_IMAGE, ROOMS } from "@/lib/constants";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, ClipboardList, BookOpen } from "lucide-react";
-import { format, parseISO, isWithinInterval, isAfter } from "date-fns";
+import { CalendarDays, ClipboardList, Droplet } from "lucide-react";
+import {
+  format,
+  parseISO,
+  isWithinInterval,
+  isAfter,
+  differenceInMinutes,
+} from "date-fns";
 
 export default function Dashboard() {
   const [stays, setStays] = useState([]);
   const [manuals, setManuals] = useState([]);
+  const [lastWatered, setLastWatered] = useState(null);
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,6 +30,19 @@ export default function Dashboard() {
       setManuals(manualsResponse.data);
     };
     loadData();
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("plantsWateredAt");
+    if (stored) {
+      setLastWatered(new Date(stored));
+    }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
   }, []);
 
   const today = new Date();
@@ -53,6 +74,25 @@ export default function Dashboard() {
     const activeStay = activeStays.find((stay) => stay.room === room.id);
     return { room, activeStay };
   });
+
+  const getWateredLabel = () => {
+    if (!lastWatered) return "Noch nicht erfasst";
+    const minutes = differenceInMinutes(now, lastWatered);
+    if (minutes < 1) return "Gerade eben";
+    if (minutes < 60) return `vor ${minutes} Min.`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `vor ${hours} Std.`;
+    const days = Math.floor(hours / 24);
+    return `vor ${days} Tagen`;
+  };
+
+  const handleResetWatered = () => {
+    const next = new Date();
+    setLastWatered(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("plantsWateredAt", next.toISOString());
+    }
+  };
 
   return (
     <div className="space-y-8" data-testid="dashboard-page">
@@ -107,42 +147,43 @@ export default function Dashboard() {
         </Card>
         <Card
           className="border-stone-200/80 bg-white/80"
-          data-testid="dashboard-today-card"
+          data-testid="dashboard-plants-card"
         >
           <CardHeader>
-            <CardTitle data-testid="dashboard-today-title">
-              Heute in der Wohnung
+            <CardTitle data-testid="dashboard-plants-title">
+              Pflanzen gegossen
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {roomOverview.map(({ room, activeStay }) => (
-              <div
-                key={room.id}
-                className="flex items-center justify-between rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                data-testid={`dashboard-room-status-${room.id}`}
-              >
-                <div>
-                  <p
-                    className="text-sm font-semibold text-stone-900"
-                    data-testid={`dashboard-room-name-${room.id}`}
-                  >
-                    {room.name}
-                  </p>
-                  <p
-                    className="text-xs text-stone-600"
-                    data-testid={`dashboard-room-occupant-${room.id}`}
-                  >
-                    {activeStay
-                      ? `${activeStay.occupant_name} eingecheckt`
-                      : "Aktuell frei"}
-                  </p>
-                </div>
-                <span
-                  className={`h-3 w-3 rounded-full ${room.dot}`}
-                  data-testid={`dashboard-room-dot-${room.id}`}
-                />
+            <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
+              <div>
+                <p
+                  className="text-sm font-semibold text-stone-900"
+                  data-testid="dashboard-plants-status"
+                >
+                  Letzte Bewässerung
+                </p>
+                <p
+                  className="text-xs text-stone-600"
+                  data-testid="dashboard-plants-timer"
+                >
+                  {getWateredLabel()}
+                </p>
               </div>
-            ))}
+              <span
+                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-900/10 text-emerald-900"
+                data-testid="dashboard-plants-icon"
+              >
+                <Droplet className="h-5 w-5" />
+              </span>
+            </div>
+            <Button
+              onClick={handleResetWatered}
+              className="w-full rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+              data-testid="dashboard-plants-reset"
+            >
+              Jetzt gegossen
+            </Button>
             <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
               <p
                 className="text-sm font-semibold text-stone-900"
@@ -243,12 +284,6 @@ export default function Dashboard() {
                 </div>
               ))
             )}
-            <Button variant="ghost" asChild className="justify-start text-emerald-900">
-              <Link to="/anleitungen" data-testid="dashboard-manuals-link">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Zu den Anleitungen
-              </Link>
-            </Button>
           </CardContent>
         </Card>
       </section>
