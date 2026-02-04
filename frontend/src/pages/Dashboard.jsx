@@ -16,18 +16,13 @@ import {
 
 export default function Dashboard() {
   const [stays, setStays] = useState([]);
-  const [manuals, setManuals] = useState([]);
   const [lastWatered, setLastWatered] = useState(null);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const loadData = async () => {
-      const [staysResponse, manualsResponse] = await Promise.all([
-        api.get("/stays"),
-        api.get("/manuals"),
-      ]);
+      const staysResponse = await api.get("/stays");
       setStays(staysResponse.data);
-      setManuals(manualsResponse.data);
     };
     loadData();
   }, []);
@@ -145,9 +140,7 @@ export default function Dashboard() {
           data-testid="dashboard-plants-card"
         >
           <CardHeader>
-            <CardTitle data-testid="dashboard-plants-title">
-              Pflanzen gegossen
-            </CardTitle>
+            <CardTitle data-testid="dashboard-plants-title">Pflanzen</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
@@ -179,19 +172,15 @@ export default function Dashboard() {
             >
               Jetzt gegossen
             </Button>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
-              <p
-                className="text-sm font-semibold text-stone-900"
-                data-testid="dashboard-manual-count-label"
-              >
-                Bedienungsanleitungen
-              </p>
-              <p
-                className="text-xs text-stone-600"
-                data-testid="dashboard-manual-count"
-              >
-                {manuals.length} Geräte dokumentiert
-              </p>
+            <div
+              className="overflow-hidden rounded-2xl border border-stone-200"
+              data-testid="dashboard-plants-image"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1767244047794-94dc52f7b7db?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwzfHxsdXNoJTIwanVuZ2xlJTIwcGxhbnRzJTIwaW5kb29yfGVufDB8fHx8MTc3MDIxOTUyOHww&ixlib=rb-4.1.0&q=85"
+                alt="Dschungelpflanzen"
+                className="h-32 w-full object-cover"
+              />
             </div>
           </CardContent>
         </Card>
