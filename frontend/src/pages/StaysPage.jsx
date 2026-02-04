@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
-import { ROOMS } from "@/lib/constants";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { getRoomBadgeStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { format, parseISO } from "date-fns";
 
 export default function StaysPage() {
+  const { settings } = useSettings();
   const [stays, setStays] = useState([]);
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   useEffect(() => {
     const loadStays = async () => {
@@ -48,9 +52,7 @@ export default function StaysPage() {
           </Card>
         ) : (
           stays.map((stay) => {
-            const roomStyle =
-              ROOMS.find((room) => room.id === stay.room)?.badge ||
-              "bg-stone-100 text-stone-900";
+            const roomColor = rooms.find((room) => room.id === stay.room)?.color;
             const openIn = stay.checklist_in?.filter((item) => !item.done).length;
             const openOut = stay.checklist_out?.filter((item) => !item.done).length;
 
@@ -76,7 +78,11 @@ export default function StaysPage() {
                         {format(parseISO(stay.end_date), "dd.MM.yyyy")}
                       </p>
                     </div>
-                    <Badge className={roomStyle} data-testid={`stays-room-${stay.id}`}>
+                    <Badge
+                      style={getRoomBadgeStyle(roomColor)}
+                      className="border border-transparent text-stone-900"
+                      data-testid={`stays-room-${stay.id}`}
+                    >
                       Zimmer {stay.room}
                     </Badge>
                   </CardHeader>
