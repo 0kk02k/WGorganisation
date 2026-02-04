@@ -9,7 +9,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Datenmodelle: Aufenthalte (Zimmer, Zeitraum, Checklisten), Anleitungen (Text + Bild)
 
 ## Implementiert
-- Dashboard mit Überblick über Zimmerstatus, aktive Aufenthalte und Anleitungen
+- Dashboard mit Überblick über aktive Aufenthalte, Pflanzen-Timer und Anleitungen
 - Dashboard-Widget "Pflanzen gegossen" mit Timer + Reset (lokal gespeichert)
 - Kalenderansicht mit Belegungspunkten für beide Zimmer + Monatsnavigation
 - Aufenthalte: Anlegen, Liste, Detailansicht, Check-in/Check-out Checklisten, Bearbeiten, Löschen
