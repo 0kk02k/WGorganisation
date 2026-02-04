@@ -225,13 +225,13 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 <ul className="list-disc pl-5">
                   {(settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).map(
                     (item, index) => (
-                    <li
-                      key={`ci-${index}`}
-                      data-testid={`stay-checkin-preview-${index}`}
-                    >
-                      {item}
-                    </li>
-                  ),
+                      <li
+                        key={`ci-${index}`}
+                        data-testid={`stay-checkin-preview-${index}`}
+                      >
+                        {item}
+                      </li>
+                    ),
                   )}
                 </ul>
               </div>
@@ -242,13 +242,13 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 <ul className="list-disc pl-5">
                   {(settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).map(
                     (item, index) => (
-                    <li
-                      key={`co-${index}`}
-                      data-testid={`stay-checkout-preview-${index}`}
-                    >
-                      {item}
-                    </li>
-                  ),
+                      <li
+                        key={`co-${index}`}
+                        data-testid={`stay-checkout-preview-${index}`}
+                      >
+                        {item}
+                      </li>
+                    ),
                   )}
                 </ul>
               </div>
