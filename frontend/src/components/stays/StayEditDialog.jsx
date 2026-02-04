@@ -17,9 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ROOMS } from "@/lib/constants";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
 
 export const StayEditDialog = ({ stay, onSave }) => {
+  const { settings } = useSettings();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(stay);
 
@@ -76,7 +78,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {ROOMS.map((room) => (
+                  {(settings?.rooms || DEFAULT_ROOMS).map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
