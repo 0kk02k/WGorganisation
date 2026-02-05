@@ -158,6 +158,19 @@ export default function BerlinPage() {
     }
   };
 
+  const handleDeleteEvent = async () => {
+    if (!editingId || editingType !== "event") return;
+    try {
+      await api.delete(`/events/${editingId}`);
+      setEvents((prev) => prev.filter((item) => item.id !== editingId));
+      setEditingId(null);
+      setEditingType(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("Tipp konnte nicht gelöscht werden.");
+    }
+  };
+
   const handleLinkSubmit = async () => {
     if (!linkForm.url || !linkForm.description) {
       toast.error("Bitte Link und Beschreibung ausfüllen.");
@@ -183,6 +196,19 @@ export default function BerlinPage() {
       setIsModalOpen(false);
     } catch (error) {
       toast.error("Link konnte nicht gespeichert werden.");
+    }
+  };
+
+  const handleDeleteLink = async () => {
+    if (!editingId || editingType !== "link") return;
+    try {
+      await api.delete(`/berlin-links/${editingId}`);
+      setLinks((prev) => prev.filter((item) => item.id !== editingId));
+      setEditingId(null);
+      setEditingType(null);
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error("Link konnte nicht gelöscht werden.");
     }
   };
 
