@@ -456,7 +456,7 @@ export default function BerlinPage() {
           ) : (
             <div className="space-y-4">
               {filteredLinks.map((link) => (
-                <Card key={link.id} data-testid={`berlin-link-${link.id}`}>
+                <Card key={link.id} className="relative" data-testid={`berlin-link-${link.id}`}>
                   <CardHeader className="space-y-1">
                     <CardTitle data-testid={`berlin-link-title-${link.id}`}>
                       <a
@@ -493,7 +493,16 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  </CardContent>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openEditLink(link)}
+                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full border border-white/10 text-white/70 hover:bg-white/10"
+                    data-testid={`berlin-link-edit-${link.id}`}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </CardContent>
                 </Card>
               ))}
             </div>
