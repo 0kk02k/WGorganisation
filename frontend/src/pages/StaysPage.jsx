@@ -26,15 +26,9 @@ export default function StaysPage() {
     <div className="space-y-6" data-testid="stays-page">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1
-            className="font-[Manrope] text-3xl font-bold tracking-tight"
-            data-testid="stays-title"
-          >
+          <h1 className="text-3xl font-bold tracking-tight" data-testid="stays-title">
             Aufenthalte
           </h1>
-          <p className="text-sm text-stone-600" data-testid="stays-subtitle">
-            Alle Check-ins inklusive To-do-Listen.
-          </p>
         </div>
         <StayDialog
           triggerLabel="Neue Belegung"
