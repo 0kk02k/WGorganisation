@@ -139,6 +139,22 @@ class Message(MessageBase):
     created_at: str = Field(default_factory=now_iso)
 
 
+class EventBase(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    title: str
+    date: str
+    location: str
+    description: str
+
+
+class Event(EventBase):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: str = Field(default_factory=now_iso)
+
+
 class RoomConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -271,6 +287,19 @@ async def create_message(payload: MessageBase):
     message = Message(**payload.model_dump())
     await db.messages.insert_one(message.model_dump())
     return message
+
+
+@api_router.get("/events", response_model=List[Event])
+async def list_events():
+    events = await db.events.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return events
+
+
+@api_router.post("/events", response_model=Event)
+async def create_event(payload: EventBase):
+    event = Event(**payload.model_dump())
+    await db.events.insert_one(event.model_dump())
+    return event
 
 
 async def get_or_create_settings() -> Settings:
