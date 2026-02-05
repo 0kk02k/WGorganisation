@@ -121,48 +121,11 @@ export default function Dashboard() {
           className="overflow-hidden lg:col-span-2"
           data-testid="dashboard-hero-card"
         >
-          <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_1fr]">
-            <div className="space-y-4">
-              <Badge
-                className="w-fit rounded-full bg-[#CCFF00]/15 text-[#CCFF00]"
-                data-testid="dashboard-hero-badge"
-              >
-                Organisation
-              </Badge>
-              <div className="space-y-3">
-                <h1
-                  className="text-3xl font-semibold tracking-tight text-white"
-                  data-testid="dashboard-title"
-                >
-                  Check-in & Alltag im Griff
-                </h1>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  asChild
-                  className="rounded-full shadow-[0_0_20px_rgba(204,255,0,0.35)]"
-                >
-                  <Link to="/kalender" data-testid="dashboard-calendar-link">
-                    <CalendarDays className="mr-2 h-4 w-4" />
-                    Kalender öffnen
-                  </Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  className="rounded-full border-white/5 text-white/80 hover:text-white"
-                >
-                  <Link to="/aufenthalte" data-testid="dashboard-stays-link">
-                    <ClipboardList className="mr-2 h-4 w-4" />
-                    Aufenthalte
-                  </Link>
-                </Button>
-              </div>
-            </div>
-            <div className="relative overflow-hidden rounded-2xl" data-testid="dashboard-hero-image">
+          <div className="p-4">
+            <div className="relative overflow-hidden rounded-2xl" data-testid="dashboard-organization-image">
               <img
-                src={HERO_IMAGE}
-                alt="Wohnung"
+                src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/6t2n8w07_image.png"
+                alt="Organisation Visual"
                 className="h-full w-full object-cover"
               />
             </div>
