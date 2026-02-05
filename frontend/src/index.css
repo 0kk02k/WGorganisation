@@ -108,6 +108,10 @@ code {
     border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
+.font-mono {
+    font-family: "JetBrains Mono", monospace !important;
+}
+
 @layer base {
     [data-debug-wrapper="true"] {
         display: contents !important;
