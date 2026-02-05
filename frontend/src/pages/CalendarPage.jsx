@@ -83,7 +83,7 @@ export default function CalendarPage() {
       <Card className="border-stone-200/80" data-testid="calendar-grid-card">
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <CardTitle data-testid="calendar-month-title">
-            {format(currentMonth, "MMMM yyyy")}
+            {format(currentMonth, "MMMM yyyy", { locale: de })}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Button
@@ -185,7 +185,7 @@ export default function CalendarPage() {
       <Card className="border-stone-200/80" data-testid="calendar-selected-card">
         <CardHeader>
           <CardTitle data-testid="calendar-selected-title">
-            {format(selectedDate, "EEEE, dd.MM.yyyy")}
+            {format(selectedDate, "EEEE, dd.MM.yyyy", { locale: de })}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
