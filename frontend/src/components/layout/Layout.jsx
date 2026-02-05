@@ -1,12 +1,5 @@
-import { NavLink } from "react-router-dom";
-import {
-  Home,
-  CalendarDays,
-  ClipboardList,
-  BookOpen,
-  Settings,
-  MapPin,
-} from "lucide-react";
+import { NavLink, useLocation } from "react-router-dom";
+import { Home, CalendarDays, BookOpen, Settings, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
