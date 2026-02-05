@@ -218,11 +218,11 @@ export default function BerlinPage() {
                       className="mt-3 flex flex-wrap gap-2"
                       data-testid={`berlin-event-tags-${event.id}`}
                     >
-                      {event.hashtags.map((tag) => (
+                      {event.hashtags.map((tag, index) => (
                         <Badge
-                          key={tag}
+                          key={`${event.id}-${tag}`}
                           className="rounded-full bg-white/10 text-white/70"
-                          data-testid={`berlin-event-tag-${event.id}-${tagToId(tag)}`}
+                          data-testid={`berlin-event-tag-${event.id}-${index}`}
                         >
                           {tag}
                         </Badge>
@@ -312,13 +312,13 @@ export default function BerlinPage() {
             >
               Alle
             </Button>
-            {availableTags.map((tag) => (
+            {availableTags.map((tag, index) => (
               <Button
                 key={tag}
                 variant={selectedTag === tag ? "default" : "outline"}
                 onClick={() => setSelectedTag(tag)}
                 className="rounded-full"
-                data-testid={`berlin-tag-${tagToId(tag)}`}
+                data-testid={`berlin-tag-${index}`}
               >
                 {tag}
               </Button>
@@ -354,11 +354,11 @@ export default function BerlinPage() {
                   </p>
                   {link.hashtags?.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2" data-testid={`berlin-link-tags-${link.id}`}>
-                      {link.hashtags.map((tag) => (
+                      {link.hashtags.map((tag, index) => (
                         <Badge
-                          key={tag}
+                          key={`${link.id}-${tag}`}
                           className="rounded-full bg-white/10 text-white/70"
-                          data-testid={`berlin-link-tag-${link.id}-${tagToId(tag)}`}
+                          data-testid={`berlin-link-tag-${link.id}-${index}`}
                         >
                           {tag}
                         </Badge>
