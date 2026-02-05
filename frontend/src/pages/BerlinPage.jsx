@@ -314,13 +314,25 @@ export default function BerlinPage() {
                   data-testid="berlin-hashtags-input"
                 />
               </div>
-              <Button
-                onClick={handleSubmit}
-                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-                data-testid="berlin-submit-button"
-              >
-                {editingType === "event" ? "Änderungen speichern" : "Tipp posten"}
-              </Button>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={handleSubmit}
+                  className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                  data-testid="berlin-submit-button"
+                >
+                  {editingType === "event" ? "Änderungen speichern" : "Tipp posten"}
+                </Button>
+                {editingType === "event" && (
+                  <Button
+                    variant="outline"
+                    onClick={handleDeleteEvent}
+                    className="rounded-full border-red-500/60 text-red-200 hover:bg-red-500/10"
+                    data-testid="berlin-event-delete-button"
+                  >
+                    Termin löschen
+                  </Button>
+                )}
+              </div>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
               <div className="grid gap-4 md:grid-cols-2">
