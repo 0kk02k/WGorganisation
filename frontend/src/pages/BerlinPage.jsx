@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +6,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+
+const parseTags = (value) =>
+  value
+    .split(",")
+    .map((tag) => tag.replace("#", "").trim())
+    .filter(Boolean)
+    .map((tag) => `#${tag}`);
+
+const safeTags = (tags) => (Array.isArray(tags) ? tags : []);
 
 export default function BerlinPage() {
   const [events, setEvents] = useState([]);
@@ -25,26 +33,18 @@ export default function BerlinPage() {
     hashtags: "",
   });
 
-  const parseTags = (value) =>
-    value
-      .split(",")
-      .map((tag) => tag.replace("#", "").trim())
-      .filter(Boolean)
-      .map((tag) => `#${tag}`);
-
-
   const availableTags = useMemo(() => {
     const tagSet = new Set();
-    events.forEach((event) => event.hashtags?.forEach((tag) => tagSet.add(tag)));
-    links.forEach((link) => link.hashtags?.forEach((tag) => tagSet.add(tag)));
+    events.forEach((event) => safeTags(event.hashtags).forEach((tag) => tagSet.add(tag)));
+    links.forEach((link) => safeTags(link.hashtags).forEach((tag) => tagSet.add(tag)));
     return Array.from(tagSet);
   }, [events, links]);
 
   const filteredEvents = selectedTag
-    ? events.filter((event) => event.hashtags?.includes(selectedTag))
+    ? events.filter((event) => safeTags(event.hashtags).includes(selectedTag))
     : events;
   const filteredLinks = selectedTag
-    ? links.filter((link) => link.hashtags?.includes(selectedTag))
+    ? links.filter((link) => safeTags(link.hashtags).includes(selectedTag))
     : links;
 
   const loadData = async () => {
@@ -99,9 +99,9 @@ export default function BerlinPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="berlin-page">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight" data-testid="berlin-title">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-20 pt-28 md:px-8">
+      <div className="space-y-1">
+        <h1 className="text-3xl font-semibold" data-testid="berlin-page">
           Berlin
         </h1>
       </div>
@@ -142,9 +142,7 @@ export default function BerlinPage() {
               </label>
               <Input
                 value={form.location}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, location: event.target.value }))
-                }
+                onChange={(event) => setForm((prev) => ({ ...prev, location: event.target.value }))}
                 placeholder="z.B. Kreuzberg"
                 data-testid="berlin-location-input"
               />
@@ -170,9 +168,7 @@ export default function BerlinPage() {
             </label>
             <Input
               value={form.hashtags}
-              onChange={(event) =>
-                setForm((prev) => ({ ...prev, hashtags: event.target.value }))
-              }
+              onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
               placeholder="#club, #openair"
               data-testid="berlin-hashtags-input"
             />
@@ -205,20 +201,20 @@ export default function BerlinPage() {
                   <CardTitle data-testid={`berlin-event-title-${event.id}`}>
                     {event.title}
                   </CardTitle>
-                  <p className="text-sm text-white/60" data-testid={`berlin-event-meta-${event.id}`}>
-                    {event.date} · {event.location}
+                  <p className="text-xs text-white/60" data-testid={`berlin-event-date-${event.id}`}>
+                    {event.date}
+                  </p>
+                  <p className="text-xs text-white/60" data-testid={`berlin-event-location-${event.id}`}>
+                    {event.location}
                   </p>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-white/70" data-testid={`berlin-event-description-${event.id}`}>
                     {event.description}
                   </p>
-                  {event.hashtags?.length > 0 && (
-                    <div
-                      className="mt-3 flex flex-wrap gap-2"
-                      data-testid={`berlin-event-tags-${event.id}`}
-                    >
-                      {event.hashtags.map((tag, index) => (
+                  {safeTags(event.hashtags).length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2" data-testid={`berlin-event-tags-${event.id}`}>
+                      {safeTags(event.hashtags).map((tag, index) => (
                         <Badge
                           key={`${event.id}-${tag}`}
                           className="rounded-full bg-white/10 text-white/70"
@@ -252,18 +248,13 @@ export default function BerlinPage() {
                 </label>
                 <Input
                   value={linkForm.url}
-                  onChange={(event) =>
-                    setLinkForm((prev) => ({ ...prev, url: event.target.value }))
-                  }
+                  onChange={(event) => setLinkForm((prev) => ({ ...prev, url: event.target.value }))}
                   placeholder="https://..."
                   data-testid="berlin-link-url-input"
                 />
               </div>
               <div className="space-y-2">
-                <label
-                  className="text-xs text-white/60"
-                  data-testid="berlin-link-hashtags-label"
-                >
+                <label className="text-xs text-white/60" data-testid="berlin-link-hashtags-label">
                   Hashtags
                 </label>
                 <Input
@@ -277,10 +268,7 @@ export default function BerlinPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <label
-                className="text-xs text-white/60"
-                data-testid="berlin-link-description-label"
-              >
+              <label className="text-xs text-white/60" data-testid="berlin-link-description-label">
                 Beschreibung
               </label>
               <Textarea
@@ -352,9 +340,9 @@ export default function BerlinPage() {
                   <p className="text-sm text-white/70" data-testid={`berlin-link-description-${link.id}`}>
                     {link.description}
                   </p>
-                  {link.hashtags?.length > 0 && (
+                  {safeTags(link.hashtags).length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-2" data-testid={`berlin-link-tags-${link.id}`}>
-                      {link.hashtags.map((tag, index) => (
+                      {safeTags(link.hashtags).map((tag, index) => (
                         <Badge
                           key={`${link.id}-${tag}`}
                           className="rounded-full bg-white/10 text-white/70"
