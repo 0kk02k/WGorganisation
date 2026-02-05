@@ -31,6 +31,8 @@ export default function BerlinPage() {
       .filter(Boolean)
       .map((tag) => `#${tag}`);
 
+  const tagToId = (tag) => tag.replace(/[^a-z0-9]/gi, "").toLowerCase();
+
   const availableTags = useMemo(() => {
     const tagSet = new Set();
     events.forEach((event) => event.hashtags?.forEach((tag) => tagSet.add(tag)));
