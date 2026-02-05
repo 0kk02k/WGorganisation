@@ -22,6 +22,8 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Manuals: "How to....." Rebranding, Beispiel-Anleitungen entfernt, Lösch-Button im Editmodus
 - Kalender: aktueller Tag mit Glow + Hover-Lift bei klickbaren Elementen
 - Aufenthalte: Anzeige der Zimmernamen aus den Einstellungen (statt Zimmer A/B)
+- Aufenthalte: Karten in Übersicht/Kalender anklickbar für Detailansicht
+- Berlin: Bearbeiten-Modal mit Löschen für Links und Veranstaltungen
 - Übersicht: Haus-Chat mit Nachrichten + Namen (persistiert)
 - Übersicht: Organisations-Box mit Benutzerbild ersetzt (aktuelles Hero-Bild aktualisiert)
 - Kalender: Aufenthalte-Liste unter dem Kalender ergänzt
