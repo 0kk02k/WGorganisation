@@ -18,6 +18,7 @@ import {
   isSameDay,
   parseISO,
   isWithinInterval,
+  isToday,
 } from "date-fns";
 
 export default function CalendarPage() {
