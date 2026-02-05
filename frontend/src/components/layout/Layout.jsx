@@ -95,14 +95,16 @@ export const Layout = ({ children }) => {
             <NavLink
               key={`${item.to}-mobile`}
               to={item.to}
-              className={({ isActive }) =>
-                cn(
+              className={({ isActive }) => {
+                const calendarActive =
+                  item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
+                return cn(
                   "hover-lift flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-xs font-medium transition-colors",
-                  isActive
+                  isActive || calendarActive
                     ? "bg-[#CCFF00]/15 text-[#CCFF00]"
                     : "text-white/70 hover:bg-white/10 hover:text-white",
-                )
-              }
+                );
+              }}
               data-testid={`${item.testId}-mobile`}
             >
               <item.icon className="h-4 w-4" />
