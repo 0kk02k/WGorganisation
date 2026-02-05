@@ -6,6 +6,7 @@ import { getRoomDotStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { StayDialog } from "@/components/stays/StayDialog";
+import { StaysList } from "@/components/stays/StaysList";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   format,
