@@ -389,7 +389,7 @@ export default function BerlinPage() {
           ) : (
             <div className="space-y-4">
               {filteredEvents.map((event) => (
-                <Card key={event.id} data-testid={`berlin-event-${event.id}`}>
+                <Card key={event.id} className="relative" data-testid={`berlin-event-${event.id}`}>
                   <CardHeader className="space-y-1">
                     <CardTitle data-testid={`berlin-event-title-${event.id}`}>
                       {event.title}
@@ -427,7 +427,16 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  </CardContent>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openEditEvent(event)}
+                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full border border-white/10 text-white/70 hover:bg-white/10"
+                    data-testid={`berlin-event-edit-${event.id}`}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </CardContent>
                 </Card>
               ))}
             </div>
