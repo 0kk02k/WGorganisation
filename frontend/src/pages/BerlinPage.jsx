@@ -1,18 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 export default function BerlinPage() {
   const [events, setEvents] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [selectedTag, setSelectedTag] = useState(null);
   const [form, setForm] = useState({
     title: "",
     date: "",
     location: "",
     description: "",
+    hashtags: "",
+  });
+  const [linkForm, setLinkForm] = useState({
+    url: "",
+    description: "",
+    hashtags: "",
   });
 
   const loadEvents = async () => {
