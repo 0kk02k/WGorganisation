@@ -57,12 +57,9 @@ export const Layout = ({ children }) => {
         <div className="absolute -top-40 left-1/3 h-72 w-72 rounded-full bg-[#B026FF]/25 blur-[140px]" />
         <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
       </div>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-white/5 backdrop-blur-2xl">
+      <header className="fixed inset-x-0 top-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl min-[755px]:block">
         <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-4 md:px-8">
-          <nav
-            className="hidden w-full items-center justify-between gap-2 md:flex"
-            data-testid="top-nav"
-          >
+          <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
