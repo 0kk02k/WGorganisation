@@ -48,19 +48,26 @@ const navItems = [
 
 export const Layout = ({ children }) => {
   return (
-    <div className="min-h-screen bg-stone-50 text-stone-900" data-testid="app-shell">
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-stone-200/70 bg-white/70 backdrop-blur-2xl">
+    <div
+      className="relative min-h-screen bg-[#050505] text-white"
+      data-testid="app-shell"
+    >
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 left-1/3 h-72 w-72 rounded-full bg-[#B026FF]/25 blur-[140px]" />
+        <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
+      </div>
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-white/5 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-8">
           <div className="space-y-1">
             <p
               data-testid="app-title"
-              className="font-[Manrope] text-xl font-bold tracking-tight text-stone-900"
+              className="text-xl font-semibold tracking-tight text-white"
             >
               Teilzeit-WG Hub
             </p>
             <p
               data-testid="app-subtitle"
-              className="text-sm text-stone-600"
+              className="text-xs font-mono text-white/50"
             >
               Check-in, Belegung & Gerätewissen
             </p>
@@ -74,8 +81,8 @@ export const Layout = ({ children }) => {
                   cn(
                     "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-emerald-900 text-emerald-50 shadow-sm"
-                      : "text-stone-600 hover:bg-stone-100 hover:text-stone-900",
+                      ? "bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_20px_rgba(204,255,0,0.35)]"
+                      : "text-white/70 hover:bg-white/10 hover:text-white",
                   )
                 }
                 data-testid={item.testId}
@@ -88,13 +95,13 @@ export const Layout = ({ children }) => {
         </div>
       </header>
       <main
-        className="mx-auto w-full max-w-5xl px-4 pb-28 pt-28 md:px-8"
+        className="mx-auto w-full max-w-6xl px-4 pb-28 pt-28 md:px-8"
         data-testid="main-content"
       >
         {children}
       </main>
       <nav
-        className="fixed bottom-4 left-1/2 z-40 w-[min(92%,560px)] -translate-x-1/2 rounded-full border border-stone-200 bg-white/80 px-2 py-2 shadow-xl backdrop-blur-2xl md:hidden"
+        className="fixed bottom-4 left-1/2 z-40 w-[min(92%,560px)] -translate-x-1/2 rounded-full border border-white/10 bg-white/5 px-2 py-2 shadow-[0_0_30px_rgba(176,38,255,0.25)] backdrop-blur-2xl md:hidden"
         data-testid="bottom-nav"
       >
         <div className="flex items-center justify-between px-2">
@@ -106,8 +113,8 @@ export const Layout = ({ children }) => {
                 cn(
                   "flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-xs font-medium transition-colors",
                   isActive
-                    ? "bg-emerald-900 text-emerald-50"
-                    : "text-stone-600 hover:bg-stone-100 hover:text-stone-900",
+                    ? "bg-[#CCFF00]/15 text-[#CCFF00]"
+                    : "text-white/70 hover:bg-white/10 hover:text-white",
                 )
               }
               data-testid={`${item.testId}-mobile`}
