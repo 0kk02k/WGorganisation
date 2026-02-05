@@ -172,7 +172,7 @@ export default function SettingsPage() {
                       {room.name}
                     </p>
                     <p
-                      className="text-xs text-stone-600"
+                      className="text-xs font-mono text-stone-600"
                       data-testid={`settings-room-info-${room.id}`}
                     >
                       Farbcode {room.color}
