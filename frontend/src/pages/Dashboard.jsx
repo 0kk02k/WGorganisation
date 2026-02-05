@@ -140,10 +140,15 @@ export default function Dashboard() {
           </div>
         </Card>
         <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
-          <CardHeader>
-            <CardTitle data-testid="dashboard-plants-title">Pflanzen</CardTitle>
-          </CardHeader>
           <CardContent className="space-y-4">
+            <div className="overflow-hidden rounded-2xl border border-stone-200">
+              <img
+                src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/wjz1h4j6_image.png"
+                alt="Neonpalme"
+                className="h-56 w-full object-cover"
+                data-testid="dashboard-plants-image"
+              />
+            </div>
             <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
               <div>
                 <p
@@ -163,23 +168,13 @@ export default function Dashboard() {
                 <Droplet className="h-5 w-5" />
               </span>
             </div>
-              <Button
+            <Button
               onClick={handleResetWatered}
               className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
               data-testid="dashboard-plants-reset"
             >
               Jetzt gegossen
             </Button>
-            <div
-              className="overflow-hidden rounded-2xl border border-stone-200"
-              data-testid="dashboard-plants-image"
-            >
-              <img
-                src="https://images.unsplash.com/photo-1767244047794-94dc52f7b7db?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA4Mzl8MHwxfHNlYXJjaHwzfHxsdXNoJTIwanVuZ2xlJTIwcGxhbnRzJTIwaW5kb29yfGVufDB8fHx8MTc3MDIxOTUyOHww&ixlib=rb-4.1.0&q=85"
-                alt="Dschungelpflanzen"
-                className="h-32 w-full object-cover"
-              />
-            </div>
           </CardContent>
         </Card>
         <Card className="lg:col-span-2" data-testid="dashboard-active-stays">
