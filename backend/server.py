@@ -125,6 +125,20 @@ class Manual(ManualBase):
     updated_at: str = Field(default_factory=now_iso)
 
 
+class MessageBase(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: str
+    content: str
+
+
+class Message(MessageBase):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=generate_id)
+    created_at: str = Field(default_factory=now_iso)
+
+
 class RoomConfig(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -242,6 +256,21 @@ async def delete_manual(manual_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Anleitung nicht gefunden")
     return {"ok": True}
+
+
+@api_router.get("/messages", response_model=List[Message])
+async def list_messages():
+    messages = (
+        await db.messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    )
+    return messages
+
+
+@api_router.post("/messages", response_model=Message)
+async def create_message(payload: MessageBase):
+    message = Message(**payload.model_dump())
+    await db.messages.insert_one(message.model_dump())
+    return message
 
 
 async def get_or_create_settings() -> Settings:
