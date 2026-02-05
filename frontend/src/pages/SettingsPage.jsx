@@ -74,15 +74,9 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6" data-testid="settings-page">
       <div>
-        <h1
-          className="font-[Manrope] text-3xl font-bold tracking-tight"
-          data-testid="settings-title"
-        >
+        <h1 className="text-3xl font-bold tracking-tight" data-testid="settings-title">
           Einstellungen & Vorlagen
         </h1>
-        <p className="text-sm text-stone-600" data-testid="settings-subtitle">
-          Überblick zu Zimmern und Standard-Checklisten.
-        </p>
       </div>
 
       <Card className="border-stone-200/80" data-testid="settings-rooms-card">
