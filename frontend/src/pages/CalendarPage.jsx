@@ -58,7 +58,11 @@ export default function CalendarPage() {
       }),
     );
 
+  const eventsForDate = (date) =>
+    events.filter((event) => isSameDay(parseISO(event.date), date));
+
   const selectedStays = staysForDate(selectedDate);
+  const selectedEvents = eventsForDate(selectedDate);
 
   return (
     <div className="space-y-6" data-testid="calendar-page">
