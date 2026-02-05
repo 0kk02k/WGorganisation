@@ -18,13 +18,6 @@ const navItems = [
     testId: "nav-calendar-link",
   },
   {
-    to: "/aufenthalte",
-    label: "Aufenthalte",
-    short: "Check-in",
-    icon: ClipboardList,
-    testId: "nav-stays-link",
-  },
-  {
     to: "/anleitungen",
     label: "How to.....",
     short: "How to",
