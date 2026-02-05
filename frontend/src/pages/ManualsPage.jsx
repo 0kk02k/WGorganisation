@@ -33,15 +33,9 @@ export default function ManualsPage() {
     <div className="space-y-6" data-testid="manuals-page">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1
-            className="font-[Manrope] text-3xl font-bold tracking-tight"
-            data-testid="manuals-title"
-          >
+          <h1 className="text-3xl font-bold tracking-tight" data-testid="manuals-title">
             Bedienungsanleitungen
           </h1>
-          <p className="text-sm text-stone-600" data-testid="manuals-subtitle">
-            Speichere alle Geräte-Anleitungen inklusive Bilder.
-          </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
