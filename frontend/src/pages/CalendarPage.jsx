@@ -112,6 +112,7 @@ export default function CalendarPage() {
           <div className="mt-2 grid grid-cols-7 gap-2">
             {calendarDays.map((day) => {
               const inMonth = isSameMonth(day, currentMonth);
+              const isCurrentDay = isToday(day);
               const dayStays = staysForDate(day);
               const hasRoomA = dayStays.some((stay) => stay.room === "A");
               const hasRoomB = dayStays.some((stay) => stay.room === "B");
@@ -120,11 +121,15 @@ export default function CalendarPage() {
                 <button
                   key={day.toISOString()}
                   onClick={() => setSelectedDate(day)}
-                  className={`rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
+                  className={`hover-lift rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
                     isSameDay(day, selectedDate)
                       ? "bg-[#B026FF] text-white"
                       : "bg-white/5 hover:bg-white/10"
-                  } ${!inMonth ? "opacity-40" : "opacity-100"}`}
+                  } ${!inMonth ? "opacity-40" : "opacity-100"} ${
+                    isCurrentDay
+                      ? "ring-1 ring-[#B026FF]/50 shadow-[0_0_22px_rgba(176,38,255,0.35)]"
+                      : ""
+                  }`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
                   <div className="flex items-center justify-between">
