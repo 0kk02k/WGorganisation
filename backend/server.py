@@ -326,6 +326,16 @@ async def create_event(payload: EventBase):
     return event
 
 
+@api_router.put("/events/{event_id}", response_model=Event)
+async def update_event(event_id: str, payload: EventUpdate):
+    update_data = payload.model_dump()
+    result = await db.events.update_one({"id": event_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    stored_event = await db.events.find_one({"id": event_id}, {"_id": 0})
+    return Event(**stored_event)
+
+
 @api_router.get("/berlin-links", response_model=List[BerlinLink])
 async def list_berlin_links():
     links = await db.berlin_links.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
@@ -337,6 +347,16 @@ async def create_berlin_link(payload: BerlinLinkBase):
     link = BerlinLink(**payload.model_dump())
     await db.berlin_links.insert_one(link.model_dump())
     return link
+
+
+@api_router.put("/berlin-links/{link_id}", response_model=BerlinLink)
+async def update_berlin_link(link_id: str, payload: BerlinLinkUpdate):
+    update_data = payload.model_dump()
+    result = await db.berlin_links.update_one({"id": link_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Link not found")
+    stored_link = await db.berlin_links.find_one({"id": link_id}, {"_id": 0})
+    return BerlinLink(**stored_link)
 
 
 async def get_or_create_settings() -> Settings:
