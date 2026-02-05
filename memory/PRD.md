@@ -25,6 +25,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Übersicht: Organisations-Box mit Benutzerbild ersetzt
 - Kalender: Aufenthalte-Liste unter dem Kalender ergänzt
 - Berlin-Seite: Veranstaltungstipps posten & ansehen (Events-API)
+- Navigation: Titel entfernt, Items gleichmäßig verteilt, Aufenthalte-Link entfernt (Kalender aktiv bei Stay-Details)
 
 ## Priorisierter Backlog
 **P0**
