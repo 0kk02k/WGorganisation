@@ -40,6 +40,8 @@ export default function BerlinPage() {
     description: "",
     hashtags: "",
   });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postType, setPostType] = useState("event");
 
   const availableTags = useMemo(() => {
     const tagSet = new Set();
