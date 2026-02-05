@@ -124,7 +124,7 @@ export default function Dashboard() {
           <div className="p-4">
             <div className="relative overflow-hidden rounded-2xl" data-testid="dashboard-organization-image">
               <img
-                src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/6t2n8w07_image.png"
+            src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/mez14nh4_image.png"
                 alt="Organisation Visual"
                 className="h-full w-full object-cover"
               />
