@@ -118,7 +118,7 @@ export default function Dashboard() {
     <div className="space-y-6" data-testid="dashboard-page">
       <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
         <Card
-          className="overflow-hidden lg:col-span-2"
+          className="overflow-hidden lg:col-span-2 max-[755px]:hidden"
           data-testid="dashboard-hero-card"
         >
           <div className="p-4">
