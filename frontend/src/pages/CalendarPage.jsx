@@ -201,5 +201,17 @@ export default function CalendarPage() {
         </CardContent>
       </Card>
     </div>
+    <div className="space-y-4" data-testid="calendar-stays-section">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold" data-testid="calendar-stays-title">
+          Aufenthalte
+        </h2>
+      </div>
+      <StaysList
+        stays={stays}
+        testIdPrefix="calendar-stays"
+        emptyLabel="Keine Aufenthalte geplant."
+      />
+    </div>
   );
 }
