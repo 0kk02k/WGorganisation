@@ -135,7 +135,7 @@ class MessageBase(BaseModel):
 class Message(MessageBase):
     model_config = ConfigDict(extra="ignore")
 
-    id: str = Field(default_factory=generate_id)
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=now_iso)
 
 
