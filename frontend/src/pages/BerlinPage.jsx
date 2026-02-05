@@ -293,7 +293,7 @@ export default function BerlinPage() {
                 className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
                 data-testid="berlin-submit-button"
               >
-                Tipp posten
+                {editingType === "event" ? "Änderungen speichern" : "Tipp posten"}
               </Button>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
@@ -344,7 +344,7 @@ export default function BerlinPage() {
                 className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
                 data-testid="berlin-link-submit-button"
               >
-                Link speichern
+                {editingType === "link" ? "Änderungen speichern" : "Link speichern"}
               </Button>
             </TabsContent>
           </Tabs>
