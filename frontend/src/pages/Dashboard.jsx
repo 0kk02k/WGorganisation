@@ -89,40 +89,50 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="space-y-8" data-testid="dashboard-page">
-      <section className="grid gap-6 lg:grid-cols-[2fr_1fr]">
+    <div className="space-y-6" data-testid="dashboard-page">
+      <section
+        className="grid gap-4 lg:grid-cols-3 lg:auto-rows-[minmax(0,1fr)]"
+        data-testid="dashboard-bento-grid"
+      >
         <Card
-          className="overflow-hidden border-stone-200/80 bg-white/70"
+          className="overflow-hidden lg:col-span-2 lg:row-span-2"
           data-testid="dashboard-hero-card"
         >
           <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_1fr]">
             <div className="space-y-4">
               <Badge
-                className="w-fit rounded-full bg-emerald-900/10 text-emerald-900"
+                className="w-fit rounded-full bg-[#CCFF00]/15 text-[#CCFF00]"
                 data-testid="dashboard-hero-badge"
               >
                 Organisation
               </Badge>
               <div className="space-y-3">
                 <h1
-                  className="font-[Manrope] text-3xl font-bold tracking-tight text-stone-900"
+                  className="text-3xl font-semibold tracking-tight text-white"
                   data-testid="dashboard-title"
                 >
                   Check-in & Alltag im Griff
                 </h1>
-                <p className="text-stone-600" data-testid="dashboard-subtitle">
+                <p className="text-white/70" data-testid="dashboard-subtitle">
                   Verwalte Belegungen, Checklisten und Gerätewissen in einer
                   gemeinsamen Übersicht.
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild className="rounded-full">
+                <Button
+                  asChild
+                  className="rounded-full shadow-[0_0_20px_rgba(204,255,0,0.35)]"
+                >
                   <Link to="/kalender" data-testid="dashboard-calendar-link">
                     <CalendarDays className="mr-2 h-4 w-4" />
                     Kalender öffnen
                   </Link>
                 </Button>
-                <Button variant="outline" asChild className="rounded-full">
+                <Button
+                  variant="outline"
+                  asChild
+                  className="rounded-full border-white/20 text-white/80 hover:text-white"
+                >
                   <Link to="/aufenthalte" data-testid="dashboard-stays-link">
                     <ClipboardList className="mr-2 h-4 w-4" />
                     Aufenthalte
@@ -139,10 +149,7 @@ export default function Dashboard() {
             </div>
           </div>
         </Card>
-        <Card
-          className="border-stone-200/80 bg-white/80"
-          data-testid="dashboard-plants-card"
-        >
+        <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
           <CardHeader>
             <CardTitle data-testid="dashboard-plants-title">Pflanzen</CardTitle>
           </CardHeader>
@@ -150,13 +157,13 @@ export default function Dashboard() {
             <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
               <div>
                 <p
-                  className="text-sm font-semibold text-stone-900"
+                  className="text-sm font-semibold text-white"
                   data-testid="dashboard-plants-status"
                 >
                   Letzte Bewässerung
                 </p>
                 <p
-                  className="text-xs text-stone-600"
+                  className="text-xs font-mono text-white/60"
                   data-testid="dashboard-plants-timer"
                 >
                   {getWateredLabel()}
@@ -169,9 +176,9 @@ export default function Dashboard() {
                 <Droplet className="h-5 w-5" />
               </span>
             </div>
-            <Button
+              <Button
               onClick={handleResetWatered}
-              className="w-full rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+              className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
               data-testid="dashboard-plants-reset"
             >
               Jetzt gegossen
@@ -188,10 +195,7 @@ export default function Dashboard() {
             </div>
           </CardContent>
         </Card>
-      </section>
-
-      <section className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
-        <Card className="border-stone-200/80" data-testid="dashboard-active-stays">
+        <Card className="lg:col-span-2" data-testid="dashboard-active-stays">
           <CardHeader>
             <CardTitle data-testid="dashboard-active-title">
               Aktive Aufenthalte
@@ -199,25 +203,25 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-3">
             {activeStays.length === 0 ? (
-              <p className="text-sm text-stone-600" data-testid="dashboard-no-active">
+              <p className="text-sm text-white/60" data-testid="dashboard-no-active">
                 Keine aktiven Aufenthalte.
               </p>
             ) : (
               activeStays.map((stay) => (
                 <div
                   key={stay.id}
-                  className="flex items-center justify-between rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-active-stay-${stay.id}`}
                 >
                   <div>
                     <p
-                      className="text-sm font-semibold text-stone-900"
+                      className="text-sm font-semibold text-white"
                       data-testid={`dashboard-active-name-${stay.id}`}
                     >
                       {stay.occupant_name}
                     </p>
                     <p
-                      className="text-xs text-stone-600"
+                      className="text-xs font-mono text-white/60"
                       data-testid={`dashboard-active-dates-${stay.id}`}
                     >
                       {format(parseISO(stay.start_date), "dd.MM.")} –
@@ -239,7 +243,7 @@ export default function Dashboard() {
             )}
           </CardContent>
         </Card>
-        <Card className="border-stone-200/80" data-testid="dashboard-upcoming-card">
+        <Card className="lg:col-span-1" data-testid="dashboard-upcoming-card">
           <CardHeader>
             <CardTitle data-testid="dashboard-upcoming-title">
               Nächste Check-ins
@@ -247,24 +251,24 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="space-y-3">
             {upcomingStays.length === 0 ? (
-              <p className="text-sm text-stone-600" data-testid="dashboard-no-upcoming">
+              <p className="text-sm text-white/60" data-testid="dashboard-no-upcoming">
                 Keine geplanten Check-ins.
               </p>
             ) : (
               upcomingStays.map((stay) => (
                 <div
                   key={stay.id}
-                  className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-upcoming-${stay.id}`}
                 >
                   <p
-                    className="text-sm font-semibold text-stone-900"
+                    className="text-sm font-semibold text-white"
                     data-testid={`dashboard-upcoming-name-${stay.id}`}
                   >
                     {stay.occupant_name}
                   </p>
                   <p
-                    className="text-xs text-stone-600"
+                    className="text-xs font-mono text-white/60"
                     data-testid={`dashboard-upcoming-date-${stay.id}`}
                   >
                     {format(parseISO(stay.start_date), "dd.MM.yyyy")}
