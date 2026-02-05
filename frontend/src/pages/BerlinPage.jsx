@@ -85,6 +85,7 @@ export default function BerlinPage() {
       });
       setEvents((prev) => [response.data, ...prev]);
       setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
+      setIsModalOpen(false);
     } catch (error) {
       toast.error("Tipp konnte nicht gespeichert werden.");
     }
@@ -103,6 +104,7 @@ export default function BerlinPage() {
       });
       setLinks((prev) => [response.data, ...prev]);
       setLinkForm({ url: "", description: "", hashtags: "" });
+      setIsModalOpen(false);
     } catch (error) {
       toast.error("Link konnte nicht gespeichert werden.");
     }
