@@ -17,6 +17,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Detailansicht der Anleitungen editierbar per Inline-Bearbeiten/Speichern
 - Pflanzen-Kachel im Dashboard mit Dschungelbild und Reset-Timer
 - Einstellungen: Zimmernamen & Farbcodes sowie Checklisten-Vorlagen editierbar mit Speichern
+- UI-Redesign: Dark Mode Bento-Grid mit Glassmorphism, Noise-Background und neonfarbenen Akzenten
 
 ## Priorisierter Backlog
 **P0**
