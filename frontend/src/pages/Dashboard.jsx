@@ -229,10 +229,11 @@ export default function Dashboard() {
               </p>
             ) : (
               upcomingStays.map((stay) => (
-                <div
+                <Link
                   key={stay.id}
-                  className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
-                  data-testid={`dashboard-upcoming-${stay.id}`}
+                  to={`/aufenthalte/${stay.id}`}
+                  className="hover-lift rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                  data-testid={`dashboard-upcoming-link-${stay.id}`}
                 >
                   <p
                     className="text-sm font-semibold text-white"
@@ -243,7 +244,7 @@ export default function Dashboard() {
                   <p className="text-xs text-white/60" data-testid={`dashboard-upcoming-date-${stay.id}`}>
                     {format(parseISO(stay.start_date), "dd.MM.yyyy")}
                   </p>
-                </div>
+                </Link>
               ))
             )}
           </CardContent>
