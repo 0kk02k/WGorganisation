@@ -133,8 +133,10 @@ export default function CalendarPage() {
               const inMonth = isSameMonth(day, currentMonth);
               const isCurrentDay = isToday(day);
               const dayStays = staysForDate(day);
-              const hasRoomA = dayStays.some((stay) => stay.room === "A");
-              const hasRoomB = dayStays.some((stay) => stay.room === "B");
+              const hasTopRoom = dayStays.some((stay) => stay.room === topRoomId);
+              const hasBottomRoom = dayStays.some(
+                (stay) => stay.room === bottomRoomId,
+              );
               const hasEvents = eventsForDate(day).length > 0;
 
               return (
