@@ -29,6 +29,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Übersicht: Organisationsbild mit großem Overlay-Text "BODDIN14 WG-HUB"
 - Übersicht: Pflanzenkarte ohne Überschrift, neues Bild großflächig oben
 - Kalender: Veranstaltungstipps erscheinen als Tagespunkte + im Tagesdetail
+- Tagesdetail: Veranstaltungstipps-Sektion nur bei vorhandenen Einträgen
 
 ## Priorisierter Backlog
 **P0**
