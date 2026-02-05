@@ -90,12 +90,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6" data-testid="dashboard-page">
-      <section
-        className="grid gap-4 lg:grid-cols-3 lg:auto-rows-[minmax(0,1fr)]"
-        data-testid="dashboard-bento-grid"
-      >
+      <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
         <Card
-          className="overflow-hidden lg:col-span-2 lg:row-span-2"
+          className="overflow-hidden lg:col-span-2"
           data-testid="dashboard-hero-card"
         >
           <div className="grid gap-6 p-6 md:grid-cols-[1.2fr_1fr]">
@@ -113,10 +110,6 @@ export default function Dashboard() {
                 >
                   Check-in & Alltag im Griff
                 </h1>
-                <p className="text-white/70" data-testid="dashboard-subtitle">
-                  Verwalte Belegungen, Checklisten und Gerätewissen in einer
-                  gemeinsamen Übersicht.
-                </p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Button
@@ -162,10 +155,7 @@ export default function Dashboard() {
                 >
                   Letzte Bewässerung
                 </p>
-                <p
-                  className="text-xs font-mono text-white/60"
-                  data-testid="dashboard-plants-timer"
-                >
+                <p className="text-xs text-white/60" data-testid="dashboard-plants-timer">
                   {getWateredLabel()}
                 </p>
               </div>
@@ -220,10 +210,7 @@ export default function Dashboard() {
                     >
                       {stay.occupant_name}
                     </p>
-                    <p
-                      className="text-xs font-mono text-white/60"
-                      data-testid={`dashboard-active-dates-${stay.id}`}
-                    >
+                    <p className="text-xs text-white/60" data-testid={`dashboard-active-dates-${stay.id}`}>
                       {format(parseISO(stay.start_date), "dd.MM.")} –
                       {" "}
                       {format(parseISO(stay.end_date), "dd.MM.yyyy")}
@@ -267,10 +254,7 @@ export default function Dashboard() {
                   >
                     {stay.occupant_name}
                   </p>
-                  <p
-                    className="text-xs font-mono text-white/60"
-                    data-testid={`dashboard-upcoming-date-${stay.id}`}
-                  >
+                  <p className="text-xs text-white/60" data-testid={`dashboard-upcoming-date-${stay.id}`}>
                     {format(parseISO(stay.start_date), "dd.MM.yyyy")}
                   </p>
                 </div>
