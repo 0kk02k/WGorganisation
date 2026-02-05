@@ -337,6 +337,39 @@ async def create_message(payload: MessageBase):
     return message
 
 
+@api_router.put("/messages/{message_id}", response_model=Message)
+async def update_message(message_id: str, payload: MessageUpdate):
+    update_data = payload.model_dump(exclude_none=True)
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No updates provided")
+    result = await db.messages.update_one({"id": message_id}, {"$set": update_data})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    stored_message = await db.messages.find_one({"id": message_id}, {"_id": 0})
+    return Message(**stored_message)
+
+
+@api_router.delete("/messages/{message_id}")
+async def delete_message(message_id: str):
+    result = await db.messages.delete_one({"id": message_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return {"status": "ok"}
+
+
+@api_router.post("/messages/{message_id}/replies", response_model=Message)
+async def create_reply(message_id: str, payload: MessageReplyCreate):
+    reply = MessageReply(name=payload.name, content=payload.content)
+    result = await db.messages.update_one(
+        {"id": message_id},
+        {"$push": {"replies": reply.model_dump()}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    stored_message = await db.messages.find_one({"id": message_id}, {"_id": 0})
+    return Message(**stored_message)
+
+
 @api_router.get("/events", response_model=List[Event])
 async def list_events():
     events = await db.events.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
