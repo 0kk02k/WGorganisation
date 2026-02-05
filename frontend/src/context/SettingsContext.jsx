@@ -32,10 +32,10 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   const updateSettings = async (payload) => {
-    const cleanedPayload = {
-      ...payload,
-      rooms: payload.rooms ? limitRooms(payload.rooms) : undefined,
-    };
+    const cleanedPayload = { ...payload };
+    if (payload.rooms) {
+      cleanedPayload.rooms = limitRooms(payload.rooms);
+    }
     const response = await api.put("/settings", cleanedPayload);
     setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
     return response.data;
