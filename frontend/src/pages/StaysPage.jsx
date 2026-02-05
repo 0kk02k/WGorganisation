@@ -54,10 +54,10 @@ export default function StaysPage() {
               <Link
                 to={`/aufenthalte/${stay.id}`}
                 key={stay.id}
-                className="group"
+                className="group hover-lift"
                 data-testid={`stays-card-${stay.id}`}
               >
-                <Card className="border-stone-200/80 transition-colors group-hover:bg-stone-50">
+                <Card className="transition-colors group-hover:bg-white/5">
                   <CardHeader className="flex flex-row items-center justify-between">
                     <div>
                       <CardTitle data-testid={`stays-name-${stay.id}`}>
