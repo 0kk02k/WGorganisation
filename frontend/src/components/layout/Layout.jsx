@@ -43,6 +43,11 @@ const navItems = [
 
 export const Layout = ({ children }) => {
   const location = useLocation();
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
   return (
     <div
       className="relative min-h-screen bg-[#050505] text-white"
