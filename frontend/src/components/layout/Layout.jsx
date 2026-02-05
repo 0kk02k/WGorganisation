@@ -83,39 +83,89 @@ export const Layout = ({ children }) => {
           </nav>
         </div>
       </header>
+      <div
+        className="fixed inset-x-0 top-0 z-40 flex items-center justify-center border-b border-white/5 bg-white/5 px-4 py-4 backdrop-blur-2xl min-[755px]:hidden"
+        data-testid="mobile-brand-bar"
+      >
+        <span
+          className="text-xs font-semibold uppercase tracking-[0.4em] text-white/80"
+          data-testid="mobile-brand-text"
+        >
+          BODDIN14 WG-HUB
+        </span>
+      </div>
+      <button
+        type="button"
+        onClick={() => setMobileNavOpen(true)}
+        className="fixed right-4 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-2xl transition hover:bg-white/20 min-[755px]:hidden"
+        data-testid="mobile-nav-toggle"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+      <div
+        className={`fixed inset-0 z-50 min-[755px]:hidden ${
+          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
+        }`}
+        data-testid="mobile-nav-wrapper"
+      >
+        <button
+          type="button"
+          onClick={() => setMobileNavOpen(false)}
+          className={`absolute inset-0 bg-black/60 transition-opacity ${
+            mobileNavOpen ? "opacity-100" : "opacity-0"
+          }`}
+          data-testid="mobile-nav-overlay"
+        />
+        <aside
+          className={`absolute right-0 top-0 flex h-full w-72 flex-col gap-6 border-l border-white/10 bg-white/5 p-6 text-white backdrop-blur-2xl transition-transform ${
+            mobileNavOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+          data-testid="mobile-nav-panel"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-[0.4em] text-white/70">
+              BODDIN14 WG-HUB
+            </span>
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              className="rounded-full border border-white/10 p-2 text-white/80 transition hover:bg-white/10"
+              data-testid="mobile-nav-close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          <div className="flex flex-col gap-2" data-testid="mobile-nav-links">
+            {navItems.map((item) => (
+              <NavLink
+                key={`${item.to}-drawer`}
+                to={item.to}
+                onClick={() => setMobileNavOpen(false)}
+                className={({ isActive }) => {
+                  const calendarActive =
+                    item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
+                  return cn(
+                    "flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-medium transition-colors",
+                    isActive || calendarActive
+                      ? "border-[#CCFF00] bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_18px_rgba(204,255,0,0.35)]"
+                      : "border-white/10 text-white/70 hover:border-white/30 hover:text-white",
+                  );
+                }}
+                data-testid={`mobile-${item.testId}`}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.label}</span>
+              </NavLink>
+            ))}
+          </div>
+        </aside>
+      </div>
       <main
         className="mx-auto w-full max-w-6xl px-4 pb-28 pt-28 md:px-8"
         data-testid="main-content"
       >
         {children}
       </main>
-      <nav
-        className="fixed bottom-4 left-1/2 z-40 w-[min(92%,560px)] -translate-x-1/2 rounded-full border border-white/5 bg-white/5 px-2 py-2 shadow-[0_0_30px_rgba(176,38,255,0.25)] backdrop-blur-2xl md:hidden"
-        data-testid="bottom-nav"
-      >
-        <div className="flex items-center justify-between px-2">
-          {navItems.map((item) => (
-            <NavLink
-              key={`${item.to}-mobile`}
-              to={item.to}
-              className={({ isActive }) => {
-                const calendarActive =
-                  item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                return cn(
-                  "hover-lift flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-xs font-medium transition-colors",
-                  isActive || calendarActive
-                    ? "bg-[#CCFF00]/15 text-[#CCFF00]"
-                    : "text-white/70 hover:bg-white/10 hover:text-white",
-                );
-              }}
-              data-testid={`${item.testId}-mobile`}
-            >
-              <item.icon className="h-4 w-4" />
-              <span data-testid={`${item.testId}-mobile-label`}>{item.short}</span>
-            </NavLink>
-          ))}
-        </div>
-      </nav>
     </div>
   );
 };
