@@ -11,7 +11,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 ## Implementiert
 - Dashboard mit Überblick über aktive Aufenthalte, Pflanzen-Timer und Anleitungen
 - Dashboard-Widget "Pflanzen gegossen" mit Timer + Reset (lokal gespeichert)
-- Kalenderansicht mit Belegungspunkten für beide Zimmer + Monatsnavigation
+- Kalenderansicht mit Zimmer-Balken (oben/unten) + Monatsnavigation
 - Aufenthalte: Anlegen, Liste, Detailansicht, Check-in/Check-out Checklisten, Bearbeiten, Löschen
 - Bedienungsanleitungen: Anlegen (Bild-Upload oder Bild-URL), Liste, Detailansicht, Beispiel-Seed
 - Detailansicht der Anleitungen editierbar per Inline-Bearbeiten/Speichern
@@ -21,8 +21,9 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - UI-Feinschliff: Space Grotesk überall, Untertitel entfernt, subtile Rahmen + lila Akzente auf Kalender/Aufenthalte/Anleitungen
 - Manuals: "How to....." Rebranding, Beispiel-Anleitungen entfernt, Lösch-Button im Editmodus
 - Kalender: aktueller Tag mit Glow + Hover-Lift bei klickbaren Elementen
+- Aufenthalte: Anzeige der Zimmernamen aus den Einstellungen (statt Zimmer A/B)
 - Übersicht: Haus-Chat mit Nachrichten + Namen (persistiert)
-- Übersicht: Organisations-Box mit Benutzerbild ersetzt
+- Übersicht: Organisations-Box mit Benutzerbild ersetzt (aktuelles Hero-Bild aktualisiert)
 - Kalender: Aufenthalte-Liste unter dem Kalender ergänzt
 - Berlin-Seite: Veranstaltungstipps posten & ansehen (Events-API)
 - Berlin-Seite: Dauerhafte Links mit Beschreibung & Hashtags
