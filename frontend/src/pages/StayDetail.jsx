@@ -101,6 +101,8 @@ export default function StayDetail() {
 
   const rooms = settings?.rooms || DEFAULT_ROOMS;
   const roomColor = rooms.find((room) => room.id === stay.room)?.color;
+  const roomLabel =
+    rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`;
 
   return (
     <div className="space-y-6" data-testid="stay-detail-page">
@@ -128,7 +130,7 @@ export default function StayDetail() {
             className="border border-transparent text-stone-900"
             data-testid="stay-detail-room"
           >
-            Zimmer {stay.room}
+            {roomLabel}
           </Badge>
           <StayEditDialog stay={stay} onSave={updateStay} />
         </div>
