@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+ 
 import { api } from "@/lib/api";
-import { HERO_IMAGE, DEFAULT_ROOMS } from "@/lib/constants";
+import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { getRoomBadgeStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarDays, ClipboardList, Droplet } from "lucide-react";
+import { Droplet } from "lucide-react";
 import {
   format,
   parseISO,
