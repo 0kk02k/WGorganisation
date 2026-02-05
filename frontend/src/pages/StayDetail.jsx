@@ -113,10 +113,7 @@ export default function StayDetail() {
           >
             ← Zurück
           </Link>
-          <h1
-            className="font-[Manrope] text-3xl font-bold tracking-tight"
-            data-testid="stay-detail-title"
-          >
+          <h1 className="text-3xl font-bold tracking-tight" data-testid="stay-detail-title">
             {stay.occupant_name}
           </h1>
           <p className="text-sm text-stone-600" data-testid="stay-detail-date">
