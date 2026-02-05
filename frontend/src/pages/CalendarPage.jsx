@@ -126,6 +126,7 @@ export default function CalendarPage() {
               const dayStays = staysForDate(day);
               const hasRoomA = dayStays.some((stay) => stay.room === "A");
               const hasRoomB = dayStays.some((stay) => stay.room === "B");
+              const hasEvents = eventsForDate(day).length > 0;
 
               return (
                 <button
