@@ -187,7 +187,7 @@ export default function CalendarPage() {
             {format(selectedDate, "EEEE, dd.MM.yyyy")}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
           {selectedStays.length === 0 ? (
             <p className="text-sm text-stone-600" data-testid="calendar-no-stays">
               Keine Belegung an diesem Tag.
@@ -214,6 +214,27 @@ export default function CalendarPage() {
               </div>
             ))
           )}
+          <div className="space-y-2" data-testid="calendar-day-events">
+            <p className="text-xs text-white/60" data-testid="calendar-day-events-label">
+              Veranstaltungstipps
+            </p>
+            {selectedEvents.length === 0 ? (
+              <p className="text-sm text-stone-600" data-testid="calendar-no-events">
+                Keine Tipps für diesen Tag.
+              </p>
+            ) : (
+              selectedEvents.map((event) => (
+                <div
+                  key={event.id}
+                  className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                  data-testid={`calendar-event-${event.id}`}
+                >
+                  <p className="text-sm font-semibold text-stone-900">{event.title}</p>
+                  <p className="text-xs text-stone-600">{event.location}</p>
+                </div>
+              ))
+            )}
+          </div>
         </CardContent>
       </Card>
     <div className="space-y-4" data-testid="calendar-stays-section">
