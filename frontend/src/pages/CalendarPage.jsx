@@ -25,6 +25,7 @@ import {
 export default function CalendarPage() {
   const { settings } = useSettings();
   const [stays, setStays] = useState([]);
+  const [events, setEvents] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(new Date());
   const rooms = settings?.rooms || DEFAULT_ROOMS;
@@ -32,11 +33,15 @@ export default function CalendarPage() {
   const roomB = rooms.find((room) => room.id === "B");
 
   useEffect(() => {
-    const loadStays = async () => {
-      const response = await api.get("/stays");
-      setStays(response.data);
+    const loadData = async () => {
+      const [staysResponse, eventsResponse] = await Promise.all([
+        api.get("/stays"),
+        api.get("/events"),
+      ]);
+      setStays(staysResponse.data);
+      setEvents(eventsResponse.data);
     };
-    loadStays();
+    loadData();
   }, []);
 
   const calendarDays = useMemo(() => {
