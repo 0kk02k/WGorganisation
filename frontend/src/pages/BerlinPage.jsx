@@ -132,14 +132,25 @@ export default function BerlinPage() {
       return;
     }
     try {
-      const response = await api.post("/events", {
-        title: form.title,
-        date: form.date,
-        location: form.location,
-        description: form.description,
-        hashtags: parseTags(form.hashtags),
-      });
-      setEvents((prev) => [response.data, ...prev]);
+      if (editingType === "event" && editingId) {
+        const response = await api.put(`/events/${editingId}`, {
+          title: form.title,
+          date: form.date,
+          location: form.location,
+          description: form.description,
+          hashtags: parseTags(form.hashtags),
+        });
+        setEvents((prev) => prev.map((item) => (item.id === editingId ? response.data : item)));
+      } else {
+        const response = await api.post("/events", {
+          title: form.title,
+          date: form.date,
+          location: form.location,
+          description: form.description,
+          hashtags: parseTags(form.hashtags),
+        });
+        setEvents((prev) => [response.data, ...prev]);
+      }
       setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
       setIsModalOpen(false);
     } catch (error) {
@@ -153,12 +164,21 @@ export default function BerlinPage() {
       return;
     }
     try {
-      const response = await api.post("/berlin-links", {
-        url: linkForm.url,
-        description: linkForm.description,
-        hashtags: parseTags(linkForm.hashtags),
-      });
-      setLinks((prev) => [response.data, ...prev]);
+      if (editingType === "link" && editingId) {
+        const response = await api.put(`/berlin-links/${editingId}`, {
+          url: linkForm.url,
+          description: linkForm.description,
+          hashtags: parseTags(linkForm.hashtags),
+        });
+        setLinks((prev) => prev.map((item) => (item.id === editingId ? response.data : item)));
+      } else {
+        const response = await api.post("/berlin-links", {
+          url: linkForm.url,
+          description: linkForm.description,
+          hashtags: parseTags(linkForm.hashtags),
+        });
+        setLinks((prev) => [response.data, ...prev]);
+      }
       setLinkForm({ url: "", description: "", hashtags: "" });
       setIsModalOpen(false);
     } catch (error) {
