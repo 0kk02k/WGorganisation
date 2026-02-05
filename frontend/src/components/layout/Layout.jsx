@@ -52,28 +52,25 @@ export const Layout = ({ children }) => {
         <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
       </div>
       <header className="fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-white/5 backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-8">
-          <div>
-            <p
-              data-testid="app-title"
-              className="text-xl font-semibold tracking-tight text-white"
-            >
-              Teilzeit-WG Hub
-            </p>
-          </div>
-          <nav className="hidden items-center gap-2 md:flex" data-testid="top-nav">
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-4 md:px-8">
+          <nav
+            className="hidden w-full items-center justify-between gap-2 md:flex"
+            data-testid="top-nav"
+          >
             {navItems.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
-                className={({ isActive }) =>
-                  cn(
+                className={({ isActive }) => {
+                  const calendarActive =
+                    item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
+                  return cn(
                     "hover-lift flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                    isActive
+                    isActive || calendarActive
                       ? "bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_20px_rgba(204,255,0,0.35)]"
                       : "text-white/70 hover:bg-white/10 hover:text-white",
-                  )
-                }
+                  );
+                }}
                 data-testid={item.testId}
               >
                 <item.icon className="h-4 w-4" />
