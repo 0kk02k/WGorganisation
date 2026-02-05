@@ -146,9 +146,25 @@ class EventBase(BaseModel):
     date: str
     location: str
     description: str
+    hashtags: List[str] = Field(default_factory=list)
 
 
 class Event(EventBase):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    created_at: str = Field(default_factory=now_iso)
+
+
+class BerlinLinkBase(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    url: str
+    description: str
+    hashtags: List[str] = Field(default_factory=list)
+
+
+class BerlinLink(BerlinLinkBase):
     model_config = ConfigDict(extra="ignore")
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -300,6 +316,19 @@ async def create_event(payload: EventBase):
     event = Event(**payload.model_dump())
     await db.events.insert_one(event.model_dump())
     return event
+
+
+@api_router.get("/berlin-links", response_model=List[BerlinLink])
+async def list_berlin_links():
+    links = await db.berlin_links.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return links
+
+
+@api_router.post("/berlin-links", response_model=BerlinLink)
+async def create_berlin_link(payload: BerlinLinkBase):
+    link = BerlinLink(**payload.model_dump())
+    await db.berlin_links.insert_one(link.model_dump())
+    return link
 
 
 async def get_or_create_settings() -> Settings:
