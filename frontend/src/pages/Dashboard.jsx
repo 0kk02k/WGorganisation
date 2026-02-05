@@ -128,15 +128,6 @@ export default function Dashboard() {
                 alt="Organisation Visual"
                 className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/35">
-                <span
-                  className="px-3 text-center text-[clamp(2.8rem,8vw,7rem)] font-semibold uppercase leading-[0.9] tracking-[0.15em] text-white/90"
-                  data-testid="dashboard-organization-title"
-                >
-                  <span className="block">BODDIN14</span>
-                  <span className="block">WG-HUB</span>
-                </span>
-              </div>
             </div>
           </div>
         </Card>
