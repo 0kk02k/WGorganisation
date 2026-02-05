@@ -209,15 +209,15 @@ export default function Dashboard() {
                       {format(parseISO(stay.end_date), "dd.MM.yyyy")}
                     </p>
                   </div>
-                  <Badge
-                    style={getRoomBadgeStyle(
-                      rooms.find((room) => room.id === stay.room)?.color,
-                    )}
-                    className="border border-transparent text-stone-900"
-                    data-testid={`dashboard-active-room-${stay.id}`}
-                  >
-                    Zimmer {stay.room}
-                  </Badge>
+                <Badge
+                  style={getRoomBadgeStyle(
+                    rooms.find((room) => room.id === stay.room)?.color,
+                  )}
+                  className="border border-transparent text-stone-900"
+                  data-testid={`dashboard-active-room-${stay.id}`}
+                >
+                  {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                </Badge>
                 </div>
               ))
             )}
