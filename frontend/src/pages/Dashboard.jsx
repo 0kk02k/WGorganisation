@@ -160,7 +160,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <span
-                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-900/10 text-emerald-900"
+                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#B026FF]/20 text-[#B026FF]"
                 data-testid="dashboard-plants-icon"
               >
                 <Droplet className="h-5 w-5" />
