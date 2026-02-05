@@ -124,7 +124,7 @@ export default function Dashboard() {
                 <Button
                   variant="outline"
                   asChild
-                  className="rounded-full border-white/10 text-white/80 hover:text-white"
+                  className="rounded-full border-white/5 text-white/80 hover:text-white"
                 >
                   <Link to="/aufenthalte" data-testid="dashboard-stays-link">
                     <ClipboardList className="mr-2 h-4 w-4" />
@@ -200,7 +200,7 @@ export default function Dashboard() {
               activeStays.map((stay) => (
                 <div
                   key={stay.id}
-                  className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                  className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-active-stay-${stay.id}`}
                 >
                   <div>
@@ -245,7 +245,7 @@ export default function Dashboard() {
               upcomingStays.map((stay) => (
                 <div
                   key={stay.id}
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                  className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-upcoming-${stay.id}`}
                 >
                   <p
