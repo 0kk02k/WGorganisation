@@ -336,6 +336,14 @@ async def update_event(event_id: str, payload: EventUpdate):
     return Event(**stored_event)
 
 
+@api_router.delete("/events/{event_id}")
+async def delete_event(event_id: str):
+    result = await db.events.delete_one({"id": event_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"status": "ok"}
+
+
 @api_router.get("/berlin-links", response_model=List[BerlinLink])
 async def list_berlin_links():
     links = await db.berlin_links.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
@@ -357,6 +365,14 @@ async def update_berlin_link(link_id: str, payload: BerlinLinkUpdate):
         raise HTTPException(status_code=404, detail="Link not found")
     stored_link = await db.berlin_links.find_one({"id": link_id}, {"_id": 0})
     return BerlinLink(**stored_link)
+
+
+@api_router.delete("/berlin-links/{link_id}")
+async def delete_berlin_link(link_id: str):
+    result = await db.berlin_links.delete_one({"id": link_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Link not found")
+    return {"status": "ok"}
 
 
 async def get_or_create_settings() -> Settings:
