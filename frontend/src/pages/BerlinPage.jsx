@@ -377,13 +377,25 @@ export default function BerlinPage() {
                   data-testid="berlin-link-description-input"
                 />
               </div>
-              <Button
-                onClick={handleLinkSubmit}
-                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-                data-testid="berlin-link-submit-button"
-              >
-                {editingType === "link" ? "Änderungen speichern" : "Link speichern"}
-              </Button>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={handleLinkSubmit}
+                  className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                  data-testid="berlin-link-submit-button"
+                >
+                  {editingType === "link" ? "Änderungen speichern" : "Link speichern"}
+                </Button>
+                {editingType === "link" && (
+                  <Button
+                    variant="outline"
+                    onClick={handleDeleteLink}
+                    className="rounded-full border-red-500/60 text-red-200 hover:bg-red-500/10"
+                    data-testid="berlin-link-delete-button"
+                  >
+                    Link löschen
+                  </Button>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </DialogContent>
