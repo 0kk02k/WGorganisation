@@ -132,11 +132,35 @@ class MessageBase(BaseModel):
     content: str
 
 
+class MessageReply(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    content: str
+    created_at: str = Field(default_factory=now_iso)
+
+
+class MessageReplyCreate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: str
+    content: str
+
+
+class MessageUpdate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    name: Optional[str] = None
+    content: Optional[str] = None
+
+
 class Message(MessageBase):
     model_config = ConfigDict(extra="ignore")
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=now_iso)
+    replies: List[MessageReply] = Field(default_factory=list)
 
 
 class EventBase(BaseModel):
