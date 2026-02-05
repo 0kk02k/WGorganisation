@@ -122,7 +122,7 @@ export default function CalendarPage() {
                   className={`rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
                     isSameDay(day, selectedDate)
                       ? "bg-[#B026FF] text-white"
-                      : "bg-white hover:bg-stone-100"
+                      : "bg-white/5 hover:bg-white/10"
                   } ${!inMonth ? "opacity-40" : "opacity-100"}`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
