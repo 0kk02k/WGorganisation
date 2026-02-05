@@ -376,7 +376,10 @@ export default function BerlinPage() {
       )}
 
       <div className="grid gap-6 lg:grid-cols-2" data-testid="berlin-columns">
-        <div className="space-y-4" data-testid="berlin-events-section">
+        <div
+          className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_0_30px_rgba(176,38,255,0.15)]"
+          data-testid="berlin-events-section"
+        >
           <h2 className="text-xl font-semibold" data-testid="berlin-events-title">
             Aktuelle Tipps
           </h2>
@@ -443,7 +446,10 @@ export default function BerlinPage() {
           )}
         </div>
 
-        <div className="space-y-4" data-testid="berlin-links-section">
+        <div
+          className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_0_30px_rgba(176,38,255,0.15)]"
+          data-testid="berlin-links-section"
+        >
           <h2 className="text-xl font-semibold" data-testid="berlin-links-title">
             Dauerhafte Links
           </h2>
