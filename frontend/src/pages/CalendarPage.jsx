@@ -32,6 +32,8 @@ export default function CalendarPage() {
   const rooms = settings?.rooms || DEFAULT_ROOMS;
   const roomA = rooms.find((room) => room.id === "A");
   const roomB = rooms.find((room) => room.id === "B");
+  const getRoomLabel = (roomId) =>
+    rooms.find((room) => room.id === roomId)?.name || `Zimmer ${roomId}`;
 
   useEffect(() => {
     const loadData = async () => {
