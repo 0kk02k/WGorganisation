@@ -53,6 +53,8 @@ export default function BerlinPage() {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postType, setPostType] = useState("event");
+  const [editingType, setEditingType] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   const availableTags = useMemo(() => {
     const tagSet = new Set();
@@ -80,6 +82,49 @@ export default function BerlinPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const openCreateModal = () => {
+    setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
+    setLinkForm({ url: "", description: "", hashtags: "" });
+    setPostType("event");
+    setEditingType(null);
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditEvent = (event) => {
+    setForm({
+      title: event.title || "",
+      date: event.date || "",
+      location: event.location || "",
+      description: event.description || "",
+      hashtags: safeTags(event.hashtags).join(", "),
+    });
+    setPostType("event");
+    setEditingType("event");
+    setEditingId(event.id);
+    setIsModalOpen(true);
+  };
+
+  const openEditLink = (link) => {
+    setLinkForm({
+      url: link.url || "",
+      description: link.description || "",
+      hashtags: safeTags(link.hashtags).join(", "),
+    });
+    setPostType("link");
+    setEditingType("link");
+    setEditingId(link.id);
+    setIsModalOpen(true);
+  };
+
+  const handleModalChange = (open) => {
+    setIsModalOpen(open);
+    if (!open) {
+      setEditingType(null);
+      setEditingId(null);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!form.title || !form.date || !form.location || !form.description) {
