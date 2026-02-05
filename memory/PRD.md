@@ -23,6 +23,8 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Kalender: aktueller Tag mit Glow + Hover-Lift bei klickbaren Elementen
 - Übersicht: Haus-Chat mit Nachrichten + Namen (persistiert)
 - Übersicht: Organisations-Box mit Benutzerbild ersetzt
+- Kalender: Aufenthalte-Liste unter dem Kalender ergänzt
+- Berlin-Seite: Veranstaltungstipps posten & ansehen (Events-API)
 
 ## Priorisierter Backlog
 **P0**
