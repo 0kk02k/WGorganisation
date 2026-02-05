@@ -162,6 +162,19 @@ export default function BerlinPage() {
               />
             </div>
           </div>
+          <div className="space-y-2">
+            <label className="text-xs text-white/60" data-testid="berlin-hashtags-label">
+              Hashtags
+            </label>
+            <Input
+              value={form.hashtags}
+              onChange={(event) =>
+                setForm((prev) => ({ ...prev, hashtags: event.target.value }))
+              }
+              placeholder="#club, #openair"
+              data-testid="berlin-hashtags-input"
+            />
+          </div>
           <Button
             onClick={handleSubmit}
             className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
