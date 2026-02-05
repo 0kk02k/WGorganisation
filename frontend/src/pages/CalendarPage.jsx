@@ -210,10 +210,11 @@ export default function CalendarPage() {
             </p>
           ) : (
             selectedStays.map((stay) => (
-              <div
+              <Link
                 key={stay.id}
-                className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                data-testid={`calendar-stay-${stay.id}`}
+                to={`/aufenthalte/${stay.id}`}
+                className="hover-lift rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                data-testid={`calendar-stay-link-${stay.id}`}
               >
                 <p
                   className="text-sm font-semibold text-stone-900"
@@ -227,7 +228,7 @@ export default function CalendarPage() {
                 >
                   {getRoomLabel(stay.room)}
                 </p>
-              </div>
+              </Link>
             ))
           )}
           {selectedEvents.length > 0 && (
@@ -236,14 +237,15 @@ export default function CalendarPage() {
                 Veranstaltungstipps
               </p>
               {selectedEvents.map((event) => (
-                <div
+                <Link
                   key={event.id}
-                  className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                  data-testid={`calendar-event-${event.id}`}
+                  to="/berlin"
+                  className="hover-lift rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                  data-testid={`calendar-event-link-${event.id}`}
                 >
                   <p className="text-sm font-semibold text-stone-900">{event.title}</p>
                   <p className="text-xs text-stone-600">{event.location}</p>
-                </div>
+                </Link>
               ))}
             </div>
           )}
