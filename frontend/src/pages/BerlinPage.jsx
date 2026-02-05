@@ -233,6 +233,142 @@ export default function BerlinPage() {
           </div>
         )}
       </div>
+
+      <div className="space-y-4" data-testid="berlin-links-section">
+        <h2 className="text-xl font-semibold" data-testid="berlin-links-title">
+          Dauerhafte Links
+        </h2>
+        <Card data-testid="berlin-links-form-card">
+          <CardHeader>
+            <CardTitle data-testid="berlin-links-form-title">Link hinzufügen</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-xs text-white/60" data-testid="berlin-link-url-label">
+                  URL
+                </label>
+                <Input
+                  value={linkForm.url}
+                  onChange={(event) =>
+                    setLinkForm((prev) => ({ ...prev, url: event.target.value }))
+                  }
+                  placeholder="https://..."
+                  data-testid="berlin-link-url-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  className="text-xs text-white/60"
+                  data-testid="berlin-link-hashtags-label"
+                >
+                  Hashtags
+                </label>
+                <Input
+                  value={linkForm.hashtags}
+                  onChange={(event) =>
+                    setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
+                  }
+                  placeholder="#tickets, #club"
+                  data-testid="berlin-link-hashtags-input"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label
+                className="text-xs text-white/60"
+                data-testid="berlin-link-description-label"
+              >
+                Beschreibung
+              </label>
+              <Textarea
+                rows={2}
+                value={linkForm.description}
+                onChange={(event) =>
+                  setLinkForm((prev) => ({ ...prev, description: event.target.value }))
+                }
+                placeholder="Warum ist der Link hilfreich?"
+                data-testid="berlin-link-description-input"
+              />
+            </div>
+            <Button
+              onClick={handleLinkSubmit}
+              className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+              data-testid="berlin-link-submit-button"
+            >
+              Link speichern
+            </Button>
+          </CardContent>
+        </Card>
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap gap-2" data-testid="berlin-tags">
+            <Button
+              variant={selectedTag ? "outline" : "default"}
+              onClick={() => setSelectedTag(null)}
+              className="rounded-full"
+              data-testid="berlin-tag-all"
+            >
+              Alle
+            </Button>
+            {availableTags.map((tag) => (
+              <Button
+                key={tag}
+                variant={selectedTag === tag ? "default" : "outline"}
+                onClick={() => setSelectedTag(tag)}
+                className="rounded-full"
+                data-testid={`berlin-tag-${tag}`}
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        )}
+        {filteredLinks.length === 0 ? (
+          <Card className="border-dashed border-stone-300" data-testid="berlin-links-empty">
+            <CardContent className="py-8 text-center text-sm text-stone-600">
+              Noch keine Links vorhanden.
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2">
+            {filteredLinks.map((link) => (
+              <Card key={link.id} data-testid={`berlin-link-${link.id}`}>
+                <CardHeader className="space-y-1">
+                  <CardTitle data-testid={`berlin-link-title-${link.id}`}>
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-[#CCFF00] hover:underline"
+                      data-testid={`berlin-link-url-${link.id}`}
+                    >
+                      {link.url}
+                    </a>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-white/70" data-testid={`berlin-link-description-${link.id}`}>
+                    {link.description}
+                  </p>
+                  {link.hashtags?.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2" data-testid={`berlin-link-tags-${link.id}`}>
+                      {link.hashtags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          className="rounded-full bg-white/10 text-white/70"
+                          data-testid={`berlin-link-tag-${link.id}-${tag}`}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
