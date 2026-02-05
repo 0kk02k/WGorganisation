@@ -112,88 +112,192 @@ export default function BerlinPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 pb-20 pt-28 md:px-8">
-      <div className="space-y-1">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold" data-testid="berlin-page">
           Berlin
         </h1>
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          className="h-12 w-12 rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+          data-testid="berlin-open-modal-button"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
       </div>
 
-      <Card data-testid="berlin-form-card">
-        <CardHeader>
-          <CardTitle data-testid="berlin-form-title">Veranstaltungstipp posten</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs text-white/60" data-testid="berlin-title-label">
-                Titel
-              </label>
-              <Input
-                value={form.title}
-                onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                placeholder="z.B. Jazz Night"
-                data-testid="berlin-title-input"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-white/60" data-testid="berlin-date-label">
-                Datum
-              </label>
-              <Input
-                type="date"
-                value={form.date}
-                onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                data-testid="berlin-date-input"
-              />
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-xs text-white/60" data-testid="berlin-location-label">
-                Ort
-              </label>
-              <Input
-                value={form.location}
-                onChange={(event) => setForm((prev) => ({ ...prev, location: event.target.value }))}
-                placeholder="z.B. Kreuzberg"
-                data-testid="berlin-location-input"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-xs text-white/60" data-testid="berlin-description-label">
-                Beschreibung
-              </label>
-              <Textarea
-                rows={2}
-                value={form.description}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, description: event.target.value }))
-                }
-                placeholder="Was lohnt sich?"
-                data-testid="berlin-description-input"
-              />
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="text-xs text-white/60" data-testid="berlin-hashtags-label">
-              Hashtags
-            </label>
-            <Input
-              value={form.hashtags}
-              onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
-              placeholder="#club, #openair"
-              data-testid="berlin-hashtags-input"
-            />
-          </div>
-          <Button
-            onClick={handleSubmit}
-            className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-            data-testid="berlin-submit-button"
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent
+          className="max-w-2xl border-white/10 bg-[#141414]/95 text-white"
+          data-testid="berlin-create-modal"
+        >
+          <DialogHeader>
+            <DialogTitle data-testid="berlin-create-title">Neuer Beitrag</DialogTitle>
+          </DialogHeader>
+          <Tabs
+            value={postType}
+            onValueChange={setPostType}
+            className="space-y-4"
+            data-testid="berlin-create-tabs"
           >
-            Tipp posten
+            <TabsList className="grid w-full grid-cols-2 bg-white/5">
+              <TabsTrigger value="event" data-testid="berlin-tab-event">
+                Veranstaltung
+              </TabsTrigger>
+              <TabsTrigger value="link" data-testid="berlin-tab-link">
+                Link
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-title-label">
+                    Titel
+                  </label>
+                  <Input
+                    value={form.title}
+                    onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                    placeholder="z.B. Jazz Night"
+                    data-testid="berlin-title-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-date-label">
+                    Datum
+                  </label>
+                  <Input
+                    type="date"
+                    value={form.date}
+                    onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                    data-testid="berlin-date-input"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-location-label">
+                    Ort
+                  </label>
+                  <Input
+                    value={form.location}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, location: event.target.value }))
+                    }
+                    placeholder="z.B. Kreuzberg"
+                    data-testid="berlin-location-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-description-label">
+                    Beschreibung
+                  </label>
+                  <Textarea
+                    rows={2}
+                    value={form.description}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, description: event.target.value }))
+                    }
+                    placeholder="Was lohnt sich?"
+                    data-testid="berlin-description-input"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-white/60" data-testid="berlin-hashtags-label">
+                  Hashtags
+                </label>
+                <Input
+                  value={form.hashtags}
+                  onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
+                  placeholder="#club, #openair"
+                  data-testid="berlin-hashtags-input"
+                />
+              </div>
+              <Button
+                onClick={handleSubmit}
+                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                data-testid="berlin-submit-button"
+              >
+                Tipp posten
+              </Button>
+            </TabsContent>
+            <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-link-url-label">
+                    URL
+                  </label>
+                  <Input
+                    value={linkForm.url}
+                    onChange={(event) =>
+                      setLinkForm((prev) => ({ ...prev, url: event.target.value }))
+                    }
+                    placeholder="https://..."
+                    data-testid="berlin-link-url-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs text-white/60" data-testid="berlin-link-hashtags-label">
+                    Hashtags
+                  </label>
+                  <Input
+                    value={linkForm.hashtags}
+                    onChange={(event) =>
+                      setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
+                    }
+                    placeholder="#tickets, #club"
+                    data-testid="berlin-link-hashtags-input"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs text-white/60" data-testid="berlin-link-description-label">
+                  Beschreibung
+                </label>
+                <Textarea
+                  rows={2}
+                  value={linkForm.description}
+                  onChange={(event) =>
+                    setLinkForm((prev) => ({ ...prev, description: event.target.value }))
+                  }
+                  placeholder="Warum ist der Link hilfreich?"
+                  data-testid="berlin-link-description-input"
+                />
+              </div>
+              <Button
+                onClick={handleLinkSubmit}
+                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                data-testid="berlin-link-submit-button"
+              >
+                Link speichern
+              </Button>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      {availableTags.length > 0 && (
+        <div className="flex flex-wrap gap-2" data-testid="berlin-tags">
+          <Button
+            variant={selectedTag ? "outline" : "default"}
+            onClick={() => setSelectedTag(null)}
+            className="rounded-full"
+            data-testid="berlin-tag-all"
+          >
+            Alle
           </Button>
-        </CardContent>
-      </Card>
+          {availableTags.map((tag, index) => (
+            <Button
+              key={tag}
+              variant={selectedTag === tag ? "default" : "outline"}
+              onClick={() => setSelectedTag(tag)}
+              className="rounded-full"
+              data-testid={`berlin-tag-${index}`}
+            >
+              {tag}
+            </Button>
+          ))}
+        </div>
+      )}
 
       <div className="space-y-4" data-testid="berlin-events-section">
         <h2 className="text-xl font-semibold" data-testid="berlin-events-title">
