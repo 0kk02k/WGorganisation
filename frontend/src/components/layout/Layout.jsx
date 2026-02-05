@@ -88,7 +88,7 @@ export const Layout = ({ children }) => {
         data-testid="mobile-brand-bar"
       >
         <span
-          className="text-base font-semibold uppercase tracking-[0.4em] text-white/80"
+          className="text-2xl font-semibold uppercase tracking-[0.3em] text-white/80"
           data-testid="mobile-brand-text"
         >
           BODDIN14 WG-HUB
