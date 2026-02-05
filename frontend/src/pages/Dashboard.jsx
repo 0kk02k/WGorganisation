@@ -248,7 +248,7 @@ export default function Dashboard() {
         </Card>
         <Card className="lg:col-span-3" data-testid="dashboard-chat-card">
           <CardHeader>
-            <CardTitle data-testid="dashboard-chat-title">Haus-Chat</CardTitle>
+            <CardTitle data-testid="dashboard-chat-title">WG-Chat</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
