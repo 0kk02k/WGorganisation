@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "@/lib/api";
-import { DEMO_MANUALS } from "@/lib/constants";
 import { ManualDialog } from "@/components/manuals/ManualDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function ManualsPage() {
@@ -18,42 +16,22 @@ export default function ManualsPage() {
     loadManuals();
   }, []);
 
-  const seedManuals = async () => {
-    try {
-      await Promise.all(DEMO_MANUALS.map((manual) => api.post("/manuals", manual)));
-      const response = await api.get("/manuals");
-      setManuals(response.data);
-      toast.success("Beispiel-Anleitungen hinzugefügt.");
-    } catch (error) {
-      toast.error("Beispiel konnte nicht geladen werden.");
-    }
-  };
-
   return (
     <div className="space-y-6" data-testid="manuals-page">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight" data-testid="manuals-title">
-            Bedienungsanleitungen
+            How to.....
           </h1>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <Button
-            variant="outline"
-            onClick={seedManuals}
-            data-testid="manuals-seed-button"
-          >
-            Beispiel-Anleitungen
-          </Button>
-          <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
-        </div>
+        <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-2" data-testid="manuals-grid">
         {manuals.length === 0 ? (
           <Card className="border-dashed border-stone-300" data-testid="manuals-empty">
             <CardContent className="py-8 text-center text-sm text-stone-600">
-              Noch keine Anleitungen. Lege eine neue an oder nutze die Beispiele.
+              Noch keine Anleitungen. Lege eine neue an.
             </CardContent>
           </Card>
         ) : (
