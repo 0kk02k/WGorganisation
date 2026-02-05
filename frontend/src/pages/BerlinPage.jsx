@@ -24,13 +24,38 @@ export default function BerlinPage() {
     hashtags: "",
   });
 
-  const loadEvents = async () => {
-    const response = await api.get("/events");
-    setEvents(response.data);
+  const parseTags = (value) =>
+    value
+      .split(",")
+      .map((tag) => tag.replace("#", "").trim())
+      .filter(Boolean)
+      .map((tag) => `#${tag}`);
+
+  const availableTags = useMemo(() => {
+    const tagSet = new Set();
+    events.forEach((event) => event.hashtags?.forEach((tag) => tagSet.add(tag)));
+    links.forEach((link) => link.hashtags?.forEach((tag) => tagSet.add(tag)));
+    return Array.from(tagSet);
+  }, [events, links]);
+
+  const filteredEvents = selectedTag
+    ? events.filter((event) => event.hashtags?.includes(selectedTag))
+    : events;
+  const filteredLinks = selectedTag
+    ? links.filter((link) => link.hashtags?.includes(selectedTag))
+    : links;
+
+  const loadData = async () => {
+    const [eventsResponse, linksResponse] = await Promise.all([
+      api.get("/events"),
+      api.get("/berlin-links"),
+    ]);
+    setEvents(eventsResponse.data);
+    setLinks(linksResponse.data);
   };
 
   useEffect(() => {
-    loadEvents();
+    loadData();
   }, []);
 
   const handleSubmit = async () => {
