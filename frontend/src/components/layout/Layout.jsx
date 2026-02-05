@@ -88,7 +88,7 @@ export const Layout = ({ children }) => {
         data-testid="mobile-brand-bar"
       >
         <span
-          className="text-xs font-semibold uppercase tracking-[0.4em] text-white/80"
+          className="text-base font-semibold uppercase tracking-[0.4em] text-white/80"
           data-testid="mobile-brand-text"
         >
           BODDIN14 WG-HUB
@@ -122,10 +122,7 @@ export const Layout = ({ children }) => {
           }`}
           data-testid="mobile-nav-panel"
         >
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-[0.4em] text-white/70">
-              BODDIN14 WG-HUB
-            </span>
+          <div className="flex items-center justify-end">
             <button
               type="button"
               onClick={() => setMobileNavOpen(false)}
