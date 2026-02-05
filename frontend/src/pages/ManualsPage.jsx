@@ -44,10 +44,10 @@ export default function ManualsPage() {
               <Link
                 to={`/anleitungen/${manual.id}`}
                 key={manual.id}
-                className="group"
+                className="group hover-lift"
                 data-testid={`manual-card-${manual.id}`}
               >
-                <Card className="overflow-hidden border-stone-200/80 transition-colors group-hover:bg-stone-50">
+                <Card className="overflow-hidden transition-colors group-hover:bg-white/5">
                   <div className="aspect-video overflow-hidden bg-stone-100" data-testid={`manual-image-${manual.id}`}>
                     <img
                       src={imageSrc}
