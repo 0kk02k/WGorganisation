@@ -57,15 +57,9 @@ export default function CalendarPage() {
     <div className="space-y-6" data-testid="calendar-page">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1
-            className="font-[Manrope] text-3xl font-bold tracking-tight"
-            data-testid="calendar-title"
-          >
+          <h1 className="text-3xl font-bold tracking-tight" data-testid="calendar-title">
             Zimmerbelegung
           </h1>
-          <p className="text-sm text-stone-600" data-testid="calendar-subtitle">
-            Übersicht wann welches Zimmer belegt ist.
-          </p>
         </div>
         <StayDialog
           triggerLabel="Neue Belegung"
@@ -127,7 +121,7 @@ export default function CalendarPage() {
                   onClick={() => setSelectedDate(day)}
                   className={`rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
                     isSameDay(day, selectedDate)
-                      ? "bg-emerald-900 text-emerald-50"
+                      ? "bg-[#B026FF] text-white"
                       : "bg-white hover:bg-stone-100"
                   } ${!inMonth ? "opacity-40" : "opacity-100"}`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
