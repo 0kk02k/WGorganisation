@@ -121,6 +121,73 @@ export default function Dashboard() {
     }
   };
 
+  const startEditMessage = (message) => {
+    setEditingMessageId(message.id);
+    setEditingContent(message.content);
+    setReplyingToId(null);
+  };
+
+  const handleUpdateMessage = async () => {
+    if (!editingMessageId || !editingContent.trim()) {
+      toast.error("Bitte eine Nachricht eingeben.");
+      return;
+    }
+    try {
+      const response = await api.put(`/messages/${editingMessageId}`, {
+        content: editingContent.trim(),
+      });
+      setMessages((prev) =>
+        prev.map((item) => (item.id === editingMessageId ? response.data : item)),
+      );
+      setEditingMessageId(null);
+      setEditingContent("");
+    } catch (error) {
+      toast.error("Nachricht konnte nicht gespeichert werden.");
+    }
+  };
+
+  const handleDeleteMessage = async (messageId) => {
+    try {
+      await api.delete(`/messages/${messageId}`);
+      setMessages((prev) => prev.filter((item) => item.id !== messageId));
+      if (editingMessageId === messageId) {
+        setEditingMessageId(null);
+        setEditingContent("");
+      }
+      if (replyingToId === messageId) {
+        setReplyingToId(null);
+      }
+    } catch (error) {
+      toast.error("Nachricht konnte nicht gelöscht werden.");
+    }
+  };
+
+  const startReply = (message) => {
+    setReplyingToId(message.id);
+    setReplyForm({ name: messageForm.name || "", content: "" });
+    setEditingMessageId(null);
+  };
+
+  const handleReplySubmit = async (messageId) => {
+    if (!replyForm.name.trim() || !replyForm.content.trim()) {
+      toast.error("Bitte Name und Antwort ausfüllen.");
+      return;
+    }
+    try {
+      const response = await api.post(`/messages/${messageId}/replies`, {
+        name: replyForm.name.trim(),
+        content: replyForm.content.trim(),
+      });
+      setMessages((prev) =>
+        prev.map((item) => (item.id === messageId ? response.data : item)),
+      );
+      setReplyingToId(null);
+      setReplyForm({ name: "", content: "" });
+    } catch (error) {
+      toast.error("Antwort konnte nicht gesendet werden.");
+    }
+  };
+
   return (
     <div className="space-y-6" data-testid="dashboard-page">
       <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
