@@ -156,6 +156,10 @@ class Event(EventBase):
     created_at: str = Field(default_factory=now_iso)
 
 
+class EventUpdate(EventBase):
+    model_config = ConfigDict(extra="ignore")
+
+
 class BerlinLinkBase(BaseModel):
     model_config = ConfigDict(extra="ignore")
 
@@ -169,6 +173,10 @@ class BerlinLink(BerlinLinkBase):
 
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: str = Field(default_factory=now_iso)
+
+
+class BerlinLinkUpdate(BerlinLinkBase):
+    model_config = ConfigDict(extra="ignore")
 
 
 class RoomConfig(BaseModel):
