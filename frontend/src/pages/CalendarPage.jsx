@@ -213,7 +213,7 @@ export default function CalendarPage() {
               <Link
                 key={stay.id}
                 to={`/aufenthalte/${stay.id}`}
-                className="hover-lift rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                className="hover-lift block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
                 data-testid={`calendar-stay-link-${stay.id}`}
               >
                 <p
@@ -240,7 +240,7 @@ export default function CalendarPage() {
                 <Link
                   key={event.id}
                   to="/berlin"
-                  className="hover-lift rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                  className="hover-lift block rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
                   data-testid={`calendar-event-link-${event.id}`}
                 >
                   <p className="text-sm font-semibold text-stone-900">{event.title}</p>
