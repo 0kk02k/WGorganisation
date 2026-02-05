@@ -167,6 +167,12 @@ export default function CalendarPage() {
                       }
                       data-testid={`calendar-room-b-${format(day, "yyyy-MM-dd")}`}
                     />
+                    {hasEvents && (
+                      <span
+                        className="h-2 w-2 rounded-full bg-[#B026FF]"
+                        data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
+                      />
+                    )}
                   </div>
                 </button>
               );
