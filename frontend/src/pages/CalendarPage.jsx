@@ -21,6 +21,7 @@ import {
   isWithinInterval,
   isToday,
 } from "date-fns";
+import { de } from "date-fns/locale";
 
 export default function CalendarPage() {
   const { settings } = useSettings();
