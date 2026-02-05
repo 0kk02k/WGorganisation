@@ -135,7 +135,7 @@ export default function CalendarPage() {
                 <button
                   key={day.toISOString()}
                   onClick={() => setSelectedDate(day)}
-                  className={`hover-lift rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
+                  className={`relative hover-lift rounded-2xl border border-stone-200 px-2 py-3 text-left text-sm transition-colors ${
                     isSameDay(day, selectedDate)
                       ? "bg-[#B026FF] text-white"
                       : "bg-white/5 hover:bg-white/10"
@@ -146,37 +146,31 @@ export default function CalendarPage() {
                   }`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
+                  {hasRoomA && (
+                    <span
+                      className="absolute left-2 right-2 top-1 h-1 rounded-full"
+                      style={roomA?.color ? getRoomDotStyle(roomA?.color) : undefined}
+                      data-testid={`calendar-room-a-bar-${format(day, "yyyy-MM-dd")}`}
+                    />
+                  )}
+                  {hasRoomB && (
+                    <span
+                      className="absolute left-2 right-2 bottom-1 h-1 rounded-full"
+                      style={roomB?.color ? getRoomDotStyle(roomB?.color) : undefined}
+                      data-testid={`calendar-room-b-bar-${format(day, "yyyy-MM-dd")}`}
+                    />
+                  )}
                   <div className="flex items-center justify-between">
                     <span data-testid={`calendar-day-label-${format(day, "yyyy-MM-dd")}`}>
                       {format(day, "d")}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center gap-1">
+                  {hasEvents && (
                     <span
-                      className="h-2 w-2 rounded-full"
-                      style={
-                        hasRoomA
-                          ? getRoomDotStyle(roomA?.color)
-                          : { backgroundColor: "#e7e5e4" }
-                      }
-                      data-testid={`calendar-room-a-${format(day, "yyyy-MM-dd")}`}
+                      className="mt-2 inline-block h-1.5 w-3 rounded-full bg-[#B026FF]"
+                      data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
                     />
-                    <span
-                      className="h-2 w-2 rounded-full"
-                      style={
-                        hasRoomB
-                          ? getRoomDotStyle(roomB?.color)
-                          : { backgroundColor: "#e7e5e4" }
-                      }
-                      data-testid={`calendar-room-b-${format(day, "yyyy-MM-dd")}`}
-                    />
-                    {hasEvents && (
-                      <span
-                        className="h-2 w-2 rounded-full bg-[#B026FF]"
-                        data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
-                      />
-                    )}
-                  </div>
+                  )}
                 </button>
               );
             })}
