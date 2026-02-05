@@ -75,7 +75,7 @@ export default function StayDetail() {
   const handleDelete = async () => {
     await api.delete(`/stays/${id}`);
     toast.success("Aufenthalt gelöscht.");
-    navigate("/aufenthalte");
+    navigate("/kalender");
   };
 
   if (loading) {
