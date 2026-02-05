@@ -8,6 +8,8 @@ import {
 
 const SettingsContext = createContext(null);
 
+const limitRooms = (rooms) => (Array.isArray(rooms) ? rooms.slice(0, 2) : rooms);
+
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     rooms: DEFAULT_ROOMS,
@@ -19,7 +21,7 @@ export const SettingsProvider = ({ children }) => {
   const loadSettings = async () => {
     try {
       const response = await api.get("/settings");
-      setSettings(response.data);
+        setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
     } finally {
       setLoading(false);
     }
@@ -30,8 +32,12 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   const updateSettings = async (payload) => {
-    const response = await api.put("/settings", payload);
-    setSettings(response.data);
+    const cleanedPayload = {
+      ...payload,
+      rooms: payload.rooms ? limitRooms(payload.rooms) : undefined,
+    };
+    const response = await api.put("/settings", cleanedPayload);
+    setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
     return response.data;
   };
 
