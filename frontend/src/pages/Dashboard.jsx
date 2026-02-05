@@ -7,6 +7,8 @@ import { getRoomBadgeStyle } from "@/lib/color";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { CalendarDays, ClipboardList, Droplet } from "lucide-react";
 import {
   format,
@@ -15,17 +17,24 @@ import {
   isAfter,
   differenceInMinutes,
 } from "date-fns";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const { settings } = useSettings();
   const [stays, setStays] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
   const [lastWatered, setLastWatered] = useState(null);
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const loadData = async () => {
-      const staysResponse = await api.get("/stays");
+      const [staysResponse, messagesResponse] = await Promise.all([
+        api.get("/stays"),
+        api.get("/messages"),
+      ]);
       setStays(staysResponse.data);
+      setMessages(messagesResponse.data);
     };
     loadData();
   }, []);
@@ -85,6 +94,23 @@ export default function Dashboard() {
     setLastWatered(next);
     if (typeof window !== "undefined") {
       window.localStorage.setItem("plantsWateredAt", next.toISOString());
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!messageForm.name.trim() || !messageForm.content.trim()) {
+      toast.error("Bitte Name und Nachricht ausfüllen.");
+      return;
+    }
+    try {
+      const response = await api.post("/messages", {
+        name: messageForm.name.trim(),
+        content: messageForm.content.trim(),
+      });
+      setMessages((prev) => [response.data, ...prev]);
+      setMessageForm({ name: "", content: "" });
+    } catch (error) {
+      toast.error("Nachricht konnte nicht gesendet werden.");
     }
   };
 
@@ -260,6 +286,82 @@ export default function Dashboard() {
                 </div>
               ))
             )}
+          </CardContent>
+        </Card>
+        <Card className="lg:col-span-3" data-testid="dashboard-chat-card">
+          <CardHeader>
+            <CardTitle data-testid="dashboard-chat-title">Haus-Chat</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+              <div className="space-y-2">
+                <label
+                  className="text-xs text-white/60"
+                  data-testid="chat-name-label"
+                >
+                  Dein Name
+                </label>
+                <Input
+                  value={messageForm.name}
+                  onChange={(event) =>
+                    setMessageForm((prev) => ({ ...prev, name: event.target.value }))
+                  }
+                  placeholder="z.B. Lea"
+                  data-testid="chat-name-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  className="text-xs text-white/60"
+                  data-testid="chat-message-label"
+                >
+                  Nachricht
+                </label>
+                <Textarea
+                  rows={2}
+                  value={messageForm.content}
+                  onChange={(event) =>
+                    setMessageForm((prev) => ({ ...prev, content: event.target.value }))
+                  }
+                  placeholder="Kurze Info für alle"
+                  data-testid="chat-message-input"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  onClick={handleSendMessage}
+                  className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
+                  data-testid="chat-send-button"
+                >
+                  Senden
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-3" data-testid="chat-messages-list">
+              {messages.length === 0 ? (
+                <p className="text-sm text-white/60" data-testid="chat-empty">
+                  Noch keine Nachrichten. Starte den Chat.
+                </p>
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className="rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                    data-testid={`chat-message-${message.id}`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-white">
+                        {message.name}
+                      </p>
+                      <p className="text-xs text-white/50">
+                        {format(parseISO(message.created_at), "dd.MM HH:mm")}
+                      </p>
+                    </div>
+                    <p className="text-sm text-white/70">{message.content}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </CardContent>
         </Card>
       </section>
