@@ -28,6 +28,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Berlin-Seite: Dauerhafte Links mit Beschreibung & Hashtags
 - Berlin-Seite: Hashtag-Filter oberhalb der Linkliste filtert Events & Links
 - Berlin-Seite: Zwei-Spalten-Layout (Events links, Links rechts) + zentraler Modal-Dialog zum Posten
+- Berlin-Seite: Bearbeitungsfunktion für Events & Links (Edit-Icon, Update-API)
 - Navigation: Titel entfernt, Items gleichmäßig verteilt, Aufenthalte-Link entfernt (Kalender aktiv bei Stay-Details)
 - Übersicht: Organisationsbild mit großem Overlay-Text "BODDIN14 WG-HUB"
 - Übersicht: Pflanzenkarte ohne Überschrift, neues Bild großflächig oben
