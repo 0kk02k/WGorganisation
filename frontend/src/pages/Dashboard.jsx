@@ -232,7 +232,7 @@ export default function Dashboard() {
                 <Link
                   key={stay.id}
                   to={`/aufenthalte/${stay.id}`}
-                  className="hover-lift rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                  className="hover-lift block rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-upcoming-link-${stay.id}`}
                 >
                   <p
