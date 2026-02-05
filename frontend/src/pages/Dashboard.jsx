@@ -130,7 +130,7 @@ export default function Dashboard() {
               />
               <div className="absolute inset-0 flex items-center justify-center bg-black/35">
                 <span
-                  className="px-4 text-center text-[clamp(3.2rem,9vw,7.8rem)] font-semibold uppercase leading-[0.9] tracking-[0.2em] text-white/90"
+                  className="px-3 text-center text-[clamp(2.8rem,8vw,7rem)] font-semibold uppercase leading-[0.9] tracking-[0.15em] text-white/90"
                   data-testid="dashboard-organization-title"
                 >
                   <span className="block">BODDIN14</span>
