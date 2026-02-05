@@ -91,7 +91,7 @@ export default function StayDetail() {
       <div className="space-y-4" data-testid="stay-not-found">
         <p className="text-sm text-stone-600">Aufenthalt nicht gefunden.</p>
         <Button asChild variant="outline">
-          <Link to="/aufenthalte" data-testid="stay-back-link">
+          <Link to="/kalender" data-testid="stay-back-link">
             Zurück zur Übersicht
           </Link>
         </Button>
@@ -107,7 +107,7 @@ export default function StayDetail() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
           <Link
-            to="/aufenthalte"
+            to="/kalender"
             className="text-sm text-stone-500"
             data-testid="stay-back"
           >
