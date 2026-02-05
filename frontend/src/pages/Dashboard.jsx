@@ -124,7 +124,7 @@ export default function Dashboard() {
                 <Button
                   variant="outline"
                   asChild
-                  className="rounded-full border-white/20 text-white/80 hover:text-white"
+                  className="rounded-full border-white/10 text-white/80 hover:text-white"
                 >
                   <Link to="/aufenthalte" data-testid="dashboard-stays-link">
                     <ClipboardList className="mr-2 h-4 w-4" />
