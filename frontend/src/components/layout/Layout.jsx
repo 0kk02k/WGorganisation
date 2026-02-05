@@ -56,7 +56,7 @@ export const Layout = ({ children }) => {
         <div className="absolute -top-40 left-1/3 h-72 w-72 rounded-full bg-[#B026FF]/25 blur-[140px]" />
         <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
       </div>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-white/5 backdrop-blur-2xl">
+      <header className="fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-white/5 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-8">
           <div>
             <p
@@ -95,7 +95,7 @@ export const Layout = ({ children }) => {
         {children}
       </main>
       <nav
-        className="fixed bottom-4 left-1/2 z-40 w-[min(92%,560px)] -translate-x-1/2 rounded-full border border-white/10 bg-white/5 px-2 py-2 shadow-[0_0_30px_rgba(176,38,255,0.25)] backdrop-blur-2xl md:hidden"
+        className="fixed bottom-4 left-1/2 z-40 w-[min(92%,560px)] -translate-x-1/2 rounded-full border border-white/5 bg-white/5 px-2 py-2 shadow-[0_0_30px_rgba(176,38,255,0.25)] backdrop-blur-2xl md:hidden"
         data-testid="bottom-nav"
       >
         <div className="flex items-center justify-between px-2">
