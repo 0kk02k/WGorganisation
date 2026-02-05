@@ -141,7 +141,7 @@ export default function Dashboard() {
           </div>
         </Card>
         <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="overflow-hidden rounded-2xl border border-stone-200">
               <img
                 src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/wjz1h4j6_image.png"
