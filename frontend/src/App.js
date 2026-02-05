@@ -10,6 +10,7 @@ import StayDetail from "@/pages/StayDetail";
 import ManualsPage from "@/pages/ManualsPage";
 import ManualDetail from "@/pages/ManualDetail";
 import SettingsPage from "@/pages/SettingsPage";
+import BerlinPage from "@/pages/BerlinPage";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/anleitungen" element={<ManualsPage />} />
             <Route path="/anleitungen/:id" element={<ManualDetail />} />
             <Route path="/einstellungen" element={<SettingsPage />} />
+            <Route path="/berlin" element={<BerlinPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Layout>
