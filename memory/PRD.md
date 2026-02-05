@@ -19,6 +19,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Einstellungen: Zimmernamen & Farbcodes sowie Checklisten-Vorlagen editierbar mit Speichern
 - UI-Redesign: Dark Mode Bento-Grid mit Glassmorphism, Noise-Background und neonfarbenen Akzenten
 - UI-Feinschliff: Space Grotesk überall, Untertitel entfernt, subtile Rahmen + lila Akzente auf Kalender/Aufenthalte/Anleitungen
+- Manuals: "How to....." Rebranding, Beispiel-Anleitungen entfernt, Lösch-Button im Editmodus
 
 ## Priorisierter Backlog
 **P0**
