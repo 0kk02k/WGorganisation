@@ -362,6 +362,11 @@ async def update_berlin_link(link_id: str, payload: BerlinLinkUpdate):
 async def get_or_create_settings() -> Settings:
     settings = await db.settings.find_one({"id": "wg-settings"}, {"_id": 0})
     if settings:
+        if len(settings.get("rooms", [])) > 2:
+            settings["rooms"] = settings.get("rooms", [])[:2]
+            await db.settings.update_one(
+                {"id": "wg-settings"}, {"$set": {"rooms": settings["rooms"]}}
+            )
         return Settings(**settings)
     default_settings = Settings()
     await db.settings.insert_one(default_settings.model_dump())
@@ -379,6 +384,8 @@ async def update_settings(payload: SettingsUpdate):
     current = await get_or_create_settings()
     update_data = payload.model_dump(exclude_unset=True)
     update_data = {key: value for key, value in update_data.items() if value is not None}
+    if "rooms" in update_data and update_data["rooms"]:
+        update_data["rooms"] = update_data["rooms"][:2]
     update_data["updated_at"] = now_iso()
     await db.settings.update_one({"id": current.id}, {"$set": update_data}, upsert=True)
     updated = await db.settings.find_one({"id": current.id}, {"_id": 0})
