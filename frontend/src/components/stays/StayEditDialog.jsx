@@ -147,7 +147,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
               onSave(form);
               setOpen(false);
             }}
-            className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+            className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
             data-testid="stay-edit-save"
           >
             Änderungen speichern
