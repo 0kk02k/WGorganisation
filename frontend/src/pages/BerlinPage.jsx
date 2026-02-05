@@ -24,6 +24,17 @@ const parseTags = (value) =>
 
 const safeTags = (tags) => (Array.isArray(tags) ? tags : []);
 
+const formatGermanDate = (value) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return value;
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(parsed);
+};
+
 export default function BerlinPage() {
   const [events, setEvents] = useState([]);
   const [links, setLinks] = useState([]);
@@ -111,7 +122,7 @@ export default function BerlinPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-20 pt-28 md:px-8">
+    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-20 pt-20 md:px-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-semibold" data-testid="berlin-page">
           Berlin
@@ -319,7 +330,7 @@ export default function BerlinPage() {
                       {event.title}
                     </CardTitle>
                     <p className="text-xs text-white/60" data-testid={`berlin-event-date-${event.id}`}>
-                      {event.date}
+                      {formatGermanDate(event.date)}
                     </p>
                     <p
                       className="text-xs text-white/60"
