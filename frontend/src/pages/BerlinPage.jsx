@@ -189,7 +189,7 @@ export default function BerlinPage() {
         <h2 className="text-xl font-semibold" data-testid="berlin-events-title">
           Aktuelle Tipps
         </h2>
-        {events.length === 0 ? (
+        {filteredEvents.length === 0 ? (
           <Card className="border-dashed border-stone-300" data-testid="berlin-empty">
             <CardContent className="py-8 text-center text-sm text-stone-600">
               Noch keine Tipps vorhanden.
@@ -197,7 +197,7 @@ export default function BerlinPage() {
           </Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
-            {events.map((event) => (
+            {filteredEvents.map((event) => (
               <Card key={event.id} data-testid={`berlin-event-${event.id}`}>
                 <CardHeader className="space-y-1">
                   <CardTitle data-testid={`berlin-event-title-${event.id}`}>
@@ -211,6 +211,22 @@ export default function BerlinPage() {
                   <p className="text-sm text-white/70" data-testid={`berlin-event-description-${event.id}`}>
                     {event.description}
                   </p>
+                  {event.hashtags?.length > 0 && (
+                    <div
+                      className="mt-3 flex flex-wrap gap-2"
+                      data-testid={`berlin-event-tags-${event.id}`}
+                    >
+                      {event.hashtags.map((tag) => (
+                        <Badge
+                          key={tag}
+                          className="rounded-full bg-white/10 text-white/70"
+                          data-testid={`berlin-event-tag-${event.id}-${tag}`}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             ))}
