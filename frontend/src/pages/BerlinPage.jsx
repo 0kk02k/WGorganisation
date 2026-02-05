@@ -64,11 +64,35 @@ export default function BerlinPage() {
       return;
     }
     try {
-      const response = await api.post("/events", form);
+      const response = await api.post("/events", {
+        title: form.title,
+        date: form.date,
+        location: form.location,
+        description: form.description,
+        hashtags: parseTags(form.hashtags),
+      });
       setEvents((prev) => [response.data, ...prev]);
-      setForm({ title: "", date: "", location: "", description: "" });
+      setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
     } catch (error) {
       toast.error("Tipp konnte nicht gespeichert werden.");
+    }
+  };
+
+  const handleLinkSubmit = async () => {
+    if (!linkForm.url || !linkForm.description) {
+      toast.error("Bitte Link und Beschreibung ausfüllen.");
+      return;
+    }
+    try {
+      const response = await api.post("/berlin-links", {
+        url: linkForm.url,
+        description: linkForm.description,
+        hashtags: parseTags(linkForm.hashtags),
+      });
+      setLinks((prev) => [response.data, ...prev]);
+      setLinkForm({ url: "", description: "", hashtags: "" });
+    } catch (error) {
+      toast.error("Link konnte nicht gespeichert werden.");
     }
   };
 
