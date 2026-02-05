@@ -66,7 +66,7 @@ export const ManualDialog = ({ onCreated }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+          className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
           data-testid="manual-dialog-trigger"
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -199,7 +199,7 @@ export const ManualDialog = ({ onCreated }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="rounded-full bg-emerald-900 text-emerald-50 hover:bg-emerald-800"
+            className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
             data-testid="manual-dialog-submit"
           >
             Anleitung speichern
