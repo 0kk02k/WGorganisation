@@ -184,10 +184,11 @@ export default function Dashboard() {
               </p>
             ) : (
               activeStays.map((stay) => (
-                <div
+                <Link
                   key={stay.id}
-                  className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
-                  data-testid={`dashboard-active-stay-${stay.id}`}
+                  to={`/aufenthalte/${stay.id}`}
+                  className="hover-lift flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                  data-testid={`dashboard-active-link-${stay.id}`}
                 >
                   <div>
                     <p
@@ -197,21 +198,20 @@ export default function Dashboard() {
                       {stay.occupant_name}
                     </p>
                     <p className="text-xs text-white/60" data-testid={`dashboard-active-dates-${stay.id}`}>
-                      {format(parseISO(stay.start_date), "dd.MM.")} –
-                      {" "}
+                      {format(parseISO(stay.start_date), "dd.MM.")} –{" "}
                       {format(parseISO(stay.end_date), "dd.MM.yyyy")}
                     </p>
                   </div>
-                <Badge
-                  style={getRoomBadgeStyle(
-                    rooms.find((room) => room.id === stay.room)?.color,
-                  )}
-                  className="border border-transparent text-stone-900"
-                  data-testid={`dashboard-active-room-${stay.id}`}
-                >
-                  {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                </Badge>
-                </div>
+                  <Badge
+                    style={getRoomBadgeStyle(
+                      rooms.find((room) => room.id === stay.room)?.color,
+                    )}
+                    className="border border-transparent text-stone-900"
+                    data-testid={`dashboard-active-room-${stay.id}`}
+                  >
+                    {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                  </Badge>
+                </Link>
               ))
             )}
           </CardContent>
