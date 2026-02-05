@@ -33,9 +33,13 @@ export default function CalendarPage() {
   const roomA = rooms.find((room) => room.id === "A");
   const roomB = rooms.find((room) => room.id === "B");
   const topRoom =
-    rooms.find((room) => room.name?.toLowerCase().includes("claas")) || roomA;
+    rooms.find((room) => room.name?.toLowerCase().includes("claas")) ||
+    roomB ||
+    roomA;
   const bottomRoom =
-    rooms.find((room) => room.name?.toLowerCase().includes("okko")) || roomB;
+    rooms.find((room) => room.name?.toLowerCase().includes("okko")) ||
+    roomA ||
+    roomB;
   const topRoomId = topRoom?.id || "A";
   const bottomRoomId = bottomRoom?.id || "B";
   const getRoomLabel = (roomId) =>
