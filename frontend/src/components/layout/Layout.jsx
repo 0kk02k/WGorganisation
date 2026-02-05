@@ -73,7 +73,7 @@ export const Layout = ({ children }) => {
                 to={item.to}
                 className={({ isActive }) =>
                   cn(
-                    "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                    "hover-lift flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_20px_rgba(204,255,0,0.35)]"
                       : "text-white/70 hover:bg-white/10 hover:text-white",
@@ -105,7 +105,7 @@ export const Layout = ({ children }) => {
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  "flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-xs font-medium transition-colors",
+                  "hover-lift flex flex-col items-center gap-1 rounded-2xl px-3 py-2 text-xs font-medium transition-colors",
                   isActive
                     ? "bg-[#CCFF00]/15 text-[#CCFF00]"
                     : "text-white/70 hover:bg-white/10 hover:text-white",
