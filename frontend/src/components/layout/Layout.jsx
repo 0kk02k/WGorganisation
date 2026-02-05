@@ -32,8 +32,8 @@ const navItems = [
   },
   {
     to: "/anleitungen",
-    label: "Anleitungen",
-    short: "Geräte",
+    label: "How to.....",
+    short: "How to",
     icon: BookOpen,
     testId: "nav-manuals-link",
   },
