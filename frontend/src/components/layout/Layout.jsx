@@ -5,6 +5,7 @@ import {
   ClipboardList,
   BookOpen,
   Settings,
+  MapPin,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -36,6 +37,13 @@ const navItems = [
     short: "How to",
     icon: BookOpen,
     testId: "nav-manuals-link",
+  },
+  {
+    to: "/berlin",
+    label: "Berlin",
+    short: "Berlin",
+    icon: MapPin,
+    testId: "nav-berlin-link",
   },
   {
     to: "/einstellungen",
