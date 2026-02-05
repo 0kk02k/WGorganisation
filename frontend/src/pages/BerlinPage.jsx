@@ -222,7 +222,7 @@ export default function BerlinPage() {
                         <Badge
                           key={tag}
                           className="rounded-full bg-white/10 text-white/70"
-                          data-testid={`berlin-event-tag-${event.id}-${tag}`}
+                          data-testid={`berlin-event-tag-${event.id}-${tagToId(tag)}`}
                         >
                           {tag}
                         </Badge>
@@ -318,7 +318,7 @@ export default function BerlinPage() {
                 variant={selectedTag === tag ? "default" : "outline"}
                 onClick={() => setSelectedTag(tag)}
                 className="rounded-full"
-                data-testid={`berlin-tag-${tag}`}
+                data-testid={`berlin-tag-${tagToId(tag)}`}
               >
                 {tag}
               </Button>
@@ -358,7 +358,7 @@ export default function BerlinPage() {
                         <Badge
                           key={tag}
                           className="rounded-full bg-white/10 text-white/70"
-                          data-testid={`berlin-link-tag-${link.id}-${tag}`}
+                          data-testid={`berlin-link-tag-${link.id}-${tagToId(tag)}`}
                         >
                           {tag}
                         </Badge>
