@@ -22,6 +22,7 @@ ich benötige eine teilzeit-wg webapp die das einchecken in eine wohnung mit to-
 - Manuals: "How to....." Rebranding, Beispiel-Anleitungen entfernt, Lösch-Button im Editmodus
 - Kalender: aktueller Tag mit Glow + Hover-Lift bei klickbaren Elementen
 - Übersicht: Haus-Chat mit Nachrichten + Namen (persistiert)
+- Übersicht: Organisations-Box mit Benutzerbild ersetzt
 
 ## Priorisierter Backlog
 **P0**
