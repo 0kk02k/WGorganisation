@@ -25,19 +25,25 @@ export default function Dashboard() {
   const [stays, setStays] = useState([]);
   const [messages, setMessages] = useState([]);
   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
   const [lastWatered, setLastWatered] = useState(null);
   const [now, setNow] = useState(new Date());
 
+  const loadStays = async () => {
+    const response = await api.get("/stays");
+    setStays(response.data);
+  };
+
+  const loadMessages = async () => {
+    const response = await api.get("/messages");
+    setMessages(response.data);
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      const [staysResponse, messagesResponse] = await Promise.all([
-        api.get("/stays"),
-        api.get("/messages"),
-      ]);
-      setStays(staysResponse.data);
-      setMessages(messagesResponse.data);
-    };
-    loadData();
+    Promise.all([loadStays(), loadMessages()]);
   }, []);
 
   useEffect(() => {
