@@ -58,18 +58,12 @@ export const Layout = ({ children }) => {
       </div>
       <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-white/5 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 md:px-8">
-          <div className="space-y-1">
+          <div>
             <p
               data-testid="app-title"
               className="text-xl font-semibold tracking-tight text-white"
             >
               Teilzeit-WG Hub
-            </p>
-            <p
-              data-testid="app-subtitle"
-              className="text-xs font-mono text-white/50"
-            >
-              Check-in, Belegung & Gerätewissen
             </p>
           </div>
           <nav className="hidden items-center gap-2 md:flex" data-testid="top-nav">
