@@ -213,5 +213,6 @@ export default function CalendarPage() {
         emptyLabel="Keine Aufenthalte geplant."
       />
     </div>
+  </div>
   );
 }
