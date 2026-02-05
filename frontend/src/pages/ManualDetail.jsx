@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { api } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 export default function ManualDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [manual, setManual] = useState(null);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -70,6 +71,17 @@ export default function ManualDetail() {
     }
   };
 
+  const handleDelete = async () => {
+    if (saving) return;
+    try {
+      await api.delete(`/manuals/${id}`);
+      toast.success("Anleitung gelöscht.");
+      navigate("/anleitungen");
+    } catch (error) {
+      toast.error("Löschen fehlgeschlagen.");
+    }
+  };
+
   if (!manual || !form) {
     return (
       <div className="text-sm text-stone-600" data-testid="manual-loading">
@@ -119,14 +131,26 @@ export default function ManualDetail() {
             ) : (
               <CardTitle data-testid="manual-detail-title">{manual.title}</CardTitle>
             )}
-            <Button
-              onClick={handleEditToggle}
-              disabled={saving}
-              className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-              data-testid="manual-edit-toggle"
-            >
-              {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleEditToggle}
+                disabled={saving}
+                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                data-testid="manual-edit-toggle"
+              >
+                {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
+              </Button>
+              {isEditing && (
+                <Button
+                  onClick={handleDelete}
+                  variant="outline"
+                  className="rounded-full border-red-500/40 text-red-300 hover:bg-red-500/20"
+                  data-testid="manual-delete-button"
+                >
+                  Anleitung löschen
+                </Button>
+              )}
+            </div>
           </div>
           {isEditing ? (
             <div className="space-y-2">
