@@ -27,6 +27,8 @@ export const StaysList = ({
     <div className="grid gap-4 md:grid-cols-2">
       {stays.map((stay) => {
         const roomColor = rooms.find((room) => room.id === stay.room)?.color;
+        const roomLabel =
+          rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`;
         const openIn = stay.checklist_in?.filter((item) => !item.done).length;
         const openOut = stay.checklist_out?.filter((item) => !item.done).length;
         return (
@@ -65,7 +67,7 @@ export const StaysList = ({
                   className="border border-transparent text-stone-900"
                   data-testid={`${testIdPrefix}-room-${stay.id}`}
                 >
-                  Zimmer {stay.room}
+                  {roomLabel}
                 </Badge>
               </CardContent>
             </Card>
