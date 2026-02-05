@@ -154,18 +154,24 @@ export default function CalendarPage() {
                   }`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
-                  {hasRoomA && (
+                  {hasTopRoom && (
                     <span
                       className="absolute left-2 right-2 top-1 h-1 rounded-full"
-                      style={roomA?.color ? getRoomDotStyle(roomA?.color) : undefined}
-                      data-testid={`calendar-room-a-bar-${format(day, "yyyy-MM-dd")}`}
+                      style={
+                        topRoom?.color ? getRoomDotStyle(topRoom?.color) : undefined
+                      }
+                      data-testid={`calendar-room-top-bar-${format(day, "yyyy-MM-dd")}`}
                     />
                   )}
-                  {hasRoomB && (
+                  {hasBottomRoom && (
                     <span
                       className="absolute left-2 right-2 bottom-1 h-1 rounded-full"
-                      style={roomB?.color ? getRoomDotStyle(roomB?.color) : undefined}
-                      data-testid={`calendar-room-b-bar-${format(day, "yyyy-MM-dd")}`}
+                      style={
+                        bottomRoom?.color
+                          ? getRoomDotStyle(bottomRoom?.color)
+                          : undefined
+                      }
+                      data-testid={`calendar-room-bottom-bar-${format(day, "yyyy-MM-dd")}`}
                     />
                   )}
                   <div className="flex items-center justify-between">
