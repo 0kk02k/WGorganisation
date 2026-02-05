@@ -206,7 +206,7 @@ export default function CalendarPage() {
                   className="text-xs text-stone-600"
                   data-testid={`calendar-stay-room-${stay.id}`}
                 >
-                  Zimmer {stay.room}
+                  {getRoomLabel(stay.room)}
                 </p>
               </div>
             ))
