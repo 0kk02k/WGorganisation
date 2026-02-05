@@ -193,7 +193,7 @@ export default function BerlinPage() {
           Berlin
         </h1>
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={openCreateModal}
           className="h-12 w-12 rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
           data-testid="berlin-open-modal-button"
         >
@@ -201,7 +201,7 @@ export default function BerlinPage() {
         </Button>
       </div>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
         <DialogContent
           className="max-w-2xl border-white/10 bg-[#141414]/95 text-white"
           data-testid="berlin-create-modal"
