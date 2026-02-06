@@ -1,5 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
+import ChatReplyList from "@/components/ChatReplyList";
 
 export default function ChatMessage({
   message,
@@ -48,6 +49,9 @@ export default function ChatMessage({
           Löschen
         </Button>
       </div>
+      {message.replies?.length > 0 && (
+        <ChatReplyList messageId={message.id} replies={message.replies} />
+      )}
     </div>
   );
 }
