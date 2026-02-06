@@ -1,0 +1,29 @@
+[build]
+command = "cd frontend && yarn build"
+publish = "frontend/build"
+
+[build.environment]
+NODE_VERSION = "18"
+ENABLE_HEALTH_CHECK = "false"
+
+# SPA-Routing für React Router
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+
+# API-Weiterleitung (Backend muss separat gehostet werden)
+# Für lokale Entwicklung oder separates Backend:
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://dein-backend.herokuapp.com/api/:splat"
+#   status = 200
+
+[context.production.environment]
+NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+NODE_ENV = "production"
+
+[context.branch-deploy.environment]
+NODE_ENV = "production"
