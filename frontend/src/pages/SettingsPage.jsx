@@ -33,7 +33,7 @@ export default function SettingsPage() {
     setCheckoutDraft(
       (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
     );
-  }, [settings]);
+  }, [settings, rooms]);
 
   const parseLines = (value) =>
     value

@@ -1,67 +1,67 @@
 import { useEffect, useMemo, useState } from "react";
  
-import { api } from "@/lib/api";
-import { DEFAULT_ROOMS } from "@/lib/constants";
-import { useSettings } from "@/context/SettingsContext";
-import { getRoomBadgeStyle } from "@/lib/color";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Droplet } from "lucide-react";
-import {
-  format,
-  parseISO,
-  isWithinInterval,
-  isAfter,
-  differenceInMinutes,
-} from "date-fns";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import ChatMessage from "@/components/ChatMessage";
+ import { api } from "@/lib/api";
+ import { DEFAULT_ROOMS } from "@/lib/constants";
+ import { useSettings } from "@/context/SettingsContext";
+ import { getRoomBadgeStyle } from "@/lib/color";
+ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+ import { Button } from "@/components/ui/button";
+ import { Badge } from "@/components/ui/badge";
+ import { Input } from "@/components/ui/input";
+ import { Textarea } from "@/components/ui/textarea";
+ import { Droplet } from "lucide-react";
+ import {
+   format,
+   parseISO,
+   isWithinInterval,
+   isAfter,
+   differenceInMinutes,
+ } from "date-fns";
+ import { Link } from "react-router-dom";
+ import { toast } from "sonner";
+ import ChatMessage from "@/components/ChatMessage";
 
-export default function Dashboard() {
-  const { settings } = useSettings();
-  const [stays, setStays] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
-  const [editingMessageId, setEditingMessageId] = useState(null);
-  const [editingContent, setEditingContent] = useState("");
-  const [replyingToId, setReplyingToId] = useState(null);
-  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
-  const [lastWatered, setLastWatered] = useState(null);
-  const [now, setNow] = useState(new Date());
+ export default function Dashboard() {
+   const { settings } = useSettings();
+   const [stays, setStays] = useState([]);
+   const [messages, setMessages] = useState([]);
+   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+   const [editingMessageId, setEditingMessageId] = useState(null);
+   const [editingContent, setEditingContent] = useState("");
+   const [replyingToId, setReplyingToId] = useState(null);
+   const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+   const [lastWatered, setLastWatered] = useState(null);
+   const [now, setNow] = useState(new Date());
 
-  const loadStays = async () => {
-    const response = await api.get("/stays");
-    setStays(response.data);
-  };
+   const loadStays = async () => {
+     const response = await api.get("/stays");
+     setStays(response.data);
+   };
 
-  const loadMessages = async () => {
-    const response = await api.get("/messages");
-    setMessages(response.data);
-  };
+   const loadMessages = async () => {
+     const response = await api.get("/messages");
+     setMessages(response.data);
+   };
 
-  useEffect(() => {
-    Promise.all([loadStays(), loadMessages()]);
-  }, []);
+   useEffect(() => {
+     Promise.all([loadStays(), loadMessages()]);
+   }, []);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("plantsWateredAt");
-    if (stored) {
-      setLastWatered(new Date(stored));
-    }
-  }, []);
+   useEffect(() => {
+     if (typeof window === "undefined") return;
+     const stored = window.localStorage.getItem("plantsWateredAt");
+     if (stored) {
+       setLastWatered(new Date(stored));
+     }
+   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(interval);
-  }, []);
+   useEffect(() => {
+     const interval = setInterval(() => setNow(new Date()), 60000);
+     return () => clearInterval(interval);
+   }, []);
 
-  const today = new Date();
-  const rooms = settings?.rooms || DEFAULT_ROOMS;
+   const today = useMemo(() => new Date(), []);
+   const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   const activeStays = useMemo(
     () =>
