@@ -205,25 +205,15 @@ import { useEffect, useMemo, useState } from "react";
           data-testid="dashboard-hero-card"
         >
           <div className="p-4">
-            <div className="relative overflow-hidden rounded-2xl" data-testid="dashboard-organization-image">
-              <img
-                src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/6t2n8w07_image.png"
-                alt="Organisation Visual"
-                className="h-full w-full object-cover"
-                data-testid="dashboard-hero-image"
-              />
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#B026FF]/20 to-[#CCFF00]/20 h-48 flex items-center justify-center" data-testid="dashboard-organization-image">
+              <span className="text-2xl font-bold text-white/40">BODDIN14</span>
             </div>
           </div>
         </Card>
         <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
           <CardContent className="space-y-4 pt-6">
-            <div className="overflow-hidden rounded-2xl border border-stone-200">
-              <img
-                src="https://customer-assets.emergentagent.com/job_be727098-640a-484b-81f2-277fe0fddb15/artifacts/wjz1h4j6_image.png"
-                alt="Neonpalme"
-                className="h-56 w-full object-cover"
-                data-testid="dashboard-plants-image"
-              />
+            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-green-900/30 to-[#B026FF]/20 h-56 flex items-center justify-center">
+              <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
             </div>
             <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
               <div>
