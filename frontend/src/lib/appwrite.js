@@ -8,7 +8,7 @@ const client = new Client()
 const databases = new Databases(client);
 
 // Database und Collection IDs
-const DATABASE_ID = process.env.REACT_APP_APPWRITE_DATABASE_ID || 'wgorganiser';
+const DATABASE_ID = process.env.REACT_APP_APPWRITE_DATABASE_ID || 'wg-organiser';
 
 const COLLECTIONS = {
   stays: 'stays',

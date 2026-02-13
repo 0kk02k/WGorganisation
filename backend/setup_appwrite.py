@@ -147,23 +147,45 @@ def create_database():
 
 
 def create_collection(collection_id: str, collection_data: dict):
-    """Create a collection with attributes"""
+    """Create a collection with attributes and public permissions"""
     try:
         # Check if collection exists
         result = db_service.list_collections(DATABASE_ID)
         for col in result.get("collections", []):
             if col.get("$id") == collection_id:
                 print(f"  [OK] Collection '{collection_id}' existiert bereits")
+                # Update permissions for existing collection
+                try:
+                    db_service.update_collection(
+                        DATABASE_ID,
+                        collection_id,
+                        collection_data["name"],
+                        permissions=[
+                            "create(\"any\")",
+                            "read(\"any\")",
+                            "update(\"any\")",
+                            "delete(\"any\")"
+                        ]
+                    )
+                    print(f"  [OK] Berechtigungen für '{collection_id}' aktualisiert")
+                except AppwriteException as perm_err:
+                    print(f"  [WARN] Konnte Berechtigungen nicht aktualisieren: {perm_err}")
                 return True
         
-        # Create collection
+        # Create collection with public permissions
         print(f"  [...] Erstelle Collection '{collection_id}'...")
         db_service.create_collection(
             DATABASE_ID,
             collection_id,
-            collection_data["name"]
+            collection_data["name"],
+            permissions=[
+                "create(\"any\")",
+                "read(\"any\")",
+                "update(\"any\")",
+                "delete(\"any\")"
+            ]
         )
-        print(f"  [OK] Collection '{collection_id}' erstellt")
+        print(f"  [OK] Collection '{collection_id}' erstellt mit öffentlichen Berechtigungen")
         
         # Create attributes
         for attr in collection_data["attributes"]:
