@@ -22,6 +22,9 @@ export const SettingsProvider = ({ children }) => {
     try {
       const response = await api.get("/settings");
         setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
+    } catch (error) {
+      console.error("Failed to load settings:", error);
+      // Keep default settings on error
     } finally {
       setLoading(false);
     }

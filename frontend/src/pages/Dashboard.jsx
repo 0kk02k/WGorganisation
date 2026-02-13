@@ -34,18 +34,26 @@ import { useEffect, useMemo, useState } from "react";
    const [now, setNow] = useState(new Date());
 
    const loadStays = async () => {
-     const response = await api.get("/stays");
-     setStays(response.data);
-   };
+    try {
+      const response = await api.get("/stays");
+      setStays(response.data);
+    } catch (error) {
+      console.error("Failed to load stays:", error);
+    }
+  };
 
-   const loadMessages = async () => {
-     const response = await api.get("/messages");
-     setMessages(response.data);
-   };
+  const loadMessages = async () => {
+    try {
+      const response = await api.get("/messages");
+      setMessages(response.data);
+    } catch (error) {
+      console.error("Failed to load messages:", error);
+    }
+  };
 
-   useEffect(() => {
-     Promise.all([loadStays(), loadMessages()]);
-   }, []);
+  useEffect(() => {
+    Promise.all([loadStays(), loadMessages()]).catch(console.error);
+  }, []);
 
    useEffect(() => {
      if (typeof window === "undefined") return;
