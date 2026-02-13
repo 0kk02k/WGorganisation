@@ -3,7 +3,7 @@ command = "cd frontend && yarn install && yarn build"
 publish = "frontend/build"
 
 [build.environment]
-NODE_VERSION = "18"
+NODE_VERSION = "20"
 ENABLE_HEALTH_CHECK = "false"
 
 # SPA-Routing für React Router
