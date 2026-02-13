@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "@/lib/api";
+import { manualsApi } from "@/lib/appwrite";
 import { ManualDialog } from "@/components/manuals/ManualDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 
 export default function ManualsPage() {
   const [manuals, setManuals] = useState([]);
 
   useEffect(() => {
     const loadManuals = async () => {
-      const response = await api.get("/manuals");
-      setManuals(response.data);
+      try {
+        const data = await manualsApi.list();
+        setManuals(data);
+      } catch (error) {
+        console.error("Failed to load manuals:", error);
+      }
     };
     loadManuals();
   }, []);

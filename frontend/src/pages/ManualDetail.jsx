@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { api } from "@/lib/api";
+import { manualsApi } from "@/lib/appwrite";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,16 +17,21 @@ export default function ManualDetail() {
 
   useEffect(() => {
     const loadManual = async () => {
-      const response = await api.get(`/manuals/${id}`);
-      setManual(response.data);
-      setForm(response.data);
+      try {
+        const data = await manualsApi.get(id);
+        setManual(data);
+        setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
+      } catch (error) {
+        console.error("Failed to load manual:", error);
+      }
     };
     loadManual();
   }, [id]);
 
   const steps = useMemo(() => {
     if (!form?.steps) return [];
-    return form.steps.split("\n").filter((line) => line.trim().length > 0);
+    const stepsStr = typeof form.steps === "string" ? form.steps : form.steps.join("\n");
+    return stepsStr.split("\n").filter((line) => line.trim().length > 0);
   }, [form]);
 
   const handleFileChange = (event) => {
@@ -47,9 +52,15 @@ export default function ManualDetail() {
     }
     setSaving(true);
     try {
-      const response = await api.put(`/manuals/${id}`, form);
-      setManual(response.data);
-      setForm(response.data);
+      const stepsArray = typeof form.steps === "string" 
+        ? form.steps.split("\n").filter(s => s.trim()) 
+        : form.steps;
+      const data = await manualsApi.update(id, {
+        ...form,
+        steps: stepsArray,
+      });
+      setManual(data);
+      setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
       toast.success("Anleitung aktualisiert.");
       return true;
     } catch (error) {
@@ -74,7 +85,7 @@ export default function ManualDetail() {
   const handleDelete = async () => {
     if (saving) return;
     try {
-      await api.delete(`/manuals/${id}`);
+      await manualsApi.delete(id);
       toast.success("Anleitung gelöscht.");
       navigate("/anleitungen");
     } catch (error) {

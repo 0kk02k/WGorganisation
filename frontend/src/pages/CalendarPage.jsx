@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { api } from "@/lib/api";
+import { staysApi, eventsApi } from "@/lib/appwrite";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { getRoomDotStyle } from "@/lib/color";
@@ -48,12 +48,16 @@ export default function CalendarPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [staysResponse, eventsResponse] = await Promise.all([
-        api.get("/stays"),
-        api.get("/events"),
-      ]);
-      setStays(staysResponse.data);
-      setEvents(eventsResponse.data);
+      try {
+        const [staysData, eventsData] = await Promise.all([
+          staysApi.list(),
+          eventsApi.list(),
+        ]);
+        setStays(staysData);
+        setEvents(eventsData);
+      } catch (error) {
+        console.error("Failed to load data:", error);
+      }
     };
     loadData();
   }, []);

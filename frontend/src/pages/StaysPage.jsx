@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { staysApi } from "@/lib/appwrite";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { StaysList } from "@/components/stays/StaysList";
 
@@ -8,8 +8,12 @@ export default function StaysPage() {
 
   useEffect(() => {
     const loadStays = async () => {
-      const response = await api.get("/stays");
-      setStays(response.data);
+      try {
+        const data = await staysApi.list();
+        setStays(data);
+      } catch (error) {
+        console.error("Failed to load stays:", error);
+      }
     };
     loadStays();
   }, []);

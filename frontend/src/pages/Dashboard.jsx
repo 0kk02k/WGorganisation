@@ -1,42 +1,42 @@
 import { useEffect, useMemo, useState } from "react";
  
- import { api } from "@/lib/api";
- import { DEFAULT_ROOMS } from "@/lib/constants";
- import { useSettings } from "@/context/SettingsContext";
- import { getRoomBadgeStyle } from "@/lib/color";
- import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
- import { Button } from "@/components/ui/button";
- import { Badge } from "@/components/ui/badge";
- import { Input } from "@/components/ui/input";
- import { Textarea } from "@/components/ui/textarea";
- import { Droplet } from "lucide-react";
- import {
-   format,
-   parseISO,
-   isWithinInterval,
-   isAfter,
-   differenceInMinutes,
- } from "date-fns";
- import { Link } from "react-router-dom";
- import { toast } from "sonner";
- import ChatMessage from "@/components/ChatMessage";
+import { staysApi, messagesApi } from "@/lib/appwrite";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { getRoomBadgeStyle } from "@/lib/color";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Droplet } from "lucide-react";
+import {
+  format,
+  parseISO,
+  isWithinInterval,
+  isAfter,
+  differenceInMinutes,
+} from "date-fns";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import ChatMessage from "@/components/ChatMessage";
 
- export default function Dashboard() {
-   const { settings } = useSettings();
-   const [stays, setStays] = useState([]);
-   const [messages, setMessages] = useState([]);
-   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
-   const [editingMessageId, setEditingMessageId] = useState(null);
-   const [editingContent, setEditingContent] = useState("");
-   const [replyingToId, setReplyingToId] = useState(null);
-   const [replyForm, setReplyForm] = useState({ name: "", content: "" });
-   const [lastWatered, setLastWatered] = useState(null);
-   const [now, setNow] = useState(new Date());
+export default function Dashboard() {
+  const { settings } = useSettings();
+  const [stays, setStays] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+  const [lastWatered, setLastWatered] = useState(null);
+  const [now, setNow] = useState(new Date());
 
-   const loadStays = async () => {
+  const loadStays = async () => {
     try {
-      const response = await api.get("/stays");
-      setStays(response.data);
+      const data = await staysApi.list();
+      setStays(data);
     } catch (error) {
       console.error("Failed to load stays:", error);
     }
@@ -44,8 +44,8 @@ import { useEffect, useMemo, useState } from "react";
 
   const loadMessages = async () => {
     try {
-      const response = await api.get("/messages");
-      setMessages(response.data);
+      const data = await messagesApi.list();
+      setMessages(data);
     } catch (error) {
       console.error("Failed to load messages:", error);
     }
@@ -55,21 +55,21 @@ import { useEffect, useMemo, useState } from "react";
     Promise.all([loadStays(), loadMessages()]).catch(console.error);
   }, []);
 
-   useEffect(() => {
-     if (typeof window === "undefined") return;
-     const stored = window.localStorage.getItem("plantsWateredAt");
-     if (stored) {
-       setLastWatered(new Date(stored));
-     }
-   }, []);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const stored = window.localStorage.getItem("plantsWateredAt");
+    if (stored) {
+      setLastWatered(new Date(stored));
+    }
+  }, []);
 
-   useEffect(() => {
-     const interval = setInterval(() => setNow(new Date()), 60000);
-     return () => clearInterval(interval);
-   }, []);
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(interval);
+  }, []);
 
-   const today = useMemo(() => new Date(), []);
-   const rooms = settings?.rooms || DEFAULT_ROOMS;
+  const today = useMemo(() => new Date(), []);
+  const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   const activeStays = useMemo(
     () =>
@@ -119,11 +119,11 @@ import { useEffect, useMemo, useState } from "react";
       return;
     }
     try {
-      const response = await api.post("/messages", {
+      const data = await messagesApi.create({
         name: messageForm.name.trim(),
         content: messageForm.content.trim(),
       });
-      setMessages((prev) => [response.data, ...prev]);
+      setMessages((prev) => [data, ...prev]);
       setMessageForm({ name: "", content: "" });
     } catch (error) {
       toast.error("Nachricht konnte nicht gesendet werden.");
@@ -142,11 +142,13 @@ import { useEffect, useMemo, useState } from "react";
       return;
     }
     try {
-      const response = await api.put(`/messages/${editingMessageId}`, {
+      const message = messages.find(m => m.id === editingMessageId);
+      const data = await messagesApi.update(editingMessageId, {
         content: editingContent.trim(),
+        replies: message?.replies || [],
       });
       setMessages((prev) =>
-        prev.map((item) => (item.id === editingMessageId ? response.data : item)),
+        prev.map((item) => (item.id === editingMessageId ? data : item)),
       );
       setEditingMessageId(null);
       setEditingContent("");
@@ -157,7 +159,7 @@ import { useEffect, useMemo, useState } from "react";
 
   const handleDeleteMessage = async (messageId) => {
     try {
-      await api.delete(`/messages/${messageId}`);
+      await messagesApi.delete(messageId);
       setMessages((prev) => prev.filter((item) => item.id !== messageId));
       if (editingMessageId === messageId) {
         setEditingMessageId(null);
@@ -183,12 +185,20 @@ import { useEffect, useMemo, useState } from "react";
       return;
     }
     try {
-      const response = await api.post(`/messages/${messageId}/replies`, {
+      const message = messages.find(m => m.id === messageId);
+      const newReply = {
+        id: Date.now().toString(),
         name: replyForm.name.trim(),
         content: replyForm.content.trim(),
+        created_at: new Date().toISOString(),
+      };
+      const replies = [...(message?.replies || []), newReply];
+      const data = await messagesApi.update(messageId, {
+        content: message?.content,
+        replies: replies,
       });
       setMessages((prev) =>
-        prev.map((item) => (item.id === messageId ? response.data : item)),
+        prev.map((item) => (item.id === messageId ? data : item)),
       );
       setReplyingToId(null);
       setReplyForm({ name: "", content: "" });

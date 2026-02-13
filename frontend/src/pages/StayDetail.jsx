@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { api } from "@/lib/api";
+import { staysApi } from "@/lib/appwrite";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { getRoomBadgeStyle } from "@/lib/color";
@@ -40,8 +40,10 @@ export default function StayDetail() {
   useEffect(() => {
     const loadStay = async () => {
       try {
-        const response = await api.get(`/stays/${id}`);
-        setStay(response.data);
+        const data = await staysApi.get(id);
+        setStay(data);
+      } catch (error) {
+        console.error("Failed to load stay:", error);
       } finally {
         setLoading(false);
       }
@@ -50,8 +52,8 @@ export default function StayDetail() {
   }, [id]);
 
   const updateStay = async (payload) => {
-    const response = await api.put(`/stays/${id}`, payload);
-    setStay(response.data);
+    const data = await staysApi.update(id, payload);
+    setStay(data);
   };
 
   const handleToggle = async (listKey, itemId, checked) => {
@@ -73,7 +75,7 @@ export default function StayDetail() {
   };
 
   const handleDelete = async () => {
-    await api.delete(`/stays/${id}`);
+    await staysApi.delete(id);
     toast.success("Aufenthalt gelöscht.");
     navigate("/kalender");
   };

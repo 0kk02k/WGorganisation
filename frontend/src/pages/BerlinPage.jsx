@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api } from "@/lib/api";
+import { eventsApi, berlinLinksApi } from "@/lib/appwrite";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,12 +71,16 @@ export default function BerlinPage() {
     : links;
 
   const loadData = async () => {
-    const [eventsResponse, linksResponse] = await Promise.all([
-      api.get("/events"),
-      api.get("/berlin-links"),
-    ]);
-    setEvents(eventsResponse.data);
-    setLinks(linksResponse.data);
+    try {
+      const [eventsData, linksData] = await Promise.all([
+        eventsApi.list(),
+        berlinLinksApi.list(),
+      ]);
+      setEvents(eventsData);
+      setLinks(linksData);
+    } catch (error) {
+      console.error("Failed to load data:", error);
+    }
   };
 
   useEffect(() => {
@@ -132,25 +136,14 @@ export default function BerlinPage() {
       return;
     }
     try {
-      if (editingType === "event" && editingId) {
-        const response = await api.put(`/events/${editingId}`, {
-          title: form.title,
-          date: form.date,
-          location: form.location,
-          description: form.description,
-          hashtags: parseTags(form.hashtags),
-        });
-        setEvents((prev) => prev.map((item) => (item.id === editingId ? response.data : item)));
-      } else {
-        const response = await api.post("/events", {
-          title: form.title,
-          date: form.date,
-          location: form.location,
-          description: form.description,
-          hashtags: parseTags(form.hashtags),
-        });
-        setEvents((prev) => [response.data, ...prev]);
-      }
+      const data = await eventsApi.create({
+        title: form.title,
+        date: form.date,
+        location: form.location,
+        description: form.description,
+        hashtags: parseTags(form.hashtags),
+      });
+      setEvents((prev) => [data, ...prev]);
       setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
       setIsModalOpen(false);
     } catch (error) {
@@ -161,7 +154,7 @@ export default function BerlinPage() {
   const handleDeleteEvent = async () => {
     if (!editingId || editingType !== "event") return;
     try {
-      await api.delete(`/events/${editingId}`);
+      await eventsApi.delete(editingId);
       setEvents((prev) => prev.filter((item) => item.id !== editingId));
       setEditingId(null);
       setEditingType(null);
@@ -177,21 +170,12 @@ export default function BerlinPage() {
       return;
     }
     try {
-      if (editingType === "link" && editingId) {
-        const response = await api.put(`/berlin-links/${editingId}`, {
-          url: linkForm.url,
-          description: linkForm.description,
-          hashtags: parseTags(linkForm.hashtags),
-        });
-        setLinks((prev) => prev.map((item) => (item.id === editingId ? response.data : item)));
-      } else {
-        const response = await api.post("/berlin-links", {
-          url: linkForm.url,
-          description: linkForm.description,
-          hashtags: parseTags(linkForm.hashtags),
-        });
-        setLinks((prev) => [response.data, ...prev]);
-      }
+      const data = await berlinLinksApi.create({
+        url: linkForm.url,
+        description: linkForm.description,
+        hashtags: parseTags(linkForm.hashtags),
+      });
+      setLinks((prev) => [data, ...prev]);
       setLinkForm({ url: "", description: "", hashtags: "" });
       setIsModalOpen(false);
     } catch (error) {
@@ -202,7 +186,7 @@ export default function BerlinPage() {
   const handleDeleteLink = async () => {
     if (!editingId || editingType !== "link") return;
     try {
-      await api.delete(`/berlin-links/${editingId}`);
+      await berlinLinksApi.delete(editingId);
       setLinks((prev) => prev.filter((item) => item.id !== editingId));
       setEditingId(null);
       setEditingType(null);
@@ -320,18 +304,8 @@ export default function BerlinPage() {
                   className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
                   data-testid="berlin-submit-button"
                 >
-                  {editingType === "event" ? "Änderungen speichern" : "Tipp posten"}
+                  Tipp posten
                 </Button>
-                {editingType === "event" && (
-                  <Button
-                    variant="outline"
-                    onClick={handleDeleteEvent}
-                    className="rounded-full border-red-500/60 text-red-200 hover:bg-red-500/10"
-                    data-testid="berlin-event-delete-button"
-                  >
-                    Termin löschen
-                  </Button>
-                )}
               </div>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
@@ -383,18 +357,8 @@ export default function BerlinPage() {
                   className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
                   data-testid="berlin-link-submit-button"
                 >
-                  {editingType === "link" ? "Änderungen speichern" : "Link speichern"}
+                  Link speichern
                 </Button>
-                {editingType === "link" && (
-                  <Button
-                    variant="outline"
-                    onClick={handleDeleteLink}
-                    className="rounded-full border-red-500/60 text-red-200 hover:bg-red-500/10"
-                    data-testid="berlin-link-delete-button"
-                  >
-                    Link löschen
-                  </Button>
-                )}
               </div>
             </TabsContent>
           </Tabs>
@@ -480,16 +444,7 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditEvent(event)}
-                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full border border-white/10 text-white/70 hover:bg-white/10"
-                    data-testid={`berlin-event-edit-${event.id}`}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </CardContent>
+                  </CardContent>
                 </Card>
               ))}
             </div>
@@ -549,16 +504,7 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => openEditLink(link)}
-                    className="absolute bottom-3 right-3 h-8 w-8 rounded-full border border-white/10 text-white/70 hover:bg-white/10"
-                    data-testid={`berlin-link-edit-${link.id}`}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </CardContent>
+                  </CardContent>
                 </Card>
               ))}
             </div>

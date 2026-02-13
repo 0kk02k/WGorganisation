@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { CalendarDays, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
+import { staysApi } from "@/lib/appwrite";
 import {
   DEFAULT_CHECKIN_TEMPLATE,
   DEFAULT_CHECKOUT_TEMPLATE,
@@ -74,9 +74,9 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
         checklist_in: buildChecklist(checkinTemplate),
         checklist_out: buildChecklist(checkoutTemplate),
       };
-      const response = await api.post("/stays", payload);
+      const data = await staysApi.create(payload);
       toast.success("Aufenthalt angelegt.");
-      onCreated?.(response.data);
+      onCreated?.(data);
       setOpen(false);
     } catch (error) {
       toast.error("Anlegen fehlgeschlagen.");

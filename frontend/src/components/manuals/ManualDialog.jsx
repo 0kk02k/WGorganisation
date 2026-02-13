@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { api } from "@/lib/api";
+import { manualsApi } from "@/lib/appwrite";
 import { Plus, ImageIcon } from "lucide-react";
 
 export const ManualDialog = ({ onCreated }) => {
@@ -53,9 +53,16 @@ export const ManualDialog = ({ onCreated }) => {
     }
 
     try {
-      const response = await api.post("/manuals", form);
+      const stepsArray = form.steps.split("\n").filter(s => s.trim());
+      const data = await manualsApi.create({
+        title: form.title,
+        description: form.description,
+        steps: stepsArray,
+        image_url: form.image_url,
+        image_data: form.image_data,
+      });
       toast.success("Anleitung gespeichert.");
-      onCreated?.(response.data);
+      onCreated?.(data);
       setOpen(false);
     } catch (error) {
       toast.error("Speichern fehlgeschlagen.");

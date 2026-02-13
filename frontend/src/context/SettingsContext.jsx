@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { api } from "@/lib/api";
+import { settingsApi } from "@/lib/appwrite";
 import {
   DEFAULT_CHECKIN_TEMPLATE,
   DEFAULT_CHECKOUT_TEMPLATE,
@@ -20,8 +20,8 @@ export const SettingsProvider = ({ children }) => {
 
   const loadSettings = async () => {
     try {
-      const response = await api.get("/settings");
-        setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
+      const data = await settingsApi.get();
+      setSettings({ ...data, rooms: limitRooms(data.rooms) });
     } catch (error) {
       console.error("Failed to load settings:", error);
       // Keep default settings on error
@@ -39,9 +39,9 @@ export const SettingsProvider = ({ children }) => {
     if (payload.rooms) {
       cleanedPayload.rooms = limitRooms(payload.rooms);
     }
-    const response = await api.put("/settings", cleanedPayload);
-    setSettings({ ...response.data, rooms: limitRooms(response.data.rooms) });
-    return response.data;
+    const data = await settingsApi.update(cleanedPayload);
+    setSettings({ ...data, rooms: limitRooms(data.rooms) });
+    return data;
   };
 
   return (
