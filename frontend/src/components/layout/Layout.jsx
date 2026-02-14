@@ -102,7 +102,7 @@ export const Layout = ({ children }) => {
       {/* Mobile Navigation - always visible with slide effect */}
       <div
         className={`fixed inset-0 z-50 min-[755px]:hidden transition-all duration-300 ${
-          mobileNavOpen ? "pointer-events-auto" : ""
+          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
         data-testid="mobile-nav-wrapper"
       >
@@ -115,7 +115,7 @@ export const Layout = ({ children }) => {
           data-testid="mobile-nav-overlay"
         />
         <aside
-          className={`absolute right-0 top-0 flex h-full flex-col gap-6 border-l border-white/10 bg-white/5 p-6 pt-20 text-white backdrop-blur-2xl transition-transform duration-300 ${
+          className={`absolute right-0 top-0 flex h-full flex-col gap-6 border-l border-white/10 bg-white/5 p-6 pt-20 text-white backdrop-blur-2xl transition-transform duration-300 pointer-events-auto ${
             mobileNavOpen ? "translate-x-0" : "translate-x-[calc(100%-1.75rem)]"
           }`}
           data-testid="mobile-nav-panel"
@@ -124,7 +124,7 @@ export const Layout = ({ children }) => {
           <button
             type="button"
             onClick={toggleMobileNav}
-            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10 pointer-events-auto"
+            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10"
             data-testid="mobile-nav-toggle"
           >
             <Menu
