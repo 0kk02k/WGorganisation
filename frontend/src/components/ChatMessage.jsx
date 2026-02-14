@@ -20,6 +20,8 @@ export default function ChatMessage({
   onEdit,
   onDelete,
   onReply,
+  onEditReply,
+  onDeleteReply,
 }) {
   return (
     <div
@@ -84,7 +86,12 @@ export default function ChatMessage({
         />
       )}
       {message.replies?.length > 0 && (
-        <ChatReplyList messageId={message.id} replies={message.replies} />
+        <ChatReplyList
+          messageId={message.id}
+          replies={message.replies}
+          onEditReply={onEditReply}
+          onDeleteReply={onDeleteReply}
+        />
       )}
     </div>
   );

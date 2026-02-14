@@ -207,6 +207,42 @@ export default function Dashboard() {
     }
   };
 
+  const handleEditReply = async (messageId, replyId, newContent) => {
+    try {
+      const message = messages.find(m => m.id === messageId);
+      const replies = (message?.replies || []).map((reply) =>
+        reply.id === replyId ? { ...reply, content: newContent } : reply
+      );
+      const data = await messagesApi.update(messageId, {
+        content: message?.content,
+        replies: replies,
+      });
+      setMessages((prev) =>
+        prev.map((item) => (item.id === messageId ? data : item)),
+      );
+    } catch (error) {
+      toast.error("Antwort konnte nicht bearbeitet werden.");
+    }
+  };
+
+  const handleDeleteReply = async (messageId, replyId) => {
+    try {
+      const message = messages.find(m => m.id === messageId);
+      const replies = (message?.replies || []).filter(
+        (reply) => reply.id !== replyId
+      );
+      const data = await messagesApi.update(messageId, {
+        content: message?.content,
+        replies: replies,
+      });
+      setMessages((prev) =>
+        prev.map((item) => (item.id === messageId ? data : item)),
+      );
+    } catch (error) {
+      toast.error("Antwort konnte nicht gelöscht werden.");
+    }
+  };
+
   return (
     <div className="space-y-6" data-testid="dashboard-page">
       <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
@@ -403,6 +439,8 @@ export default function Dashboard() {
                   onReply={() => startReply(message)}
                   onCancelReply={() => setReplyingToId(null)}
                   onReplySubmit={() => handleReplySubmit(message.id)}
+                  onEditReply={handleEditReply}
+                  onDeleteReply={handleDeleteReply}
                 />
               ))
               )}
