@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import json
 
 class WGCheckInAPITester:
-    def __init__(self, base_url="https://wg-checkin.preview.emergentagent.com"):
+    def __init__(self, base_url="http://localhost:8000"):
         self.base_url = base_url
         self.tests_run = 0
         self.tests_passed = 0

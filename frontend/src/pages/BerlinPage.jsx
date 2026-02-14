@@ -197,9 +197,9 @@ export default function BerlinPage() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 px-4 pb-20 md:px-8">
+    <div className="space-y-6" data-testid="berlin-page">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold" data-testid="berlin-page">
+        <h1 className="text-3xl font-semibold" data-testid="berlin-title">
           Berlin
         </h1>
         <Button
@@ -309,6 +309,20 @@ export default function BerlinPage() {
               </div>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
+              <div className="space-y-2">
+                <label className="text-xs text-white/60" data-testid="berlin-link-description-label">
+                  Beschreibung
+                </label>
+                <Textarea
+                  rows={2}
+                  value={linkForm.description}
+                  onChange={(event) =>
+                    setLinkForm((prev) => ({ ...prev, description: event.target.value }))
+                  }
+                  placeholder="Warum ist der Link hilfreich?"
+                  data-testid="berlin-link-description-input"
+                />
+              </div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label className="text-xs text-white/60" data-testid="berlin-link-url-label">
@@ -336,20 +350,6 @@ export default function BerlinPage() {
                     data-testid="berlin-link-hashtags-input"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs text-white/60" data-testid="berlin-link-description-label">
-                  Beschreibung
-                </label>
-                <Textarea
-                  rows={2}
-                  value={linkForm.description}
-                  onChange={(event) =>
-                    setLinkForm((prev) => ({ ...prev, description: event.target.value }))
-                  }
-                  placeholder="Warum ist der Link hilfreich?"
-                  data-testid="berlin-link-description-input"
-                />
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <Button
@@ -470,24 +470,19 @@ export default function BerlinPage() {
                 <Card key={link.id} className="relative" data-testid={`berlin-link-${link.id}`}>
                   <CardHeader className="space-y-1">
                     <CardTitle data-testid={`berlin-link-title-${link.id}`}>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-[#CCFF00] hover:underline"
-                        data-testid={`berlin-link-url-${link.id}`}
-                      >
-                        {link.url}
-                      </a>
+                      {link.description}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p
-                      className="text-sm text-white/70"
-                      data-testid={`berlin-link-description-${link.id}`}
+                    <a
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-[#CCFF00] hover:underline"
+                      data-testid={`berlin-link-url-${link.id}`}
                     >
-                      {link.description}
-                    </p>
+                      {link.url}
+                    </a>
                     {safeTags(link.hashtags).length > 0 && (
                       <div
                         className="mt-3 flex flex-wrap gap-2"
