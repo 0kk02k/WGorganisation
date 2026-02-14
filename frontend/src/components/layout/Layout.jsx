@@ -164,7 +164,7 @@ export const Layout = ({ children }) => {
         </aside>
       </div>
       <main
-        className="mx-auto w-full max-w-6xl px-4 pb-28 pt-28 md:px-8"
+        className="mx-auto w-full max-w-6xl px-2 pb-20 pt-20 min-[755px]:px-4 min-[755px]:pb-28 min-[755px]:pt-28 md:px-8"
         data-testid="main-content"
       >
         {children}
