@@ -259,49 +259,7 @@ const EXPANDED_VISIBLE_COUNT = 15;
   return (
     <div className="space-y-6" data-testid="dashboard-page">
       <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
-        <Card
-          className="overflow-hidden lg:col-span-2 max-[755px]:hidden"
-          data-testid="dashboard-hero-card"
-        >
-          <div className="p-4">
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#B026FF]/20 to-[#CCFF00]/20 h-48 flex items-center justify-center" data-testid="dashboard-organization-image">
-              <span className="text-2xl font-bold text-white/40">BODDIN14</span>
-            </div>
-          </div>
-        </Card>
-        <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
-          <CardContent className="space-y-4 pt-6">
-            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-green-900/30 to-[#B026FF]/20 h-56 flex items-center justify-center">
-              <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
-              <div>
-                <p
-                  className="text-sm font-semibold text-white"
-                  data-testid="dashboard-plants-status"
-                >
-                  Letzte Bewässerung
-                </p>
-                <p className="text-xs text-white/60" data-testid="dashboard-plants-timer">
-                  {getWateredLabel()}
-                </p>
-              </div>
-              <span
-                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#B026FF]/20 text-[#B026FF]"
-                data-testid="dashboard-plants-icon"
-              >
-                <Droplet className="h-5 w-5" />
-              </span>
-            </div>
-            <Button
-              onClick={handleResetWatered}
-              className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
-              data-testid="dashboard-plants-reset"
-            >
-              Jetzt gegossen
-            </Button>
-          </CardContent>
-        </Card>
+        {/* Active Stays - Full width on mobile, 2 cols on desktop */}
         <Card className="lg:col-span-2" data-testid="dashboard-active-stays">
           <CardHeader>
             <CardTitle data-testid="dashboard-active-title">
@@ -347,7 +305,42 @@ const EXPANDED_VISIBLE_COUNT = 15;
             )}
           </CardContent>
         </Card>
-        <Card className="lg:col-span-1" data-testid="dashboard-upcoming-card">
+        {/* Plants Card */}
+        <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
+          <CardContent className="space-y-4 pt-6">
+            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-green-900/30 to-[#B026FF]/20 h-56 flex items-center justify-center">
+              <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
+              <div>
+                <p
+                  className="text-sm font-semibold text-white"
+                  data-testid="dashboard-plants-status"
+                >
+                  Letzte Bewässerung
+                </p>
+                <p className="text-xs text-white/60" data-testid="dashboard-plants-timer">
+                  {getWateredLabel()}
+                </p>
+              </div>
+              <span
+                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#B026FF]/20 text-[#B026FF]"
+                data-testid="dashboard-plants-icon"
+              >
+                <Droplet className="h-5 w-5" />
+              </span>
+            </div>
+            <Button
+              onClick={handleResetWatered}
+              className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
+              data-testid="dashboard-plants-reset"
+            >
+              Jetzt gegossen
+            </Button>
+          </CardContent>
+        </Card>
+        {/* Upcoming Check-ins - Below active stays */}
+        <Card className="lg:col-span-2" data-testid="dashboard-upcoming-card">
           <CardHeader>
             <CardTitle data-testid="dashboard-upcoming-title">
               Nächste Check-ins
