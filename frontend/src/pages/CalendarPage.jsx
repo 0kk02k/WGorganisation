@@ -190,7 +190,7 @@ export default function CalendarPage() {
                   </div>
                   {hasEvents && (
                     <span
-                      className="mt-2 inline-block h-1.5 w-3 rounded-full bg-[#B026FF]"
+                      className="mt-2 inline-block h-1.5 w-3 rounded-full bg-cyan-400"
                       data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
                     />
                   )}
