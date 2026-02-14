@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Trash2 } from "lucide-react";
 
 export default function ChatEditForm({
   messageId,
@@ -7,6 +8,7 @@ export default function ChatEditForm({
   onChange,
   onSave,
   onCancel,
+  onDelete,
 }) {
   return (
     <div className="mt-3 space-y-2">
@@ -33,6 +35,16 @@ export default function ChatEditForm({
           data-testid={`chat-edit-cancel-${messageId}`}
         >
           Abbrechen
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onDelete}
+          className="ml-auto rounded-full text-red-200 hover:text-red-100 hover:bg-red-500/10"
+          data-testid={`chat-edit-delete-${messageId}`}
+        >
+          <Trash2 className="h-4 w-4 mr-1" />
+          Löschen
         </Button>
       </div>
     </div>
