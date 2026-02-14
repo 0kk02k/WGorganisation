@@ -44,10 +44,20 @@ const navItems = [
 export const Layout = ({ children }) => {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [titleVisible, setTitleVisible] = useState(true);
 
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  // Hide title bar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setTitleVisible(window.scrollY < 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const toggleMobileNav = () => {
     setMobileNavOpen((prev) => !prev);
@@ -62,7 +72,23 @@ export const Layout = ({ children }) => {
         <div className="absolute -top-40 left-1/3 h-72 w-72 rounded-full bg-[#B026FF]/25 blur-[140px]" />
         <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
       </div>
-      <header className="fixed inset-x-0 top-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl min-[755px]:block">
+      {/* Title Bar - Desktop only, hides on scroll */}
+      <div
+        className={`fixed inset-x-0 top-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl transition-transform duration-300 min-[755px]:block ${
+          titleVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+        data-testid="desktop-title-bar"
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8">
+          <span className="text-xl font-semibold uppercase tracking-[0.3em] text-white">
+            BODDIN14-WG HUB
+          </span>
+        </div>
+      </div>
+      {/* Desktop Navigation - sticky below title bar */}
+      <header className={`fixed inset-x-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl transition-all duration-300 min-[755px]:block ${
+        titleVisible ? "top-12" : "top-0"
+      }`}>
         <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-4 md:px-8">
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
             {navItems.map((item) => (
@@ -164,7 +190,9 @@ export const Layout = ({ children }) => {
         </aside>
       </div>
       <main
-        className="mx-auto w-full max-w-6xl px-2 pb-20 pt-20 min-[755px]:px-4 min-[755px]:pb-28 min-[755px]:pt-28 md:px-8"
+        className={`mx-auto w-full max-w-6xl px-2 pb-20 pt-20 transition-all duration-300 min-[755px]:px-4 min-[755px]:pb-28 min-[755px]:pt-36 md:px-8 ${
+          !titleVisible ? "min-[755px]:!pt-28" : ""
+        }`}
         data-testid="main-content"
       >
         {children}
