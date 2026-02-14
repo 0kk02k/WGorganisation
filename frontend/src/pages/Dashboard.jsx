@@ -384,50 +384,6 @@ const EXPANDED_VISIBLE_COUNT = 15;
             <CardTitle data-testid="dashboard-chat-title">WG-Chat</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
-              <div className="space-y-2">
-                <label
-                  className="text-xs text-white/60"
-                  data-testid="chat-name-label"
-                >
-                  Dein Name
-                </label>
-                <Input
-                  value={messageForm.name}
-                  onChange={(event) =>
-                    setMessageForm((prev) => ({ ...prev, name: event.target.value }))
-                  }
-                  placeholder="z.B. Lea"
-                  data-testid="chat-name-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <label
-                  className="text-xs text-white/60"
-                  data-testid="chat-message-label"
-                >
-                  Nachricht
-                </label>
-                <Textarea
-                  rows={2}
-                  value={messageForm.content}
-                  onChange={(event) =>
-                    setMessageForm((prev) => ({ ...prev, content: event.target.value }))
-                  }
-                  placeholder="Kurze Info für alle"
-                  data-testid="chat-message-input"
-                />
-              </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleSendMessage}
-                  className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
-                  data-testid="chat-send-button"
-                >
-                  Senden
-                </Button>
-              </div>
-            </div>
             <div
               ref={chatContainerRef}
               className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
@@ -481,6 +437,50 @@ const EXPANDED_VISIBLE_COUNT = 15;
                   );
                 })()
               )}
+            </div>
+            <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+              <div className="space-y-2">
+                <label
+                  className="text-xs text-white/60"
+                  data-testid="chat-name-label"
+                >
+                  Dein Name
+                </label>
+                <Input
+                  value={messageForm.name}
+                  onChange={(event) =>
+                    setMessageForm((prev) => ({ ...prev, name: event.target.value }))
+                  }
+                  placeholder="z.B. Lea"
+                  data-testid="chat-name-input"
+                />
+              </div>
+              <div className="space-y-2">
+                <label
+                  className="text-xs text-white/60"
+                  data-testid="chat-message-label"
+                >
+                  Nachricht
+                </label>
+                <Textarea
+                  rows={2}
+                  value={messageForm.content}
+                  onChange={(event) =>
+                    setMessageForm((prev) => ({ ...prev, content: event.target.value }))
+                  }
+                  placeholder="Kurze Info für alle"
+                  data-testid="chat-message-input"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  onClick={handleSendMessage}
+                  className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
+                  data-testid="chat-send-button"
+                >
+                  Senden
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
