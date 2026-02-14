@@ -5,8 +5,6 @@ const ENDPOINT = process.env.REACT_APP_APPWRITE_ENDPOINT || 'https://fra.cloud.a
 const PROJECT_ID = process.env.REACT_APP_APPWRITE_PROJECT_ID || '698ee816003631ef3d09';
 const DATABASE_ID = process.env.REACT_APP_APPWRITE_DATABASE_ID || 'wg-organiser';
 
-console.log('Appwrite Config:', { ENDPOINT, PROJECT_ID, DATABASE_ID });
-
 const client = new Client()
   .setEndpoint(ENDPOINT)
   .setProject(PROJECT_ID);

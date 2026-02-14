@@ -74,16 +74,12 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
         checklist_in: buildChecklist(checkinTemplate),
         checklist_out: buildChecklist(checkoutTemplate),
       };
-      console.log("Creating stay with payload:", payload);
       const data = await staysApi.create(payload);
-      console.log("Stay created successfully:", data);
       toast.success("Aufenthalt angelegt.");
       onCreated?.(data);
       setOpen(false);
     } catch (error) {
       console.error("Failed to create stay:", error);
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
       toast.error(`Anlegen fehlgeschlagen: ${error.message || "Unbekannter Fehler"}`);
     }
   };
