@@ -102,7 +102,7 @@ export const Layout = ({ children }) => {
       {/* Mobile Navigation - always visible with slide effect */}
       <div
         className={`fixed inset-0 z-50 min-[755px]:hidden transition-all duration-300 ${
-          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
+          mobileNavOpen ? "pointer-events-auto" : ""
         }`}
         data-testid="mobile-nav-wrapper"
       >
@@ -110,21 +110,21 @@ export const Layout = ({ children }) => {
           type="button"
           onClick={toggleMobileNav}
           className={`absolute inset-0 bg-black/60 transition-opacity ${
-            mobileNavOpen ? "opacity-100" : "opacity-0"
+            mobileNavOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
           data-testid="mobile-nav-overlay"
         />
         <aside
           className={`absolute right-0 top-0 flex h-full flex-col gap-6 border-l border-white/10 bg-white/5 p-6 pt-20 text-white backdrop-blur-2xl transition-transform duration-300 ${
-            mobileNavOpen ? "translate-x-0" : "translate-x-[calc(100%-3.5rem)]"
+            mobileNavOpen ? "translate-x-0" : "translate-x-[calc(100%-1.75rem)]"
           }`}
           data-testid="mobile-nav-panel"
         >
-          {/* Hamburger button connected to nav */}
+          {/* Hamburger button connected to nav - always clickable */}
           <button
             type="button"
             onClick={toggleMobileNav}
-            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10"
+            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10 pointer-events-auto"
             data-testid="mobile-nav-toggle"
           >
             <Menu
