@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState, useRef } from "react";
  import { Badge } from "@/components/ui/badge";
  import { Input } from "@/components/ui/input";
  import { Textarea } from "@/components/ui/textarea";
- import { Droplet, ChevronDown } from "lucide-react";
+ import { Droplet, ChevronDown, Search } from "lucide-react";
  import {
    format,
    parseISO,
@@ -36,6 +36,7 @@ const EXPANDED_VISIBLE_COUNT = 15;
    const [lastWatered, setLastWatered] = useState(null);
    const [now, setNow] = useState(new Date());
    const [showAllMessages, setShowAllMessages] = useState(false);
+   const [chatSearch, setChatSearch] = useState("");
    const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
@@ -381,7 +382,19 @@ const EXPANDED_VISIBLE_COUNT = 15;
         </Card>
         <Card className="lg:col-span-3" data-testid="dashboard-chat-card">
           <CardHeader>
-            <CardTitle data-testid="dashboard-chat-title">WG-Chat</CardTitle>
+            <div className="flex items-center justify-between gap-4">
+              <CardTitle data-testid="dashboard-chat-title">WG-Chat</CardTitle>
+              <div className="relative w-64">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <Input
+                  value={chatSearch}
+                  onChange={(e) => setChatSearch(e.target.value)}
+                  placeholder="Suchen..."
+                  className="pl-9 h-8 rounded-full border-white/10 bg-white/5 text-white text-sm placeholder:text-white/40"
+                  data-testid="chat-search-input"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div
@@ -395,8 +408,31 @@ const EXPANDED_VISIBLE_COUNT = 15;
                 </p>
               ) : (
                 (() => {
+                  // Filter messages by search
+                  const searchLower = chatSearch.toLowerCase().trim();
+                  const filteredMessages = searchLower
+                    ? messages.filter((msg) => {
+                        const nameMatch = msg.name.toLowerCase().includes(searchLower);
+                        const contentMatch = msg.content.toLowerCase().includes(searchLower);
+                        const replyMatch = msg.replies?.some(
+                          (reply) =>
+                            reply.name.toLowerCase().includes(searchLower) ||
+                            reply.content.toLowerCase().includes(searchLower)
+                        );
+                        return nameMatch || contentMatch || replyMatch;
+                      })
+                    : messages;
+
+                  if (filteredMessages.length === 0) {
+                    return (
+                      <p className="text-sm text-white/60">
+                        Keine Nachrichten gefunden für "{chatSearch}"
+                      </p>
+                    );
+                  }
+
                   const maxVisible = showAllMessages ? EXPANDED_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
-                  const visibleMessages = messages.slice(0, maxVisible);
+                  const visibleMessages = filteredMessages.slice(0, maxVisible);
                   // Reverse: oldest first (top), newest last (bottom)
                   const reversedMessages = [...visibleMessages].reverse();
                   return (
@@ -422,7 +458,7 @@ const EXPANDED_VISIBLE_COUNT = 15;
                           onDeleteReply={handleDeleteReply}
                         />
                       ))}
-                      {messages.length > INITIAL_VISIBLE_COUNT && !showAllMessages && (
+                      {filteredMessages.length > INITIAL_VISIBLE_COUNT && !showAllMessages && (
                         <Button
                           variant="outline"
                           onClick={() => setShowAllMessages(true)}
@@ -430,7 +466,7 @@ const EXPANDED_VISIBLE_COUNT = 15;
                           data-testid="chat-show-more"
                         >
                           <ChevronDown className="h-4 w-4 mr-2" />
-                          {messages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
+                          {filteredMessages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
                         </Button>
                       )}
                     </>
