@@ -305,13 +305,14 @@ const EXPANDED_VISIBLE_COUNT = 15;
             )}
           </CardContent>
         </Card>
-        {/* Plants Card - Right side, spans both rows */}
+        {/* Plants Card - Right side, spans both rows on desktop */}
         <Card className="lg:col-span-1 lg:row-span-2" data-testid="dashboard-plants-card">
-          <CardContent className="space-y-4 pt-6">
-            <div className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-green-900/30 to-[#B026FF]/20 h-56 flex items-center justify-center">
+          <CardContent className="space-y-3 pt-4 lg:space-y-4 lg:pt-6">
+            {/* Image placeholder - only visible on desktop */}
+            <div className="hidden lg:overflow-hidden lg:rounded-2xl lg:border lg:border-stone-200 lg:bg-gradient-to-br lg:from-green-900/30 lg:to-[#B026FF]/20 lg:h-56 lg:flex lg:items-center lg:justify-center">
               <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
             </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3">
+            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
               <div>
                 <p
                   className="text-sm font-semibold text-white"
