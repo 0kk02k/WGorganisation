@@ -1,14 +1,17 @@
 import { Client, Databases, ID, Query } from 'appwrite';
 
 // Appwrite Konfiguration
+const ENDPOINT = process.env.REACT_APP_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1';
+const PROJECT_ID = process.env.REACT_APP_APPWRITE_PROJECT_ID || '698ee816003631ef3d09';
+const DATABASE_ID = process.env.REACT_APP_APPWRITE_DATABASE_ID || 'wg-organiser';
+
+console.log('Appwrite Config:', { ENDPOINT, PROJECT_ID, DATABASE_ID });
+
 const client = new Client()
-  .setEndpoint(process.env.REACT_APP_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1')
-  .setProject(process.env.REACT_APP_APPWRITE_PROJECT_ID || '698ee816003631ef3d09');
+  .setEndpoint(ENDPOINT)
+  .setProject(PROJECT_ID);
 
 const databases = new Databases(client);
-
-// Database und Collection IDs
-const DATABASE_ID = process.env.REACT_APP_APPWRITE_DATABASE_ID || 'wg-organiser';
 
 const COLLECTIONS = {
   stays: 'stays',
