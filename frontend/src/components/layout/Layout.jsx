@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -48,6 +48,11 @@ export const Layout = ({ children }) => {
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  const toggleMobileNav = () => {
+    setMobileNavOpen((prev) => !prev);
+  };
+
   return (
     <div
       className="relative min-h-screen bg-[#050505] text-white"
@@ -94,45 +99,46 @@ export const Layout = ({ children }) => {
           BODDIN14 WG-HUB
         </span>
       </div>
-      <button
-        type="button"
-        onClick={() => setMobileNavOpen(true)}
-        className="fixed right-4 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white shadow-lg backdrop-blur-2xl transition hover:bg-white/20 min-[755px]:hidden"
-        data-testid="mobile-nav-toggle"
-      >
-        <Menu className="h-5 w-5" />
-      </button>
+      {/* Mobile Navigation - always visible with slide effect */}
       <div
-        className={`fixed inset-0 z-50 min-[755px]:hidden ${
+        className={`fixed inset-0 z-50 min-[755px]:hidden transition-all duration-300 ${
           mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
         }`}
         data-testid="mobile-nav-wrapper"
       >
         <button
           type="button"
-          onClick={() => setMobileNavOpen(false)}
+          onClick={toggleMobileNav}
           className={`absolute inset-0 bg-black/60 transition-opacity ${
             mobileNavOpen ? "opacity-100" : "opacity-0"
           }`}
           data-testid="mobile-nav-overlay"
         />
         <aside
-          className={`absolute right-0 top-0 flex h-full w-72 flex-col gap-6 border-l border-white/10 bg-white/5 p-6 text-white backdrop-blur-2xl transition-transform ${
-            mobileNavOpen ? "translate-x-0" : "translate-x-full"
+          className={`absolute right-0 top-0 flex h-full flex-col gap-6 border-l border-white/10 bg-white/5 p-6 pt-20 text-white backdrop-blur-2xl transition-transform duration-300 ${
+            mobileNavOpen ? "translate-x-0" : "translate-x-[calc(100%-3.5rem)]"
           }`}
           data-testid="mobile-nav-panel"
         >
-          <div className="flex items-center justify-end">
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen(false)}
-              className="rounded-full border border-white/10 p-2 text-white/80 transition hover:bg-white/10"
-              data-testid="mobile-nav-close"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="flex flex-col gap-2" data-testid="mobile-nav-links">
+          {/* Hamburger button connected to nav */}
+          <button
+            type="button"
+            onClick={toggleMobileNav}
+            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10"
+            data-testid="mobile-nav-toggle"
+          >
+            <Menu
+              className={`h-5 w-5 transition-transform duration-300 ${
+                mobileNavOpen ? "rotate-90" : "rotate-0"
+              }`}
+            />
+          </button>
+          <div
+            className={`flex flex-col gap-2 transition-opacity duration-300 ${
+              mobileNavOpen ? "opacity-100" : "opacity-0"
+            }`}
+            data-testid="mobile-nav-links"
+          >
             {navItems.map((item) => (
               <NavLink
                 key={`${item.to}-drawer`}
