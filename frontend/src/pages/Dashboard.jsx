@@ -258,9 +258,9 @@ const EXPANDED_VISIBLE_COUNT = 15;
 
   return (
     <div className="space-y-6" data-testid="dashboard-page">
-      <section className="grid gap-4 lg:grid-cols-3" data-testid="dashboard-bento-grid">
-        {/* Active Stays - Full width on mobile, 2 cols on desktop */}
-        <Card className="lg:col-span-2" data-testid="dashboard-active-stays">
+      <section className="grid gap-4 lg:grid-cols-3 lg:grid-rows-[auto_1fr]" data-testid="dashboard-bento-grid">
+        {/* Active Stays - Top left */}
+        <Card className="lg:col-span-2 lg:row-span-1" data-testid="dashboard-active-stays">
           <CardHeader>
             <CardTitle data-testid="dashboard-active-title">
               Aktive Aufenthalte
@@ -305,8 +305,8 @@ const EXPANDED_VISIBLE_COUNT = 15;
             )}
           </CardContent>
         </Card>
-        {/* Plants Card */}
-        <Card className="lg:col-span-1" data-testid="dashboard-plants-card">
+        {/* Plants Card - Right side, spans both rows */}
+        <Card className="lg:col-span-1 lg:row-span-2" data-testid="dashboard-plants-card">
           <CardContent className="space-y-4 pt-6">
             <div className="overflow-hidden rounded-2xl border border-stone-200 bg-gradient-to-br from-green-900/30 to-[#B026FF]/20 h-56 flex items-center justify-center">
               <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
@@ -340,7 +340,7 @@ const EXPANDED_VISIBLE_COUNT = 15;
           </CardContent>
         </Card>
         {/* Upcoming Check-ins - Below active stays */}
-        <Card className="lg:col-span-2" data-testid="dashboard-upcoming-card">
+        <Card className="lg:col-span-2 lg:row-span-1" data-testid="dashboard-upcoming-card">
           <CardHeader>
             <CardTitle data-testid="dashboard-upcoming-title">
               Nächste Check-ins
