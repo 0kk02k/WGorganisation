@@ -1,37 +1,42 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
  
-import { staysApi, messagesApi } from "@/lib/appwrite";
-import { DEFAULT_ROOMS } from "@/lib/constants";
-import { useSettings } from "@/context/SettingsContext";
-import { getRoomBadgeStyle } from "@/lib/color";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Droplet } from "lucide-react";
-import {
-  format,
-  parseISO,
-  isWithinInterval,
-  isAfter,
-  differenceInMinutes,
-} from "date-fns";
-import { Link } from "react-router-dom";
-import { toast } from "sonner";
-import ChatMessage from "@/components/ChatMessage";
+ import { staysApi, messagesApi } from "@/lib/appwrite";
+ import { DEFAULT_ROOMS } from "@/lib/constants";
+ import { useSettings } from "@/context/SettingsContext";
+ import { getRoomBadgeStyle } from "@/lib/color";
+ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+ import { Button } from "@/components/ui/button";
+ import { Badge } from "@/components/ui/badge";
+ import { Input } from "@/components/ui/input";
+ import { Textarea } from "@/components/ui/textarea";
+ import { Droplet, ChevronDown } from "lucide-react";
+ import {
+   format,
+   parseISO,
+   isWithinInterval,
+   isAfter,
+   differenceInMinutes,
+ } from "date-fns";
+ import { Link } from "react-router-dom";
+ import { toast } from "sonner";
+ import ChatMessage from "@/components/ChatMessage";
 
-export default function Dashboard() {
-  const { settings } = useSettings();
-  const [stays, setStays] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
-  const [editingMessageId, setEditingMessageId] = useState(null);
-  const [editingContent, setEditingContent] = useState("");
-  const [replyingToId, setReplyingToId] = useState(null);
-  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
-  const [lastWatered, setLastWatered] = useState(null);
-  const [now, setNow] = useState(new Date());
+const INITIAL_VISIBLE_COUNT = 7;
+const EXPANDED_VISIBLE_COUNT = 15;
+
+ export default function Dashboard() {
+   const { settings } = useSettings();
+   const [stays, setStays] = useState([]);
+   const [messages, setMessages] = useState([]);
+   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+   const [editingMessageId, setEditingMessageId] = useState(null);
+   const [editingContent, setEditingContent] = useState("");
+   const [replyingToId, setReplyingToId] = useState(null);
+   const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+   const [lastWatered, setLastWatered] = useState(null);
+   const [now, setNow] = useState(new Date());
+   const [showAllMessages, setShowAllMessages] = useState(false);
+   const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
     try {
@@ -67,6 +72,13 @@ export default function Dashboard() {
     const interval = setInterval(() => setNow(new Date()), 60000);
     return () => clearInterval(interval);
   }, []);
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages, showAllMessages]);
 
   const today = useMemo(() => new Date(), []);
   const rooms = settings?.rooms || DEFAULT_ROOMS;
@@ -416,33 +428,58 @@ export default function Dashboard() {
                 </Button>
               </div>
             </div>
-            <div className="space-y-3" data-testid="chat-messages-list">
+            <div
+              ref={chatContainerRef}
+              className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
+              data-testid="chat-messages-list"
+            >
               {messages.length === 0 ? (
                 <p className="text-sm text-white/60" data-testid="chat-empty">
                   Noch keine Nachrichten. Starte den Chat.
                 </p>
               ) : (
-              messages.map((message) => (
-                <ChatMessage
-                  key={message.id}
-                  message={message}
-                  isEditing={editingMessageId === message.id}
-                  isReplying={replyingToId === message.id}
-                  editingContent={editingContent}
-                  setEditingContent={setEditingContent}
-                  replyForm={replyForm}
-                  setReplyForm={setReplyForm}
-                  onEdit={() => startEditMessage(message)}
-                  onDelete={() => handleDeleteMessage(message.id)}
-                  onUpdate={handleUpdateMessage}
-                  onCancelEdit={() => setEditingMessageId(null)}
-                  onReply={() => startReply(message)}
-                  onCancelReply={() => setReplyingToId(null)}
-                  onReplySubmit={() => handleReplySubmit(message.id)}
-                  onEditReply={handleEditReply}
-                  onDeleteReply={handleDeleteReply}
-                />
-              ))
+                (() => {
+                  const maxVisible = showAllMessages ? EXPANDED_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
+                  const visibleMessages = messages.slice(0, maxVisible);
+                  // Reverse: oldest first (top), newest last (bottom)
+                  const reversedMessages = [...visibleMessages].reverse();
+                  return (
+                    <>
+                      {reversedMessages.map((message) => (
+                        <ChatMessage
+                          key={message.id}
+                          message={message}
+                          isEditing={editingMessageId === message.id}
+                          isReplying={replyingToId === message.id}
+                          editingContent={editingContent}
+                          setEditingContent={setEditingContent}
+                          replyForm={replyForm}
+                          setReplyForm={setReplyForm}
+                          onEdit={() => startEditMessage(message)}
+                          onDelete={() => handleDeleteMessage(message.id)}
+                          onUpdate={handleUpdateMessage}
+                          onCancelEdit={() => setEditingMessageId(null)}
+                          onReply={() => startReply(message)}
+                          onCancelReply={() => setReplyingToId(null)}
+                          onReplySubmit={() => handleReplySubmit(message.id)}
+                          onEditReply={handleEditReply}
+                          onDeleteReply={handleDeleteReply}
+                        />
+                      ))}
+                      {messages.length > INITIAL_VISIBLE_COUNT && !showAllMessages && (
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowAllMessages(true)}
+                          className="w-full rounded-full border-white/10 text-white/70 hover:text-white hover:bg-white/5"
+                          data-testid="chat-show-more"
+                        >
+                          <ChevronDown className="h-4 w-4 mr-2" />
+                          {messages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
+                        </Button>
+                      )}
+                    </>
+                  );
+                })()
               )}
             </div>
           </CardContent>
