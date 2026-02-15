@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
     short: "Home",
     icon: Home,
     testId: "nav-home-link",
+    color: "from-yellow-400 to-orange-500",
   },
   {
     to: "/kalender",
@@ -17,6 +18,7 @@ const navItems = [
     short: "Kalender",
     icon: CalendarDays,
     testId: "nav-calendar-link",
+    color: "from-teal-400 to-emerald-400",
   },
   {
     to: "/anleitungen",
@@ -24,6 +26,7 @@ const navItems = [
     short: "How to",
     icon: BookOpen,
     testId: "nav-manuals-link",
+    color: "from-pink-500 to-rose-500",
   },
   {
     to: "/berlin",
@@ -31,6 +34,7 @@ const navItems = [
     short: "Berlin",
     icon: MapPin,
     testId: "nav-berlin-link",
+    color: "from-orange-500 to-red-500",
   },
   {
     to: "/einstellungen",
@@ -38,6 +42,7 @@ const navItems = [
     short: "Info",
     icon: Settings,
     testId: "nav-settings-link",
+    color: "from-purple-500 to-pink-500",
   },
 ];
 
@@ -65,31 +70,42 @@ export const Layout = ({ children }) => {
 
   return (
     <div
-      className="relative min-h-screen bg-[#050505] text-white"
+      className="relative min-h-screen bg-white text-gray-800"
       data-testid="app-shell"
     >
+      {/* Dot-Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      
+      {/* Decorative Elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/3 h-72 w-72 rounded-full bg-[#B026FF]/25 blur-[140px]" />
-        <div className="absolute bottom-[-140px] right-[-60px] h-72 w-72 rounded-full bg-[#CCFF00]/20 blur-[160px]" />
+        <div className="absolute -top-20 left-1/4 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-20" />
+        <div className="absolute top-1/3 right-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20" />
+        <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />
       </div>
+
       {/* Title Bar - Desktop only, hides on scroll */}
       <div
-        className={`fixed inset-x-0 top-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl transition-transform duration-300 min-[755px]:block ${
+        className={`fixed inset-x-0 top-0 z-40 hidden border-b-4 border-black bg-white transition-transform duration-300 min-[755px]:block ${
           titleVisible ? "translate-y-0" : "-translate-y-full"
         }`}
         data-testid="desktop-title-bar"
       >
         <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8">
-          <span className="text-xl font-semibold uppercase tracking-[0.3em] text-white">
+          <span 
+            className="text-2xl tracking-wide text-gray-800"
+            style={{ fontFamily: "'Bangers', cursive" }}
+          >
             BODDIN14-WG HUB
           </span>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
         </div>
       </div>
+
       {/* Desktop Navigation - sticky below title bar */}
-      <header className={`fixed inset-x-0 z-40 hidden border-b border-white/5 bg-white/5 backdrop-blur-2xl transition-all duration-300 min-[755px]:block ${
+      <header className={`fixed inset-x-0 z-40 hidden border-b-4 border-black bg-white transition-all duration-300 min-[755px]:block ${
         titleVisible ? "top-12" : "top-0"
       }`}>
-        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-4 md:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8">
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
             {navItems.map((item) => (
               <NavLink
@@ -99,13 +115,14 @@ export const Layout = ({ children }) => {
                   const calendarActive =
                     item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
                   return cn(
-                    "hover-lift flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
+                    "flex items-center gap-2 px-4 py-2 text-sm font-bold border-4 border-black rounded-none transition-all duration-150",
                     isActive || calendarActive
-                      ? "bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_20px_rgba(204,255,0,0.35)]"
-                      : "text-white/70 hover:bg-white/10 hover:text-white",
+                      ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+                      : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
                   );
                 }}
                 data-testid={item.testId}
+                style={{ fontFamily: "'Nunito', sans-serif" }}
               >
                 <item.icon className="h-4 w-4" />
                 <span data-testid={`${item.testId}-label`}>{item.label}</span>
@@ -114,81 +131,78 @@ export const Layout = ({ children }) => {
           </nav>
         </div>
       </header>
+
+      {/* Mobile Brand Bar */}
       <div
-        className="fixed inset-x-0 top-0 z-40 flex items-center justify-center border-b border-white/5 bg-white/5 px-4 py-4 backdrop-blur-2xl min-[755px]:hidden"
+        className="fixed inset-x-0 top-0 z-40 flex items-center justify-center border-b-4 border-black bg-white px-4 py-3 min-[755px]:hidden"
         data-testid="mobile-brand-bar"
       >
         <span
-          className="text-2xl font-semibold uppercase tracking-[0.3em] text-white/80"
+          className="text-xl tracking-wide text-gray-800"
+          style={{ fontFamily: "'Bangers', cursive" }}
           data-testid="mobile-brand-text"
         >
           BODDIN14 WG-HUB
         </span>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
       </div>
-      {/* Mobile Navigation - always visible with slide effect */}
-      <div
-        className={`fixed inset-0 z-50 min-[755px]:hidden transition-all duration-300 ${
-          mobileNavOpen ? "pointer-events-auto" : "pointer-events-none"
-        }`}
-        data-testid="mobile-nav-wrapper"
+
+      {/* Mobile Navigation Toggle Button */}
+      <button
+        type="button"
+        onClick={toggleMobileNav}
+        className="fixed top-12 right-4 z-50 flex h-12 w-12 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-[755px]:hidden"
+        data-testid="mobile-nav-toggle"
       >
-        <button
-          type="button"
-          onClick={toggleMobileNav}
-          className={`absolute inset-0 bg-black/60 transition-opacity ${
-            mobileNavOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+        {mobileNavOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <Menu className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Mobile Navigation Overlay */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 min-[755px]:hidden"
+          onClick={() => setMobileNavOpen(false)}
           data-testid="mobile-nav-overlay"
         />
-        <aside
-          className={`absolute right-0 top-0 flex h-full flex-col gap-6 border-l border-white/10 bg-white/5 p-6 pt-20 text-white backdrop-blur-2xl transition-transform duration-300 pointer-events-auto ${
-            mobileNavOpen ? "translate-x-0" : "translate-x-[calc(100%-1.75rem)]"
-          }`}
-          data-testid="mobile-nav-panel"
-        >
-          {/* Hamburger button connected to nav - always clickable */}
-          <button
-            type="button"
-            onClick={toggleMobileNav}
-            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 flex h-14 w-10 items-center justify-center rounded-l-xl border-r border-white/10 bg-white/5 text-white backdrop-blur-2xl transition-all hover:bg-white/10"
-            data-testid="mobile-nav-toggle"
-          >
-            <Menu
-              className={`h-5 w-5 transition-transform duration-300 ${
-                mobileNavOpen ? "rotate-90" : "rotate-0"
-              }`}
-            />
-          </button>
-          <div
-            className={`flex flex-col gap-2 transition-opacity duration-300 ${
-              mobileNavOpen ? "opacity-100" : "opacity-0"
-            }`}
-            data-testid="mobile-nav-links"
-          >
-            {navItems.map((item) => (
-              <NavLink
-                key={`${item.to}-drawer`}
-                to={item.to}
-                onClick={() => setMobileNavOpen(false)}
-                className={({ isActive }) => {
-                  const calendarActive =
-                    item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                  return cn(
-                    "flex items-center gap-3 rounded-full border px-4 py-3 text-sm font-medium transition-colors",
-                    isActive || calendarActive
-                      ? "border-[#CCFF00] bg-[#CCFF00]/15 text-[#CCFF00] shadow-[0_0_18px_rgba(204,255,0,0.35)]"
-                      : "border-white/10 text-white/70 hover:border-white/30 hover:text-white",
-                  );
-                }}
-                data-testid={`mobile-${item.testId}`}
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.label}</span>
-              </NavLink>
-            ))}
-          </div>
-        </aside>
+      )}
+
+      {/* Mobile Navigation Panel */}
+      <div
+        className={`fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 transition-transform duration-300 min-[755px]:hidden ${
+          mobileNavOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+        data-testid="mobile-nav-panel"
+      >
+        <div className="flex flex-col gap-3" data-testid="mobile-nav-links">
+          {navItems.map((item) => (
+            <NavLink
+              key={`${item.to}-drawer`}
+              to={item.to}
+              onClick={() => setMobileNavOpen(false)}
+              className={({ isActive }) => {
+                const calendarActive =
+                  item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
+                return cn(
+                  "flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
+                  isActive || calendarActive
+                    ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+                    : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                );
+              }}
+              data-testid={`mobile-${item.testId}`}
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              <item.icon className="h-5 w-5" />
+              <span>{item.label}</span>
+            </NavLink>
+          ))}
+        </div>
       </div>
+
       <main
         className={`mx-auto w-full max-w-6xl px-2 pb-20 pt-20 transition-all duration-300 min-[755px]:px-4 min-[755px]:pb-28 min-[755px]:pt-36 md:px-8 ${
           !titleVisible ? "min-[755px]:!pt-28" : ""

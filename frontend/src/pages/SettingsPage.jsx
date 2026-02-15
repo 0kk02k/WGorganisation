@@ -32,7 +32,6 @@ export default function SettingsPage() {
   }, [loading, settings]);
 
   // Aktuelle Werte aus settings oder Drafts verwenden
-  // Prüfen, ob settings tatsächlich gültige Daten enthält
   const hasValidRooms = settings?.rooms && Array.isArray(settings.rooms) && settings.rooms.length > 0;
   const hasValidCheckin = settings?.checkin_template && Array.isArray(settings.checkin_template) && settings.checkin_template.length > 0;
   const hasValidCheckout = settings?.checkout_template && Array.isArray(settings.checkout_template) && settings.checkout_template.length > 0;
@@ -50,7 +49,6 @@ export default function SettingsPage() {
   const handleSaveRooms = async () => {
     try {
       const data = await updateSettings({ rooms: roomDraft });
-      // Draft mit den gespeicherten Daten aktualisieren
       setRoomDraft(data.rooms || DEFAULT_ROOMS);
       toast.success("Zimmer aktualisiert.");
       setEditingRooms(false);
@@ -62,7 +60,6 @@ export default function SettingsPage() {
   const handleSaveCheckin = async () => {
     try {
       const data = await updateSettings({ checkin_template: parseLines(checkinDraft) });
-      // Draft mit den gespeicherten Daten aktualisieren
       setCheckinDraft((data.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
       toast.success("Check-in Vorlage gespeichert.");
       setEditingCheckin(false);
@@ -74,7 +71,6 @@ export default function SettingsPage() {
   const handleSaveCheckout = async () => {
     try {
       const data = await updateSettings({ checkout_template: parseLines(checkoutDraft) });
-      // Draft mit den gespeicherten Daten aktualisieren
       setCheckoutDraft((data.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
       toast.success("Check-out Vorlage gespeichert.");
       setEditingCheckout(false);
@@ -84,247 +80,319 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="settings-page">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight" data-testid="settings-title">
-          Einstellungen & Vorlagen
-        </h1>
-      </div>
+    <div className="min-h-screen bg-white relative" data-testid="settings-page">
+      {/* Dot-Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      
+      <div className="relative z-10 space-y-8 p-6">
+        {/* Header mit Pop-Art Unterstrich */}
+        <div className="relative inline-block">
+          <h1 
+            className="text-4xl tracking-wide text-gray-800"
+            style={{ fontFamily: "'Bangers', cursive" }}
+            data-testid="settings-title"
+          >
+            Einstellungen & Vorlagen
+          </h1>
+          <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
+        </div>
 
-      <Card className="border-stone-200/80" data-testid="settings-rooms-card">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle data-testid="settings-rooms-title">Zimmer</CardTitle>
-          {!editingRooms ? (
-            <Button
-              variant="outline"
-              onClick={() => {
-                // Draft mit aktuellen Werten setzen vor dem Bearbeiten
-                setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
-                setEditingRooms(true);
-              }}
-              data-testid="settings-rooms-edit-button"
+        {/* Zimmer-Karte */}
+        <Card 
+          className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+          data-testid="settings-rooms-card"
+        >
+          <CardHeader 
+            className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black flex flex-row items-center justify-between p-4"
+          >
+            <CardTitle 
+              className="text-white text-2xl"
+              style={{ fontFamily: "'Bangers', cursive" }}
+              data-testid="settings-rooms-title"
             >
-              Bearbeiten
-            </Button>
-          ) : (
-            <div className="flex items-center gap-2">
+              Zimmer
+            </CardTitle>
+            {!editingRooms ? (
               <Button
-                variant="outline"
+                className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                 onClick={() => {
                   setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
-                  setEditingRooms(false);
+                  setEditingRooms(true);
                 }}
-                data-testid="settings-rooms-cancel-button"
+                data-testid="settings-rooms-edit-button"
               >
-                Abbrechen
+                Bearbeiten
               </Button>
-              <Button
-                onClick={handleSaveRooms}
-                data-testid="settings-rooms-save-button"
+            ) : (
+              <div className="flex items-center gap-2">
+                <Button
+                  className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                  onClick={() => {
+                    setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
+                    setEditingRooms(false);
+                  }}
+                  data-testid="settings-rooms-cancel-button"
+                >
+                  Abbrechen
+                </Button>
+                <Button
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                  onClick={handleSaveRooms}
+                  data-testid="settings-rooms-save-button"
+                >
+                  Speichern
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent className="p-6 bg-white grid gap-4 md:grid-cols-2">
+            {(editingRooms ? roomDraft : displayRooms).map((room, index) => (
+              <div
+                key={room.id}
+                className="bg-gradient-to-br from-amber-50 to-orange-50 border-4 border-black p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 relative"
+                data-testid={`settings-room-${room.id}`}
               >
-                Speichern
-              </Button>
-            </div>
-          )}
-        </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2">
-          {(editingRooms ? roomDraft : displayRooms).map((room, index) => (
-            <div
-              key={room.id}
-              className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-              data-testid={`settings-room-${room.id}`}
+                {/* Dekoratives Element */}
+                <div className="absolute top-0 right-0 w-8 h-8 bg-yellow-400 -mr-2 -mt-2 rotate-45 border-2 border-black" />
+                
+                {editingRooms ? (
+                  <div className="space-y-3 relative z-10">
+                    <div className="space-y-2">
+                      <label
+                        className="text-sm font-semibold text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`settings-room-name-label-${room.id}`}
+                      >
+                        Name
+                      </label>
+                      <Input
+                        className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 focus:ring-offset-0 text-gray-800"
+                        value={room.name}
+                        onChange={(event) => {
+                          const next = [...roomDraft];
+                          next[index] = { ...next[index], name: event.target.value };
+                          setRoomDraft(next);
+                        }}
+                        data-testid={`settings-room-name-input-${room.id}`}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label
+                        className="text-sm font-semibold text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`settings-room-color-label-${room.id}`}
+                      >
+                        Farbcode
+                      </label>
+                      <Input
+                        type="color"
+                        className="w-full h-12 bg-white border-4 border-black rounded-none cursor-pointer"
+                        value={room.color}
+                        onChange={(event) => {
+                          const next = [...roomDraft];
+                          next[index] = { ...next[index], color: event.target.value };
+                          setRoomDraft(next);
+                        }}
+                        data-testid={`settings-room-color-input-${room.id}`}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between relative z-10">
+                    <div>
+                      <p
+                        className="text-lg font-bold text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`settings-room-name-${room.id}`}
+                      >
+                        {room.name}
+                      </p>
+                      <p 
+                        className="text-sm text-gray-500"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`settings-room-info-${room.id}`}
+                      >
+                        Farbcode {room.color}
+                      </p>
+                    </div>
+                    <span
+                      className="h-12 w-12 rounded-full border-4 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                      style={{ backgroundColor: room.color }}
+                      data-testid={`settings-room-color-${room.id}`}
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        {/* Check-in und Check-out Karten */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {/* Check-in Vorlage */}
+          <Card 
+            className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="settings-checkin-card"
+          >
+            <CardHeader 
+              className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
             >
-              {editingRooms ? (
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <label
-                      className="text-xs font-medium text-stone-600"
-                      data-testid={`settings-room-name-label-${room.id}`}
-                    >
-                      Name
-                    </label>
-                    <Input
-                      value={room.name}
-                      onChange={(event) => {
-                        const next = [...roomDraft];
-                        next[index] = { ...next[index], name: event.target.value };
-                        setRoomDraft(next);
-                      }}
-                      data-testid={`settings-room-name-input-${room.id}`}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label
-                      className="text-xs font-medium text-stone-600"
-                      data-testid={`settings-room-color-label-${room.id}`}
-                    >
-                      Farbcode
-                    </label>
-                    <Input
-                      type="color"
-                      value={room.color}
-                      onChange={(event) => {
-                        const next = [...roomDraft];
-                        next[index] = { ...next[index], color: event.target.value };
-                        setRoomDraft(next);
-                      }}
-                      data-testid={`settings-room-color-input-${room.id}`}
-                    />
-                  </div>
-                </div>
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="settings-checkin-title"
+              >
+                Check-in Vorlage
+              </CardTitle>
+              {!editingCheckin ? (
+                <Button
+                  className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                  onClick={() => {
+                    setCheckinDraft((settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
+                    setEditingCheckin(true);
+                  }}
+                  data-testid="settings-checkin-edit-button"
+                >
+                  Bearbeiten
+                </Button>
               ) : (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-sm font-semibold text-stone-900"
-                      data-testid={`settings-room-name-${room.id}`}
-                    >
-                      {room.name}
-                    </p>
-                    <p className="text-xs text-stone-600" data-testid={`settings-room-info-${room.id}`}>
-                      Farbcode {room.color}
-                    </p>
-                  </div>
-                  <span
-                    className="h-8 w-8 rounded-full border"
-                    style={{ backgroundColor: room.color }}
-                    data-testid={`settings-room-color-${room.id}`}
-                  />
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    onClick={() => {
+                      setCheckinDraft((settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
+                      setEditingCheckin(false);
+                    }}
+                    data-testid="settings-checkin-cancel-button"
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button
+                    className="bg-teal-500 hover:bg-teal-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    onClick={handleSaveCheckin}
+                    data-testid="settings-checkin-save-button"
+                  >
+                    Speichern
+                  </Button>
                 </div>
               )}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-stone-200/80" data-testid="settings-checkin-card">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle data-testid="settings-checkin-title">Check-in Vorlage</CardTitle>
-            {!editingCheckin ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // Draft mit aktuellen Werten setzen vor dem Bearbeiten
-                  setCheckinDraft((settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
-                  setEditingCheckin(true);
-                }}
-                data-testid="settings-checkin-edit-button"
-              >
-                Bearbeiten
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setCheckinDraft(
-                      (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join(
-                        "\n",
-                      ),
-                    );
-                    setEditingCheckin(false);
-                  }}
-                  data-testid="settings-checkin-cancel-button"
-                >
-                  Abbrechen
-                </Button>
-                <Button onClick={handleSaveCheckin} data-testid="settings-checkin-save-button">
-                  Speichern
-                </Button>
-              </div>
-            )}
-          </CardHeader>
-          <CardContent>
-            {editingCheckin ? (
-              <Textarea
-                rows={6}
-                value={checkinDraft}
-                onChange={(event) => setCheckinDraft(event.target.value)}
-                data-testid="settings-checkin-textarea"
-              />
-            ) : (
-              <ul className="space-y-2 text-sm text-stone-700">
-                {displayCheckin.split('\n').filter(Boolean).map(
-                  (item, index) => (
+            </CardHeader>
+            <CardContent className="p-4 bg-white">
+              {editingCheckin ? (
+                <Textarea
+                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
+                  rows={6}
+                  value={checkinDraft}
+                  onChange={(event) => setCheckinDraft(event.target.value)}
+                  data-testid="settings-checkin-textarea"
+                />
+              ) : (
+                <ul className="space-y-2">
+                  {displayCheckin.split('\n').filter(Boolean).map((item, index) => (
                     <li
                       key={`checkin-${index}`}
-                      className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                      className="bg-gradient-to-r from-teal-50 to-emerald-50 border-l-8 border-teal-400 p-4 hover:from-teal-100 hover:to-emerald-100 transition-colors relative"
                       data-testid={`settings-checkin-item-${index}`}
                     >
-                      {item}
+                      {/* Nummerierter Kreis */}
+                      <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-orange-500 text-white font-bold rounded-full flex items-center justify-center border-2 border-black text-sm">
+                        {index + 1}
+                      </span>
+                      <span 
+                        className="text-gray-800 ml-4"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        {item}
+                      </span>
                     </li>
-                  ),
-                )}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
 
-        <Card className="border-stone-200/80" data-testid="settings-checkout-card">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle data-testid="settings-checkout-title">
-              Check-out Vorlage
-            </CardTitle>
-            {!editingCheckout ? (
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // Draft mit aktuellen Werten setzen vor dem Bearbeiten
-                  setCheckoutDraft((settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
-                  setEditingCheckout(true);
-                }}
-                data-testid="settings-checkout-edit-button"
+          {/* Check-out Vorlage */}
+          <Card 
+            className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="settings-checkout-card"
+          >
+            <CardHeader 
+              className="bg-gradient-to-r from-rose-400 to-pink-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
+            >
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="settings-checkout-title"
               >
-                Bearbeiten
-              </Button>
-            ) : (
-              <div className="flex items-center gap-2">
+                Check-out Vorlage
+              </CardTitle>
+              {!editingCheckout ? (
                 <Button
-                  variant="outline"
+                  className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                   onClick={() => {
-                    setCheckoutDraft(
-                      (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join(
-                        "\n",
-                      ),
-                    );
-                    setEditingCheckout(false);
+                    setCheckoutDraft((settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
+                    setEditingCheckout(true);
                   }}
-                  data-testid="settings-checkout-cancel-button"
+                  data-testid="settings-checkout-edit-button"
                 >
-                  Abbrechen
+                  Bearbeiten
                 </Button>
-                <Button onClick={handleSaveCheckout} data-testid="settings-checkout-save-button">
-                  Speichern
-                </Button>
-              </div>
-            )}
-          </CardHeader>
-          <CardContent>
-            {editingCheckout ? (
-              <Textarea
-                rows={6}
-                value={checkoutDraft}
-                onChange={(event) => setCheckoutDraft(event.target.value)}
-                data-testid="settings-checkout-textarea"
-              />
-            ) : (
-              <ul className="space-y-2 text-sm text-stone-700">
-                {displayCheckout.split('\n').filter(Boolean).map(
-                  (item, index) => (
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Button
+                    className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    onClick={() => {
+                      setCheckoutDraft((settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
+                      setEditingCheckout(false);
+                    }}
+                    data-testid="settings-checkout-cancel-button"
+                  >
+                    Abbrechen
+                  </Button>
+                  <Button
+                    className="bg-rose-500 hover:bg-rose-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    onClick={handleSaveCheckout}
+                    data-testid="settings-checkout-save-button"
+                  >
+                    Speichern
+                  </Button>
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="p-4 bg-white">
+              {editingCheckout ? (
+                <Textarea
+                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-rose-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
+                  rows={6}
+                  value={checkoutDraft}
+                  onChange={(event) => setCheckoutDraft(event.target.value)}
+                  data-testid="settings-checkout-textarea"
+                />
+              ) : (
+                <ul className="space-y-2">
+                  {displayCheckout.split('\n').filter(Boolean).map((item, index) => (
                     <li
                       key={`checkout-${index}`}
-                      className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
+                      className="bg-gradient-to-r from-rose-50 to-pink-50 border-l-8 border-rose-400 p-4 hover:from-rose-100 hover:to-pink-100 transition-colors relative"
                       data-testid={`settings-checkout-item-${index}`}
                     >
-                      {item}
+                      {/* Nummerierter Kreis */}
+                      <span className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-pink-500 text-white font-bold rounded-full flex items-center justify-center border-2 border-black text-sm">
+                        {index + 1}
+                      </span>
+                      <span 
+                        className="text-gray-800 ml-4"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        {item}
+                      </span>
                     </li>
-                  ),
-                )}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

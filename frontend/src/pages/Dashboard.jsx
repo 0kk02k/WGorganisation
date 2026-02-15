@@ -1,43 +1,41 @@
 import { useEffect, useMemo, useState, useRef } from "react";
- 
- import { staysApi, messagesApi } from "@/lib/appwrite";
- import { DEFAULT_ROOMS } from "@/lib/constants";
- import { useSettings } from "@/context/SettingsContext";
- import { getRoomBadgeStyle } from "@/lib/color";
- import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
- import { Button } from "@/components/ui/button";
- import { Badge } from "@/components/ui/badge";
- import { Input } from "@/components/ui/input";
- import { Textarea } from "@/components/ui/textarea";
- import { Droplet, ChevronDown, Search } from "lucide-react";
- import {
-   format,
-   parseISO,
-   isWithinInterval,
-   isAfter,
-   differenceInMinutes,
- } from "date-fns";
- import { Link } from "react-router-dom";
- import { toast } from "sonner";
- import ChatMessage from "@/components/ChatMessage";
+import { staysApi, messagesApi } from "@/lib/appwrite";
+import { DEFAULT_ROOMS } from "@/lib/constants";
+import { useSettings } from "@/context/SettingsContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Droplet, ChevronDown, Search } from "lucide-react";
+import {
+  format,
+  parseISO,
+  isWithinInterval,
+  isAfter,
+  differenceInMinutes,
+} from "date-fns";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import ChatMessage from "@/components/ChatMessage";
 
 const INITIAL_VISIBLE_COUNT = 7;
 const EXPANDED_VISIBLE_COUNT = 15;
 
- export default function Dashboard() {
-   const { settings } = useSettings();
-   const [stays, setStays] = useState([]);
-   const [messages, setMessages] = useState([]);
-   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
-   const [editingMessageId, setEditingMessageId] = useState(null);
-   const [editingContent, setEditingContent] = useState("");
-   const [replyingToId, setReplyingToId] = useState(null);
-   const [replyForm, setReplyForm] = useState({ name: "", content: "" });
-   const [lastWatered, setLastWatered] = useState(null);
-   const [now, setNow] = useState(new Date());
-   const [showAllMessages, setShowAllMessages] = useState(false);
-   const [chatSearch, setChatSearch] = useState("");
-   const chatContainerRef = useRef(null);
+export default function Dashboard() {
+  const { settings } = useSettings();
+  const [stays, setStays] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+  const [editingMessageId, setEditingMessageId] = useState(null);
+  const [editingContent, setEditingContent] = useState("");
+  const [replyingToId, setReplyingToId] = useState(null);
+  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+  const [lastWatered, setLastWatered] = useState(null);
+  const [now, setNow] = useState(new Date());
+  const [showAllMessages, setShowAllMessages] = useState(false);
+  const [chatSearch, setChatSearch] = useState("");
+  const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
     try {
@@ -74,7 +72,6 @@ const EXPANDED_VISIBLE_COUNT = 15;
     return () => clearInterval(interval);
   }, []);
 
-  // Scroll to bottom when messages change
   useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
@@ -257,275 +254,344 @@ const EXPANDED_VISIBLE_COUNT = 15;
   };
 
   return (
-    <div className="space-y-6" data-testid="dashboard-page">
-      <section className="grid gap-4 lg:grid-cols-3 lg:grid-rows-[auto_1fr]" data-testid="dashboard-bento-grid">
-        {/* Active Stays - Top left */}
-        <Card className="lg:col-span-2 lg:row-span-1" data-testid="dashboard-active-stays">
-          <CardHeader>
-            <CardTitle data-testid="dashboard-active-title">
-              Aktive Aufenthalte
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {activeStays.length === 0 ? (
-              <p className="text-sm text-white/60" data-testid="dashboard-no-active">
-                Keine aktiven Aufenthalte.
-              </p>
-            ) : (
-              activeStays.map((stay) => (
-                <Link
-                  key={stay.id}
-                  to={`/aufenthalte/${stay.id}`}
-                  className="hover-lift flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
-                  data-testid={`dashboard-active-link-${stay.id}`}
+    <div className="min-h-screen bg-white relative" data-testid="dashboard-page">
+      {/* Dot-Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      
+      <div className="relative z-10 space-y-6" data-testid="dashboard-bento-grid">
+        {/* Header */}
+        <div className="relative inline-block">
+          <h1 
+            className="text-4xl tracking-wide text-gray-800"
+            style={{ fontFamily: "'Bangers', cursive" }}
+          >
+            Übersicht
+          </h1>
+          <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
+        </div>
+
+        <section className="grid gap-6 lg:grid-cols-3 lg:grid-rows-[auto_1fr]">
+          {/* Active Stays - Top left */}
+          <Card 
+            className="lg:col-span-2 lg:row-span-1 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="dashboard-active-stays"
+          >
+            <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="dashboard-active-title"
+              >
+                Aktive Aufenthalte
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {activeStays.length === 0 ? (
+                <p 
+                  className="text-sm text-gray-500"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                  data-testid="dashboard-no-active"
                 >
-                  <div>
-                    <p
-                      className="text-sm font-semibold text-white"
-                      data-testid={`dashboard-active-name-${stay.id}`}
-                    >
-                      {stay.occupant_name}
-                    </p>
-                    <p className="text-xs text-white/60" data-testid={`dashboard-active-dates-${stay.id}`}>
-                      {format(parseISO(stay.start_date), "dd.MM.")} –{" "}
-                      {format(parseISO(stay.end_date), "dd.MM.yyyy")}
-                    </p>
-                  </div>
-                  <Badge
-                    style={getRoomBadgeStyle(
-                      rooms.find((room) => room.id === stay.room)?.color,
-                    )}
-                    className="border border-transparent text-stone-900"
-                    data-testid={`dashboard-active-room-${stay.id}`}
+                  Keine aktiven Aufenthalte.
+                </p>
+              ) : (
+                activeStays.map((stay) => (
+                  <Link
+                    key={stay.id}
+                    to={`/aufenthalte/${stay.id}`}
+                    className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid={`dashboard-active-link-${stay.id}`}
                   >
-                    {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                  </Badge>
-                </Link>
-              ))
-            )}
-          </CardContent>
-        </Card>
-        {/* Plants Card - Right side, spans both rows on desktop */}
-        <Card className="lg:col-span-1 lg:row-span-2" data-testid="dashboard-plants-card">
-          <CardContent className="space-y-3 pt-4 lg:space-y-4 lg:pt-6">
-            {/* Image placeholder - only visible on desktop */}
-            <div className="hidden lg:overflow-hidden lg:rounded-2xl lg:border lg:border-stone-200 lg:bg-gradient-to-br lg:from-green-900/30 lg:to-[#B026FF]/20 lg:h-56 lg:flex lg:items-center lg:justify-center">
-              <Droplet className="h-16 w-16 text-[#CCFF00]/40" />
-            </div>
-            <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <div>
+                    <div>
+                      <p
+                        className="text-lg font-bold text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`dashboard-active-name-${stay.id}`}
+                      >
+                        {stay.occupant_name}
+                      </p>
+                      <p 
+                        className="text-sm text-gray-500"
+                        data-testid={`dashboard-active-dates-${stay.id}`}
+                      >
+                        {format(parseISO(stay.start_date), "dd.MM.")} -{" "}
+                        {format(parseISO(stay.end_date), "dd.MM.yyyy")}
+                      </p>
+                    </div>
+                    <Badge
+                      className="border-2 border-black text-gray-800 font-bold"
+                      style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
+                      data-testid={`dashboard-active-room-${stay.id}`}
+                    >
+                      {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                    </Badge>
+                  </Link>
+                ))
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Plants Card - Right side */}
+          <Card 
+            className="lg:col-span-1 lg:row-span-2 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="dashboard-plants-card"
+          >
+            <CardHeader className="bg-gradient-to-r from-emerald-400 to-teal-400 border-b-4 border-black p-4">
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+              >
+                Pflanzen
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {/* Image placeholder */}
+              <div className="hidden lg:flex items-center justify-center h-40 bg-gradient-to-br from-emerald-100 to-teal-100 border-4 border-black">
+                <Droplet className="h-16 w-16 text-teal-500" />
+              </div>
+              <div className="border-4 border-black p-4 bg-gradient-to-r from-emerald-50 to-teal-50">
                 <p
-                  className="text-sm font-semibold text-white"
+                  className="text-lg font-bold text-gray-800"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
                   data-testid="dashboard-plants-status"
                 >
-                  Letzte Bewässerung
+                  Letzte Bewasserung
                 </p>
-                <p className="text-xs text-white/60" data-testid="dashboard-plants-timer">
+                <p 
+                  className="text-sm text-gray-500"
+                  data-testid="dashboard-plants-timer"
+                >
                   {getWateredLabel()}
                 </p>
               </div>
-              <span
-                className="ml-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#B026FF]/20 text-[#B026FF]"
-                data-testid="dashboard-plants-icon"
+              <Button
+                onClick={handleResetWatered}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+                data-testid="dashboard-plants-reset"
               >
-                <Droplet className="h-5 w-5" />
-              </span>
-            </div>
-            <Button
-              onClick={handleResetWatered}
-              className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
-              data-testid="dashboard-plants-reset"
-            >
-              Jetzt gegossen
-            </Button>
-          </CardContent>
-        </Card>
-        {/* Upcoming Check-ins - Below active stays */}
-        <Card className="lg:col-span-2 lg:row-span-1" data-testid="dashboard-upcoming-card">
-          <CardHeader>
-            <CardTitle data-testid="dashboard-upcoming-title">
-              Nächste Check-ins
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {upcomingStays.length === 0 ? (
-              <p className="text-sm text-white/60" data-testid="dashboard-no-upcoming">
-                Keine geplanten Check-ins.
-              </p>
-            ) : (
-              upcomingStays.map((stay) => (
-                <Link
-                  key={stay.id}
-                  to={`/aufenthalte/${stay.id}`}
-                  className="hover-lift flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
-                  data-testid={`dashboard-upcoming-link-${stay.id}`}
+                Jetzt gegossen
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Check-ins */}
+          <Card 
+            className="lg:col-span-2 lg:row-span-1 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="dashboard-upcoming-card"
+          >
+            <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="dashboard-upcoming-title"
+              >
+                Nachste Check-ins
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {upcomingStays.length === 0 ? (
+                <p 
+                  className="text-sm text-gray-500"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                  data-testid="dashboard-no-upcoming"
                 >
-                  <div>
-                    <p
-                      className="text-sm font-semibold text-white"
-                      data-testid={`dashboard-upcoming-name-${stay.id}`}
-                    >
-                      {stay.occupant_name}
-                    </p>
-                    <p className="text-xs text-white/60" data-testid={`dashboard-upcoming-date-${stay.id}`}>
-                      {format(parseISO(stay.start_date), "dd.MM.yyyy")}
-                    </p>
-                  </div>
-                  <Badge
-                    style={getRoomBadgeStyle(
-                      rooms.find((room) => room.id === stay.room)?.color,
-                    )}
-                    className="border border-transparent text-stone-900"
-                    data-testid={`dashboard-upcoming-room-${stay.id}`}
-                  >
-                    {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                  </Badge>
-                </Link>
-              ))
-            )}
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3" data-testid="dashboard-chat-card">
-          <CardHeader>
-            <div className="flex items-center justify-between gap-4">
-              <CardTitle data-testid="dashboard-chat-title">WG-Chat</CardTitle>
-              <div className="relative w-64">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                <Input
-                  value={chatSearch}
-                  onChange={(e) => setChatSearch(e.target.value)}
-                  placeholder="Suchen..."
-                  className="pl-9 h-8 rounded-full border-white/10 bg-white/5 text-white text-sm placeholder:text-white/40"
-                  data-testid="chat-search-input"
-                />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div
-              ref={chatContainerRef}
-              className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
-              data-testid="chat-messages-list"
-            >
-              {messages.length === 0 ? (
-                <p className="text-sm text-white/60" data-testid="chat-empty">
-                  Noch keine Nachrichten. Starte den Chat.
+                  Keine geplanten Check-ins.
                 </p>
               ) : (
-                (() => {
-                  // Filter messages by search
-                  const searchLower = chatSearch.toLowerCase().trim();
-                  const filteredMessages = searchLower
-                    ? messages.filter((msg) => {
-                        const nameMatch = msg.name.toLowerCase().includes(searchLower);
-                        const contentMatch = msg.content.toLowerCase().includes(searchLower);
-                        const replyMatch = msg.replies?.some(
-                          (reply) =>
-                            reply.name.toLowerCase().includes(searchLower) ||
-                            reply.content.toLowerCase().includes(searchLower)
-                        );
-                        return nameMatch || contentMatch || replyMatch;
-                      })
-                    : messages;
-
-                  if (filteredMessages.length === 0) {
-                    return (
-                      <p className="text-sm text-white/60">
-                        Keine Nachrichten gefunden für "{chatSearch}"
+                upcomingStays.map((stay) => (
+                  <Link
+                    key={stay.id}
+                    to={`/aufenthalte/${stay.id}`}
+                    className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid={`dashboard-upcoming-link-${stay.id}`}
+                  >
+                    <div>
+                      <p
+                        className="text-lg font-bold text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid={`dashboard-upcoming-name-${stay.id}`}
+                      >
+                        {stay.occupant_name}
                       </p>
-                    );
-                  }
-
-                  const maxVisible = showAllMessages ? EXPANDED_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
-                  const visibleMessages = filteredMessages.slice(0, maxVisible);
-                  // Reverse: oldest first (top), newest last (bottom)
-                  const reversedMessages = [...visibleMessages].reverse();
-                  return (
-                    <>
-                      {reversedMessages.map((message) => (
-                        <ChatMessage
-                          key={message.id}
-                          message={message}
-                          isEditing={editingMessageId === message.id}
-                          isReplying={replyingToId === message.id}
-                          editingContent={editingContent}
-                          setEditingContent={setEditingContent}
-                          replyForm={replyForm}
-                          setReplyForm={setReplyForm}
-                          onEdit={() => startEditMessage(message)}
-                          onDelete={() => handleDeleteMessage(message.id)}
-                          onUpdate={handleUpdateMessage}
-                          onCancelEdit={() => setEditingMessageId(null)}
-                          onReply={() => startReply(message)}
-                          onCancelReply={() => setReplyingToId(null)}
-                          onReplySubmit={() => handleReplySubmit(message.id)}
-                          onEditReply={handleEditReply}
-                          onDeleteReply={handleDeleteReply}
-                        />
-                      ))}
-                      {filteredMessages.length > INITIAL_VISIBLE_COUNT && !showAllMessages && (
-                        <Button
-                          variant="outline"
-                          onClick={() => setShowAllMessages(true)}
-                          className="w-full rounded-full border-white/10 text-white/70 hover:text-white hover:bg-white/5"
-                          data-testid="chat-show-more"
-                        >
-                          <ChevronDown className="h-4 w-4 mr-2" />
-                          {filteredMessages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
-                        </Button>
-                      )}
-                    </>
-                  );
-                })()
+                      <p 
+                        className="text-sm text-gray-500"
+                        data-testid={`dashboard-upcoming-date-${stay.id}`}
+                      >
+                        {format(parseISO(stay.start_date), "dd.MM.yyyy")}
+                      </p>
+                    </div>
+                    <Badge
+                      className="border-2 border-black text-gray-800 font-bold"
+                      style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
+                      data-testid={`dashboard-upcoming-room-${stay.id}`}
+                    >
+                      {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                    </Badge>
+                  </Link>
+                ))
               )}
-            </div>
-            <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
-              <div className="space-y-2">
-                <label
-                  className="text-xs text-white/60"
-                  data-testid="chat-name-label"
+            </CardContent>
+          </Card>
+
+          {/* Chat Card */}
+          <Card 
+            className="lg:col-span-3 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="dashboard-chat-card"
+          >
+            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 border-b-4 border-black p-4">
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle 
+                  className="text-white text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
+                  data-testid="dashboard-chat-title"
                 >
-                  Dein Name
-                </label>
-                <Input
-                  value={messageForm.name}
-                  onChange={(event) =>
-                    setMessageForm((prev) => ({ ...prev, name: event.target.value }))
-                  }
-                  placeholder="z.B. Lea"
-                  data-testid="chat-name-input"
-                />
+                  WG-Chat
+                </CardTitle>
+                <div className="relative w-64">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Input
+                    value={chatSearch}
+                    onChange={(e) => setChatSearch(e.target.value)}
+                    placeholder="Suchen..."
+                    className="pl-9 h-10 border-4 border-black rounded-none bg-white text-gray-800 placeholder:text-gray-400"
+                    data-testid="chat-search-input"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <label
-                  className="text-xs text-white/60"
-                  data-testid="chat-message-label"
-                >
-                  Nachricht
-                </label>
-                <Textarea
-                  rows={2}
-                  value={messageForm.content}
-                  onChange={(event) =>
-                    setMessageForm((prev) => ({ ...prev, content: event.target.value }))
-                  }
-                  placeholder="Kurze Info für alle"
-                  data-testid="chat-message-input"
-                />
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              <div
+                ref={chatContainerRef}
+                className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
+                data-testid="chat-messages-list"
+              >
+                {messages.length === 0 ? (
+                  <p 
+                    className="text-sm text-gray-500"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="chat-empty"
+                  >
+                    Noch keine Nachrichten. Starte den Chat.
+                  </p>
+                ) : (
+                  (() => {
+                    const searchLower = chatSearch.toLowerCase().trim();
+                    const filteredMessages = searchLower
+                      ? messages.filter((msg) => {
+                          const nameMatch = msg.name.toLowerCase().includes(searchLower);
+                          const contentMatch = msg.content.toLowerCase().includes(searchLower);
+                          const replyMatch = msg.replies?.some(
+                            (reply) =>
+                              reply.name.toLowerCase().includes(searchLower) ||
+                              reply.content.toLowerCase().includes(searchLower)
+                          );
+                          return nameMatch || contentMatch || replyMatch;
+                        })
+                      : messages;
+
+                    if (filteredMessages.length === 0) {
+                      return (
+                        <p className="text-sm text-gray-500">
+                          Keine Nachrichten gefunden fur "{chatSearch}"
+                        </p>
+                      );
+                    }
+
+                    const maxVisible = showAllMessages ? EXPANDED_VISIBLE_COUNT : INITIAL_VISIBLE_COUNT;
+                    const visibleMessages = filteredMessages.slice(0, maxVisible);
+                    const reversedMessages = [...visibleMessages].reverse();
+                    return (
+                      <>
+                        {reversedMessages.map((message) => (
+                          <ChatMessage
+                            key={message.id}
+                            message={message}
+                            isEditing={editingMessageId === message.id}
+                            isReplying={replyingToId === message.id}
+                            editingContent={editingContent}
+                            setEditingContent={setEditingContent}
+                            replyForm={replyForm}
+                            setReplyForm={setReplyForm}
+                            onEdit={() => startEditMessage(message)}
+                            onDelete={() => handleDeleteMessage(message.id)}
+                            onUpdate={handleUpdateMessage}
+                            onCancelEdit={() => setEditingMessageId(null)}
+                            onReply={() => startReply(message)}
+                            onCancelReply={() => setReplyingToId(null)}
+                            onReplySubmit={() => handleReplySubmit(message.id)}
+                            onEditReply={handleEditReply}
+                            onDeleteReply={handleDeleteReply}
+                          />
+                        ))}
+                        {filteredMessages.length > INITIAL_VISIBLE_COUNT && !showAllMessages && (
+                          <Button
+                            className="w-full bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                            onClick={() => setShowAllMessages(true)}
+                            data-testid="chat-show-more"
+                          >
+                            <ChevronDown className="h-4 w-4 mr-2" />
+                            {filteredMessages.length - INITIAL_VISIBLE_COUNT} altere Nachrichten anzeigen
+                          </Button>
+                        )}
+                      </>
+                    );
+                  })()
+                )}
               </div>
-              <div className="flex items-end">
-                <Button
-                  onClick={handleSendMessage}
-                  className="w-full rounded-full bg-[#CCFF00] text-black hover:bg-[#CCFF00]/80"
-                  data-testid="chat-send-button"
-                >
-                  Senden
-                </Button>
+              <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-semibold text-gray-800"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="chat-name-label"
+                  >
+                    Dein Name
+                  </label>
+                  <Input
+                    value={messageForm.name}
+                    onChange={(event) =>
+                      setMessageForm((prev) => ({ ...prev, name: event.target.value }))
+                    }
+                    placeholder="z.B. Lea"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400"
+                    data-testid="chat-name-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-semibold text-gray-800"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="chat-message-label"
+                  >
+                    Nachricht
+                  </label>
+                  <Textarea
+                    rows={2}
+                    value={messageForm.content}
+                    onChange={(event) =>
+                      setMessageForm((prev) => ({ ...prev, content: event.target.value }))
+                    }
+                    placeholder="Kurze Info fur alle"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400"
+                    data-testid="chat-message-input"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={handleSendMessage}
+                    className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="chat-send-button"
+                  >
+                    Senden
+                  </Button>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
     </div>
   );
 }
