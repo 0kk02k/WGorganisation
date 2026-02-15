@@ -3,7 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
-import { getRoomBadgeStyle } from "@/lib/color";
 
 export const StaysList = ({
   stays,
@@ -15,9 +14,17 @@ export const StaysList = ({
 
   if (!stays || stays.length === 0) {
     return (
-      <Card className="border-dashed border-stone-300" data-testid={`${testIdPrefix}-empty`}>
-        <CardContent className="py-8 text-center text-sm text-stone-600">
-          {emptyLabel}
+      <Card 
+        className="border-4 border-dashed border-gray-300 rounded-none bg-white"
+        data-testid={`${testIdPrefix}-empty`}
+      >
+        <CardContent className="py-12 text-center">
+          <p 
+            className="text-gray-500 text-lg"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            {emptyLabel}
+          </p>
         </CardContent>
       </Card>
     );
@@ -35,36 +42,43 @@ export const StaysList = ({
           <Link
             to={`/aufenthalte/${stay.id}`}
             key={stay.id}
-            className="group hover-lift"
+            className="group block"
             data-testid={`${testIdPrefix}-card-${stay.id}`}
           >
-            <Card className="transition-colors group-hover:bg-white/5">
-              <CardContent className="flex items-center justify-between gap-4 p-5">
+            <Card className="bg-white border-4 border-black rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150">
+              <CardContent className="flex items-center justify-between gap-4 p-4">
                 <div className="space-y-2">
                   <p
-                    className="text-sm font-semibold text-stone-900"
+                    className="text-lg font-bold text-gray-800"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid={`${testIdPrefix}-name-${stay.id}`}
                   >
                     {stay.occupant_name}
                   </p>
                   <p
-                    className="text-xs text-stone-600"
+                    className="text-sm text-gray-500"
                     data-testid={`${testIdPrefix}-dates-${stay.id}`}
                   >
-                    {stay.start_date} – {stay.end_date}
+                    {stay.start_date} - {stay.end_date}
                   </p>
-                  <div className="flex gap-3 text-xs text-stone-600">
-                    <span data-testid={`${testIdPrefix}-open-in-${stay.id}`}>
-                      Check-in offen: {openIn}
+                  <div className="flex gap-3 text-sm">
+                    <span 
+                      className="bg-teal-100 text-teal-800 px-2 py-1 border-2 border-black font-semibold"
+                      data-testid={`${testIdPrefix}-open-in-${stay.id}`}
+                    >
+                      Check-in: {openIn} offen
                     </span>
-                    <span data-testid={`${testIdPrefix}-open-out-${stay.id}`}>
-                      Check-out offen: {openOut}
+                    <span 
+                      className="bg-rose-100 text-rose-800 px-2 py-1 border-2 border-black font-semibold"
+                      data-testid={`${testIdPrefix}-open-out-${stay.id}`}
+                    >
+                      Check-out: {openOut} offen
                     </span>
                   </div>
                 </div>
                 <Badge
-                  style={getRoomBadgeStyle(roomColor)}
-                  className="border border-transparent text-stone-900"
+                  className="text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] px-4 py-2"
+                  style={{ backgroundColor: roomColor || '#facc15' }}
                   data-testid={`${testIdPrefix}-room-${stay.id}`}
                 >
                   {roomLabel}

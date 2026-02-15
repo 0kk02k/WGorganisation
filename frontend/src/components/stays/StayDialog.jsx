@@ -88,23 +88,30 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+          className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
           data-testid={triggerTestId}
         >
           <Plus className="mr-2 h-4 w-4" />
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-lg rounded-2xl" data-testid="stay-dialog">
-        <DialogHeader>
-          <DialogTitle data-testid="stay-dialog-title">
+      <DialogContent 
+        className="max-w-lg bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
+        data-testid="stay-dialog"
+      >
+        <DialogHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black p-4 -m-6 mb-0">
+          <DialogTitle 
+            className="text-white text-2xl"
+            style={{ fontFamily: "'Bangers', cursive" }}
+            data-testid="stay-dialog-title"
+          >
             Neue Belegung anlegen
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-4 pt-8">
           <div className="space-y-2">
             <label
-              className="text-sm font-medium text-stone-700"
+              className="text-sm font-bold text-gray-800"
               data-testid="stay-form-occupant-label"
             >
               Name der Person
@@ -118,13 +125,14 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }))
               }
               placeholder="z.B. Lea oder Ben"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
               data-testid="stay-form-occupant-input"
             />
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-stone-700"
+                className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-room-label"
               >
                 Zimmer
@@ -135,14 +143,18 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   setForm((prev) => ({ ...prev, room: value }))
                 }
               >
-                <SelectTrigger data-testid="stay-form-room-select">
+                <SelectTrigger 
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  data-testid="stay-form-room-select"
+                >
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border-4 border-black rounded-none">
                   {rooms.map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
+                      className="hover:bg-gray-100"
                       data-testid={`stay-form-room-option-${room.id}`}
                     >
                       {room.name}
@@ -153,7 +165,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             </div>
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-stone-700"
+                className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-start-label"
               >
                 Check-in
@@ -167,6 +179,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     start_date: event.target.value,
                   }))
                 }
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
                 data-testid="stay-form-start-date"
               />
             </div>
@@ -174,7 +187,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-stone-700"
+                className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-end-label"
               >
                 Check-out
@@ -188,12 +201,13 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     end_date: event.target.value,
                   }))
                 }
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
                 data-testid="stay-form-end-date"
               />
             </div>
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-stone-700"
+                className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-notes-label"
               >
                 Hinweise
@@ -208,26 +222,27 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   }))
                 }
                 placeholder="Ankunftszeit, Schlüsselort ..."
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
                 data-testid="stay-form-notes-input"
               />
             </div>
           </div>
-          <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-stone-700">
+          <div className="border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex items-center gap-2 text-sm font-bold text-gray-800">
               <CalendarDays className="h-4 w-4" />
               <span data-testid="stay-checklist-preview-title">
                 Checklisten werden automatisch angelegt
               </span>
             </div>
-            <div className="mt-3 grid gap-3 text-sm text-stone-600 md:grid-cols-2">
+            <div className="mt-3 grid gap-3 text-sm text-gray-600 md:grid-cols-2">
               <div>
                 <p
-                  className="font-medium text-stone-700"
+                  className="font-bold text-gray-800"
                   data-testid="stay-checkin-preview"
                 >
                   Check-in:
                 </p>
-                <ul className="list-disc pl-5">
+                <ul className="list-disc pl-5 mt-1">
                   {checkinTemplate.map((item, index) => (
                     <li
                       key={`ci-${index}`}
@@ -240,12 +255,12 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               </div>
               <div>
                 <p
-                  className="font-medium text-stone-700"
+                  className="font-bold text-gray-800"
                   data-testid="stay-checkout-preview"
                 >
                   Check-out:
                 </p>
-                <ul className="list-disc pl-5">
+                <ul className="list-disc pl-5 mt-1">
                   {checkoutTemplate.map((item, index) => (
                     <li
                       key={`co-${index}`}
@@ -259,9 +274,9 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             </div>
           </div>
         </div>
-        <DialogFooter className="gap-2">
+        <DialogFooter className="gap-2 mt-4">
           <Button
-            variant="outline"
+            className="bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             onClick={() => setOpen(false)}
             data-testid="stay-dialog-cancel"
           >
@@ -269,7 +284,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+            className="bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="stay-dialog-submit"
           >
             Belegung speichern

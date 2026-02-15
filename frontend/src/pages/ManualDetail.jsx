@@ -95,7 +95,11 @@ export default function ManualDetail() {
 
   if (!manual || !form) {
     return (
-      <div className="text-sm text-stone-600" data-testid="manual-loading">
+      <div 
+        className="text-lg text-gray-500 p-8"
+        style={{ fontFamily: "'Nunito', sans-serif" }}
+        data-testid="manual-loading"
+      >
         Anleitung wird geladen...
       </div>
     );
@@ -107,149 +111,197 @@ export default function ManualDetail() {
     "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
 
   return (
-    <div className="space-y-6" data-testid="manual-detail-page">
-      <Button asChild variant="outline" className="rounded-full">
-        <Link to="/anleitungen" data-testid="manual-back-link">
-          Zurück
-        </Link>
-      </Button>
-      <Card className="overflow-hidden border-stone-200/80" data-testid="manual-detail-card">
-        <div className="aspect-video overflow-hidden bg-stone-100" data-testid="manual-detail-image">
-          <img
-            src={imageSrc}
-            alt={form.title}
-            className="h-full w-full object-cover"
-          />
-        </div>
-        <CardHeader className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {isEditing ? (
-              <div className="flex-1 space-y-2">
-                <label
-                  className="text-sm font-medium text-stone-700"
-                  data-testid="manual-edit-title-label"
+    <div className="min-h-screen bg-white relative" data-testid="manual-detail-page">
+      {/* Dot-Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      
+      <div className="relative z-10 space-y-6">
+        {/* Back Button */}
+        <Button 
+          asChild 
+          className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+        >
+          <Link to="/anleitungen" data-testid="manual-back-link">
+            Zurück
+          </Link>
+        </Button>
+
+        {/* Main Card */}
+        <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          {/* Image */}
+          <div 
+            className="aspect-video overflow-hidden border-b-4 border-black bg-gray-100" 
+            data-testid="manual-detail-image"
+          >
+            <img
+              src={imageSrc}
+              alt={form.title}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          
+          {/* Header */}
+          <CardHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {isEditing ? (
+                <div className="flex-1 space-y-2">
+                  <label
+                    className="text-sm font-bold text-white"
+                    data-testid="manual-edit-title-label"
+                  >
+                    Titel
+                  </label>
+                  <Input
+                    value={form.title}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, title: event.target.value }))
+                    }
+                    className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    data-testid="manual-edit-title"
+                  />
+                </div>
+              ) : (
+                <CardTitle 
+                  className="text-white text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
+                  data-testid="manual-detail-title"
                 >
-                  Titel
+                  {manual.title}
+                </CardTitle>
+              )}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handleEditToggle}
+                  disabled={saving}
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                  data-testid="manual-edit-toggle"
+                >
+                  {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
+                </Button>
+                {isEditing && (
+                  <Button
+                    onClick={handleDelete}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid="manual-delete-button"
+                  >
+                    Anleitung löschen
+                  </Button>
+                )}
+              </div>
+            </div>
+            {isEditing ? (
+              <div className="space-y-2 mt-4">
+                <label
+                  className="text-sm font-bold text-white"
+                  data-testid="manual-edit-description-label"
+                >
+                  Beschreibung
                 </label>
                 <Input
-                  value={form.title}
+                  value={form.description}
                   onChange={(event) =>
-                    setForm((prev) => ({ ...prev, title: event.target.value }))
+                    setForm((prev) => ({ ...prev, description: event.target.value }))
                   }
-                  data-testid="manual-edit-title"
+                  className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                  data-testid="manual-edit-description"
                 />
               </div>
             ) : (
-              <CardTitle data-testid="manual-detail-title">{manual.title}</CardTitle>
+              <p 
+                className="text-white/90 mt-2"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+                data-testid="manual-detail-description"
+              >
+                {manual.description}
+              </p>
             )}
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleEditToggle}
-                disabled={saving}
-                className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-                data-testid="manual-edit-toggle"
-              >
-                {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
-              </Button>
-              {isEditing && (
-                <Button
-                  onClick={handleDelete}
-                  variant="outline"
-                  className="rounded-full border-red-500/40 text-red-300 hover:bg-red-500/20"
-                  data-testid="manual-delete-button"
-                >
-                  Anleitung löschen
-                </Button>
-              )}
-            </div>
-          </div>
-          {isEditing ? (
-            <div className="space-y-2">
-              <label
-                className="text-sm font-medium text-stone-700"
-                data-testid="manual-edit-description-label"
-              >
-                Beschreibung
-              </label>
-              <Input
-                value={form.description}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, description: event.target.value }))
-                }
-                data-testid="manual-edit-description"
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-stone-600" data-testid="manual-detail-description">
-              {manual.description}
-            </p>
-          )}
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {isEditing && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-steps-label">
-                Schritte
-              </label>
-              <Textarea
-                rows={5}
-                value={form.steps}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, steps: event.target.value }))
-                }
-                data-testid="manual-edit-steps"
-              />
-            </div>
-          )}
-          {isEditing && (
-            <div className="grid gap-3 md:grid-cols-2">
+          </CardHeader>
+          
+          <CardContent className="p-4 space-y-4">
+            {isEditing && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-url-label">
-                  Bild-URL
+                <label className="text-sm font-bold text-gray-800" data-testid="manual-edit-steps-label">
+                  Schritte
                 </label>
-                <Input
-                  value={form.image_url || ""}
+                <Textarea
+                  rows={5}
+                  value={form.steps}
                   onChange={(event) =>
-                    setForm((prev) => ({ ...prev, image_url: event.target.value }))
+                    setForm((prev) => ({ ...prev, steps: event.target.value }))
                   }
-                  placeholder="https://..."
-                  data-testid="manual-edit-image-url"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                  data-testid="manual-edit-steps"
                 />
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-stone-700" data-testid="manual-edit-image-file-label">
-                  Bild hochladen
-                </label>
-                <Input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  data-testid="manual-edit-image-file"
-                />
+            )}
+            {isEditing && (
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-800" data-testid="manual-edit-image-url-label">
+                    Bild-URL
+                  </label>
+                  <Input
+                    value={form.image_url || ""}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, image_url: event.target.value }))
+                    }
+                    placeholder="https://..."
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="manual-edit-image-url"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-800" data-testid="manual-edit-image-file-label">
+                    Bild hochladen
+                  </label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    data-testid="manual-edit-image-file"
+                  />
+                </div>
               </div>
+            )}
+            
+            {/* Steps */}
+            <div>
+              <h3
+                className="mb-4 text-xl font-bold text-gray-800"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="manual-detail-steps-title"
+              >
+                Schritt-für-Schritt
+              </h3>
+              <ol className="space-y-3">
+                {steps.map((step, index) => (
+                  <li
+                    key={`${manual.id}-step-${index}`}
+                    className="border-4 border-black p-4 bg-gradient-to-r from-violet-50 to-fuchsia-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid={`manual-step-${index}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span 
+                        className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold flex items-center justify-center border-2 border-black"
+                        style={{ fontFamily: "'Bangers', cursive" }}
+                      >
+                        {index + 1}
+                      </span>
+                      <span 
+                        className="text-gray-800"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        {step}
+                      </span>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
-          )}
-          <div>
-            <h3
-              className="mb-3 text-sm font-semibold text-stone-900"
-              data-testid="manual-detail-steps-title"
-            >
-              Schritt-für-Schritt
-            </h3>
-            <ol className="space-y-2 text-sm text-stone-700">
-              {steps.map((step, index) => (
-                <li
-                  key={`${manual.id}-step-${index}`}
-                  className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
-                  data-testid={`manual-step-${index}`}
-                >
-                  {step}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

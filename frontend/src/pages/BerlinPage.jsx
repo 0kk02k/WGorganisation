@@ -197,233 +197,308 @@ export default function BerlinPage() {
   };
 
   return (
-    <div className="space-y-6" data-testid="berlin-page">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-semibold" data-testid="berlin-title">
-          Berlin
-        </h1>
-        <Button
-          onClick={openCreateModal}
-          className="h-12 w-12 rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-          data-testid="berlin-open-modal-button"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      </div>
-
-      <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
-        <DialogContent
-          className="max-w-2xl border-white/10 bg-[#141414]/95 text-white"
-          data-testid="berlin-create-modal"
-        >
-          <DialogHeader>
-            <DialogTitle data-testid="berlin-create-title">Neuer Beitrag</DialogTitle>
-          </DialogHeader>
-          <Tabs
-            value={postType}
-            onValueChange={setPostType}
-            className="space-y-4"
-            data-testid="berlin-create-tabs"
+    <div className="min-h-screen bg-white relative" data-testid="berlin-page">
+      {/* Dot-Pattern Overlay */}
+      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      
+      <div className="relative z-10 space-y-6">
+        {/* Header */}
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="relative inline-block">
+            <h1 
+              className="text-4xl tracking-wide text-gray-800"
+              style={{ fontFamily: "'Bangers', cursive" }}
+              data-testid="berlin-title"
+            >
+              Berlin
+            </h1>
+            <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-400 mt-2" />
+          </div>
+          <Button
+            onClick={openCreateModal}
+            className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+            data-testid="berlin-open-modal-button"
           >
-            <TabsList className="grid w-full grid-cols-2 bg-white/5">
-              <TabsTrigger value="event" data-testid="berlin-tab-event">
-                Veranstaltung
-              </TabsTrigger>
-              <TabsTrigger value="link" data-testid="berlin-tab-link">
-                Link
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-title-label">
-                    Titel
-                  </label>
-                  <Input
-                    value={form.title}
-                    onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                    placeholder="z.B. Jazz Night"
-                    data-testid="berlin-title-input"
-                  />
+            <Plus className="h-6 w-6" />
+          </Button>
+        </div>
+
+        {/* Modal */}
+        <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
+          <DialogContent
+            className="max-w-2xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
+            data-testid="berlin-create-modal"
+          >
+            <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
+              <DialogTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="berlin-create-title"
+              >
+                Neuer Beitrag
+              </DialogTitle>
+            </DialogHeader>
+            <Tabs
+              value={postType}
+              onValueChange={setPostType}
+              className="space-y-4 pt-8"
+              data-testid="berlin-create-tabs"
+            >
+              <TabsList className="grid w-full grid-cols-2 bg-gray-100 border-4 border-black rounded-none h-12">
+                <TabsTrigger 
+                  value="event" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-400 data-[state=active]:to-emerald-400 data-[state=active]:text-white font-bold rounded-none"
+                  data-testid="berlin-tab-event"
+                >
+                  Veranstaltung
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="link" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-400 data-[state=active]:to-blue-400 data-[state=active]:text-white font-bold rounded-none"
+                  data-testid="berlin-tab-link"
+                >
+                  Link
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-title-label"
+                    >
+                      Titel
+                    </label>
+                    <Input
+                      value={form.title}
+                      onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                      placeholder="z.B. Jazz Night"
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-title-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-date-label"
+                    >
+                      Datum
+                    </label>
+                    <Input
+                      type="date"
+                      value={form.date}
+                      onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-date-input"
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-location-label"
+                    >
+                      Ort
+                    </label>
+                    <Input
+                      value={form.location}
+                      onChange={(event) =>
+                        setForm((prev) => ({ ...prev, location: event.target.value }))
+                      }
+                      placeholder="z.B. Kreuzberg"
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-location-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-description-label"
+                    >
+                      Beschreibung
+                    </label>
+                    <Textarea
+                      rows={2}
+                      value={form.description}
+                      onChange={(event) =>
+                        setForm((prev) => ({ ...prev, description: event.target.value }))
+                      }
+                      placeholder="Was lohnt sich?"
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-description-input"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-date-label">
-                    Datum
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-hashtags-label"
+                  >
+                    Hashtags
                   </label>
                   <Input
-                    type="date"
-                    value={form.date}
-                    onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                    data-testid="berlin-date-input"
+                    value={form.hashtags}
+                    onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
+                    placeholder="#club, #openair"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-hashtags-input"
                   />
                 </div>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-location-label">
-                    Ort
-                  </label>
-                  <Input
-                    value={form.location}
-                    onChange={(event) =>
-                      setForm((prev) => ({ ...prev, location: event.target.value }))
-                    }
-                    placeholder="z.B. Kreuzberg"
-                    data-testid="berlin-location-input"
-                  />
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    onClick={handleSubmit}
+                    className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                    data-testid="berlin-submit-button"
+                  >
+                    Tipp posten
+                  </Button>
                 </div>
+              </TabsContent>
+              <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
                 <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-description-label">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-link-description-label"
+                  >
                     Beschreibung
                   </label>
                   <Textarea
                     rows={2}
-                    value={form.description}
+                    value={linkForm.description}
                     onChange={(event) =>
-                      setForm((prev) => ({ ...prev, description: event.target.value }))
+                      setLinkForm((prev) => ({ ...prev, description: event.target.value }))
                     }
-                    placeholder="Was lohnt sich?"
-                    data-testid="berlin-description-input"
+                    placeholder="Warum ist der Link hilfreich?"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-link-description-input"
                   />
                 </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs text-white/60" data-testid="berlin-hashtags-label">
-                  Hashtags
-                </label>
-                <Input
-                  value={form.hashtags}
-                  onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
-                  placeholder="#club, #openair"
-                  data-testid="berlin-hashtags-input"
-                />
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  onClick={handleSubmit}
-                  className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-                  data-testid="berlin-submit-button"
-                >
-                  Tipp posten
-                </Button>
-              </div>
-            </TabsContent>
-            <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
-              <div className="space-y-2">
-                <label className="text-xs text-white/60" data-testid="berlin-link-description-label">
-                  Beschreibung
-                </label>
-                <Textarea
-                  rows={2}
-                  value={linkForm.description}
-                  onChange={(event) =>
-                    setLinkForm((prev) => ({ ...prev, description: event.target.value }))
-                  }
-                  placeholder="Warum ist der Link hilfreich?"
-                  data-testid="berlin-link-description-input"
-                />
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-link-url-label">
-                    URL
-                  </label>
-                  <Input
-                    value={linkForm.url}
-                    onChange={(event) =>
-                      setLinkForm((prev) => ({ ...prev, url: event.target.value }))
-                    }
-                    placeholder="https://..."
-                    data-testid="berlin-link-url-input"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs text-white/60" data-testid="berlin-link-hashtags-label">
-                    Hashtags
-                  </label>
-                  <Input
-                    value={linkForm.hashtags}
-                    onChange={(event) =>
-                      setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
-                    }
-                    placeholder="#tickets, #club"
-                    data-testid="berlin-link-hashtags-input"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Button
-                  onClick={handleLinkSubmit}
-                  className="rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
-                  data-testid="berlin-link-submit-button"
-                >
-                  Link speichern
-                </Button>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </DialogContent>
-      </Dialog>
-
-      {availableTags.length > 0 && (
-        <div className="flex flex-wrap gap-2" data-testid="berlin-tags">
-          <Button
-            variant={selectedTag ? "outline" : "default"}
-            onClick={() => setSelectedTag(null)}
-            className="rounded-full"
-            data-testid="berlin-tag-all"
-          >
-            Alle
-          </Button>
-          {availableTags.map((tag, index) => (
-            <Button
-              key={tag}
-              variant={selectedTag === tag ? "default" : "outline"}
-              onClick={() => setSelectedTag(tag)}
-              className="rounded-full"
-              data-testid={`berlin-tag-${index}`}
-            >
-              {tag}
-            </Button>
-          ))}
-        </div>
-      )}
-
-      <div className="grid gap-6 lg:grid-cols-2" data-testid="berlin-columns">
-        <div
-          className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_0_30px_rgba(176,38,255,0.15)]"
-          data-testid="berlin-events-section"
-        >
-          <h2 className="text-xl font-semibold" data-testid="berlin-events-title">
-            Aktuelle Tipps
-          </h2>
-          {filteredEvents.length === 0 ? (
-            <Card className="border-dashed border-stone-300" data-testid="berlin-empty">
-              <CardContent className="py-8 text-center text-sm text-stone-600">
-                Noch keine Tipps vorhanden.
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {filteredEvents.map((event) => (
-                <Card key={event.id} className="relative" data-testid={`berlin-event-${event.id}`}>
-                  <CardHeader className="space-y-1">
-                    <CardTitle data-testid={`berlin-event-title-${event.id}`}>
-                      {event.title}
-                    </CardTitle>
-                    <p className="text-xs text-white/60" data-testid={`berlin-event-date-${event.id}`}>
-                      {formatGermanDate(event.date)}
-                    </p>
-                    <p
-                      className="text-xs text-white/60"
-                      data-testid={`berlin-event-location-${event.id}`}
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-link-url-label"
                     >
-                      {event.location}
+                      URL
+                    </label>
+                    <Input
+                      value={linkForm.url}
+                      onChange={(event) =>
+                        setLinkForm((prev) => ({ ...prev, url: event.target.value }))
+                      }
+                      placeholder="https://..."
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-link-url-input"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label 
+                      className="text-sm font-bold text-gray-800"
+                      data-testid="berlin-link-hashtags-label"
+                    >
+                      Hashtags
+                    </label>
+                    <Input
+                      value={linkForm.hashtags}
+                      onChange={(event) =>
+                        setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
+                      }
+                      placeholder="#tickets, #club"
+                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                      data-testid="berlin-link-hashtags-input"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button
+                    onClick={handleLinkSubmit}
+                    className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                    data-testid="berlin-link-submit-button"
+                  >
+                    Link speichern
+                  </Button>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </DialogContent>
+        </Dialog>
+
+        {/* Tag Filters */}
+        {availableTags.length > 0 && (
+          <div className="flex flex-wrap gap-2" data-testid="berlin-tags">
+            <Button
+              variant={selectedTag ? "outline" : "default"}
+              onClick={() => setSelectedTag(null)}
+              className={`font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
+                selectedTag ? "bg-white text-gray-800" : "bg-yellow-400 text-black"
+              }`}
+              data-testid="berlin-tag-all"
+            >
+              Alle
+            </Button>
+            {availableTags.map((tag, index) => (
+              <Button
+                key={tag}
+                variant={selectedTag === tag ? "default" : "outline"}
+                onClick={() => setSelectedTag(tag)}
+                className={`font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
+                  selectedTag === tag ? "bg-pink-500 text-white" : "bg-white text-gray-800"
+                }`}
+                data-testid={`berlin-tag-${index}`}
+              >
+                {tag}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {/* Content Grid */}
+        <div className="grid gap-6 lg:grid-cols-2" data-testid="berlin-columns">
+          {/* Events Section */}
+          <Card 
+            className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="berlin-events-section"
+          >
+            <CardHeader className="bg-gradient-to-r from-red-500 to-orange-500 border-b-4 border-black p-4">
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="berlin-events-title"
+              >
+                Aktuelle Tipps
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {filteredEvents.length === 0 ? (
+                <div className="border-4 border-dashed border-gray-300 p-8 text-center">
+                  <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
+                    Noch keine Tipps vorhanden.
+                  </p>
+                </div>
+              ) : (
+                filteredEvents.map((event) => (
+                  <div 
+                    key={event.id} 
+                    className="border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid={`berlin-event-${event.id}`}
+                  >
+                    <h3 
+                      className="text-lg font-bold text-gray-800"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                      data-testid={`berlin-event-title-${event.id}`}
+                    >
+                      {event.title}
+                    </h3>
+                    <p 
+                      className="text-sm text-gray-500"
+                      data-testid={`berlin-event-date-${event.id}`}
+                    >
+                      {formatGermanDate(event.date)} · {event.location}
                     </p>
-                  </CardHeader>
-                  <CardContent>
                     <p
-                      className="text-sm text-white/70"
+                      className="text-sm text-gray-600 mt-2"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
                       data-testid={`berlin-event-description-${event.id}`}
                     >
                       {event.description}
@@ -436,7 +511,7 @@ export default function BerlinPage() {
                         {safeTags(event.hashtags).map((tag, index) => (
                           <Badge
                             key={`${event.id}-${tag}`}
-                            className="rounded-full bg-white/10 text-white/70"
+                            className="bg-yellow-400 text-black font-bold border-2 border-black rounded-none"
                             data-testid={`berlin-event-tag-${event.id}-${index}`}
                           >
                             {tag}
@@ -444,41 +519,52 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
 
-        <div
-          className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-5 shadow-[0_0_30px_rgba(176,38,255,0.15)]"
-          data-testid="berlin-links-section"
-        >
-          <h2 className="text-xl font-semibold" data-testid="berlin-links-title">
-            Dauerhafte Links
-          </h2>
-          {filteredLinks.length === 0 ? (
-            <Card className="border-dashed border-stone-300" data-testid="berlin-links-empty">
-              <CardContent className="py-8 text-center text-sm text-stone-600">
-                Noch keine Links vorhanden.
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {filteredLinks.map((link) => (
-                <Card key={link.id} className="relative" data-testid={`berlin-link-${link.id}`}>
-                  <CardHeader className="space-y-1">
-                    <CardTitle data-testid={`berlin-link-title-${link.id}`}>
+          {/* Links Section */}
+          <Card 
+            className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            data-testid="berlin-links-section"
+          >
+            <CardHeader className="bg-gradient-to-r from-cyan-400 to-blue-500 border-b-4 border-black p-4">
+              <CardTitle 
+                className="text-white text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="berlin-links-title"
+              >
+                Dauerhafte Links
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {filteredLinks.length === 0 ? (
+                <div className="border-4 border-dashed border-gray-300 p-8 text-center">
+                  <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
+                    Noch keine Links vorhanden.
+                  </p>
+                </div>
+              ) : (
+                filteredLinks.map((link) => (
+                  <div 
+                    key={link.id} 
+                    className="border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    data-testid={`berlin-link-${link.id}`}
+                  >
+                    <h3 
+                      className="text-lg font-bold text-gray-800"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                      data-testid={`berlin-link-title-${link.id}`}
+                    >
                       {link.description}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
+                    </h3>
                     <a
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-[#CCFF00] hover:underline"
+                      className="text-sm text-teal-600 hover:text-teal-800 font-semibold underline"
                       data-testid={`berlin-link-url-${link.id}`}
                     >
                       {link.url}
@@ -491,7 +577,7 @@ export default function BerlinPage() {
                         {safeTags(link.hashtags).map((tag, index) => (
                           <Badge
                             key={`${link.id}-${tag}`}
-                            className="rounded-full bg-white/10 text-white/70"
+                            className="bg-teal-400 text-black font-bold border-2 border-black rounded-none"
                             data-testid={`berlin-link-tag-${link.id}-${index}`}
                           >
                             {tag}
@@ -499,11 +585,11 @@ export default function BerlinPage() {
                         ))}
                       </div>
                     )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
