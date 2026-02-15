@@ -16,9 +16,9 @@ export default function SettingsPage() {
   const [editingRooms, setEditingRooms] = useState(false);
   const [editingCheckin, setEditingCheckin] = useState(false);
   const [editingCheckout, setEditingCheckout] = useState(false);
-  const [roomDraft, setRoomDraft] = useState([]);
-  const [checkinDraft, setCheckinDraft] = useState("");
-  const [checkoutDraft, setCheckoutDraft] = useState("");
+  const [roomDraft, setRoomDraft] = useState(DEFAULT_ROOMS);
+  const [checkinDraft, setCheckinDraft] = useState(DEFAULT_CHECKIN_TEMPLATE.join("\n"));
+  const [checkoutDraft, setCheckoutDraft] = useState(DEFAULT_CHECKOUT_TEMPLATE.join("\n"));
   const initialized = useRef(false);
 
   // Nur einmal initialisieren, wenn loading fertig ist
@@ -118,7 +118,7 @@ export default function SettingsPage() {
           )}
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
-          {(editingRooms && roomDraft.length > 0 ? roomDraft : displayRooms).map((room, index) => (
+          {(editingRooms ? roomDraft : displayRooms).map((room, index) => (
             <div
               key={room.id}
               className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
