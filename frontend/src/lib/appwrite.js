@@ -181,7 +181,7 @@ export const manualsApi = {
     const doc = await databases.createDocument(DATABASE_ID, COLLECTIONS.manuals, id, {
       id: id,
       title: data.title,
-      description: data.description,
+      description: data.description || '',
       steps: JSON.stringify(data.steps || []),
       image_url: data.image_url || '',
       image_data: data.image_data || '',
@@ -191,7 +191,7 @@ export const manualsApi = {
     return {
       id: doc.id,
       title: doc.title,
-      description: doc.description,
+      description: doc.description || '',
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',
@@ -210,7 +210,7 @@ export const manualsApi = {
     const now = nowIso();
     const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.manuals, docId, {
       title: data.title,
-      description: data.description,
+      description: data.description || '',
       steps: JSON.stringify(data.steps || []),
       image_url: data.image_url || '',
       image_data: data.image_data || '',
@@ -219,7 +219,7 @@ export const manualsApi = {
     return {
       id: doc.id,
       title: doc.title,
-      description: doc.description,
+      description: doc.description || '',
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',

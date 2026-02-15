@@ -26,8 +26,9 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
-    if (!loading && settings) {
-      setRoomDraft(rooms);
+    // Nur einmal ausführen, wenn loading von true auf false wechselt
+    if (!loading) {
+      setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
       setCheckinDraft(
         (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"),
       );
@@ -35,7 +36,8 @@ export default function SettingsPage() {
         (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
       );
     }
-  }, [loading, settings]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
 
   const parseLines = (value) =>
     value
