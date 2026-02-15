@@ -37,15 +37,20 @@ export default function ChatReplyList({
   };
 
   return (
-    <div className="mt-4 space-y-2 border-t border-white/10 pt-3">
+    <div className="mt-4 space-y-2 border-t-4 border-black pt-3">
       {replies.map((reply) => (
         <div
           key={reply.id}
-          className="rounded-xl border border-white/5 bg-white/5 px-3 py-2"
+          className="border-4 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
           data-testid={`chat-reply-${messageId}-${reply.id}`}
         >
           <div className="flex items-start justify-between gap-2">
-            <p className="text-xs font-semibold text-white">{reply.name}</p>
+            <p 
+              className="text-sm font-bold text-gray-800"
+              style={{ fontFamily: "'Bangers', cursive" }}
+            >
+              {reply.name}
+            </p>
             <div className="flex items-center gap-1">
               {editingReplyId !== reply.id && (
                 <>
@@ -53,7 +58,7 @@ export default function ChatReplyList({
                     size="icon"
                     variant="ghost"
                     onClick={() => startEdit(reply)}
-                    className="h-5 w-5 rounded-full text-white/50 hover:text-white"
+                    className="h-6 w-6 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                     data-testid={`reply-edit-button-${reply.id}`}
                   >
                     <Pencil className="h-3 w-3" />
@@ -62,7 +67,7 @@ export default function ChatReplyList({
                     size="icon"
                     variant="ghost"
                     onClick={() => handleDelete(reply.id)}
-                    className="h-5 w-5 rounded-full text-red-200/50 hover:text-red-200"
+                    className="h-6 w-6 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
                     data-testid={`reply-delete-button-${reply.id}`}
                   >
                     <Trash2 className="h-3 w-3" />
@@ -76,14 +81,14 @@ export default function ChatReplyList({
               <Textarea
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
-                className="min-h-[60px] text-xs rounded-xl border-white/10 bg-white/5 text-white"
+                className="min-h-[60px] text-sm border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800"
                 data-testid={`reply-edit-input-${reply.id}`}
               />
               <div className="flex gap-2">
                 <Button
                   size="sm"
                   onClick={() => handleSave(reply.id)}
-                  className="h-6 rounded-full bg-[#B026FF] text-white hover:bg-[#B026FF]/80"
+                  className="h-7 bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   data-testid={`reply-save-button-${reply.id}`}
                 >
                   <Check className="h-3 w-3 mr-1" />
@@ -91,9 +96,8 @@ export default function ChatReplyList({
                 </Button>
                 <Button
                   size="sm"
-                  variant="ghost"
                   onClick={handleCancel}
-                  className="h-6 rounded-full text-white/70 hover:text-white"
+                  className="h-7 bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   data-testid={`reply-cancel-button-${reply.id}`}
                 >
                   <X className="h-3 w-3 mr-1" />
@@ -102,7 +106,12 @@ export default function ChatReplyList({
               </div>
             </div>
           ) : (
-            <p className="text-xs text-white/70">{reply.content}</p>
+            <p 
+              className="text-sm text-gray-600"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              {reply.content}
+            </p>
           )}
         </div>
       ))}
