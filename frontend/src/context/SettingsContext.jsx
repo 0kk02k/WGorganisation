@@ -33,7 +33,13 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   const updateSettings = async (payload) => {
-    const data = await settingsApi.update(payload);
+    // Merge mit bestehenden Settings, damit keine Felder verloren gehen
+    const mergedPayload = {
+      rooms: payload.rooms !== undefined ? payload.rooms : settings.rooms,
+      checkin_template: payload.checkin_template !== undefined ? payload.checkin_template : settings.checkin_template,
+      checkout_template: payload.checkout_template !== undefined ? payload.checkout_template : settings.checkout_template,
+    };
+    const data = await settingsApi.update(mergedPayload);
     setSettings(data);
     return data;
   };
