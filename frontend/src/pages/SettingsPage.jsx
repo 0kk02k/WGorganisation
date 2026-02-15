@@ -118,7 +118,7 @@ export default function SettingsPage() {
           )}
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
-          {displayRooms.map((room, index) => (
+          {(editingRooms && roomDraft.length > 0 ? roomDraft : displayRooms).map((room, index) => (
             <div
               key={room.id}
               className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
@@ -231,7 +231,7 @@ export default function SettingsPage() {
               />
             ) : (
               <ul className="space-y-2 text-sm text-stone-700">
-                {(settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).map(
+                {displayCheckin.split('\n').filter(Boolean).map(
                   (item, index) => (
                     <li
                       key={`checkin-${index}`}
@@ -292,7 +292,7 @@ export default function SettingsPage() {
               />
             ) : (
               <ul className="space-y-2 text-sm text-stone-700">
-                {(settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).map(
+                {displayCheckout.split('\n').filter(Boolean).map(
                   (item, index) => (
                     <li
                       key={`checkout-${index}`}
