@@ -31,20 +31,18 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(new Date());
   const rooms = settings?.rooms || DEFAULT_ROOMS;
-  const roomA = rooms.find((room) => room.id === "A");
-  const roomB = rooms.find((room) => room.id === "B");
-  const topRoom =
-    rooms.find((room) => room.name?.toLowerCase().includes("claas")) ||
-    roomB ||
-    roomA;
-  const bottomRoom =
-    rooms.find((room) => room.name?.toLowerCase().includes("okko")) ||
-    roomA ||
-    roomB;
-  const topRoomId = topRoom?.id || "A";
-  const bottomRoomId = bottomRoom?.id || "B";
+  
+  // Get first two rooms for calendar display
+  const room1 = rooms[0];
+  const room2 = rooms[1];
+  const room1Id = room1?.id || "A";
+  const room2Id = room2?.id || "B";
+  
   const getRoomLabel = (roomId) =>
     rooms.find((room) => room.id === roomId)?.name || `Zimmer ${roomId}`;
+    
+  const getRoomById = (roomId) =>
+    rooms.find((room) => room.id === roomId);
 
   useEffect(() => {
     const loadData = async () => {
@@ -142,10 +140,8 @@ export default function CalendarPage() {
               const inMonth = isSameMonth(day, currentMonth);
               const isCurrentDay = isToday(day);
               const dayStays = staysForDate(day);
-              const hasTopRoom = dayStays.some((stay) => stay.room === topRoomId);
-              const hasBottomRoom = dayStays.some(
-                (stay) => stay.room === bottomRoomId,
-              );
+              const hasRoom1 = dayStays.some((stay) => stay.room === room1Id);
+              const hasRoom2 = dayStays.some((stay) => stay.room === room2Id);
               const hasEvents = eventsForDate(day).length > 0;
 
               return (
@@ -163,21 +159,21 @@ export default function CalendarPage() {
                   }`}
                   data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                 >
-                  {hasTopRoom && (
+                  {hasRoom1 && (
                     <span
                       className="absolute left-2 right-2 top-1 h-1 rounded-full"
                       style={
-                        topRoom?.color ? getRoomDotStyle(topRoom?.color) : undefined
+                        room1?.color ? getRoomDotStyle(room1?.color) : undefined
                       }
                       data-testid={`calendar-room-top-bar-${format(day, "yyyy-MM-dd")}`}
                     />
                   )}
-                  {hasBottomRoom && (
+                  {hasRoom2 && (
                     <span
                       className="absolute left-2 right-2 bottom-1 h-1 rounded-full"
                       style={
-                        bottomRoom?.color
-                          ? getRoomDotStyle(bottomRoom?.color)
+                        room2?.color
+                          ? getRoomDotStyle(room2?.color)
                           : undefined
                       }
                       data-testid={`calendar-room-bottom-bar-${format(day, "yyyy-MM-dd")}`}

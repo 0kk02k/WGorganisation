@@ -12,7 +12,7 @@ import { useSettings } from "@/context/SettingsContext";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
-  const { settings, updateSettings } = useSettings();
+  const { settings, updateSettings, loading } = useSettings();
   const rooms = settings?.rooms || DEFAULT_ROOMS;
   const [editingRooms, setEditingRooms] = useState(false);
   const [roomDraft, setRoomDraft] = useState(rooms);
@@ -26,14 +26,16 @@ export default function SettingsPage() {
   );
 
   useEffect(() => {
-    setRoomDraft(rooms);
-    setCheckinDraft(
-      (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"),
-    );
-    setCheckoutDraft(
-      (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
-    );
-  }, [settings, rooms]);
+    if (!loading && settings) {
+      setRoomDraft(rooms);
+      setCheckinDraft(
+        (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"),
+      );
+      setCheckoutDraft(
+        (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
+      );
+    }
+  }, [loading, settings]);
 
   const parseLines = (value) =>
     value
