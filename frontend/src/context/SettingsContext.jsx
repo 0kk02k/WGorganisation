@@ -8,8 +8,6 @@ import {
 
 const SettingsContext = createContext(null);
 
-const limitRooms = (rooms) => (Array.isArray(rooms) ? rooms.slice(0, 2) : rooms);
-
 export const SettingsProvider = ({ children }) => {
   const [settings, setSettings] = useState({
     rooms: DEFAULT_ROOMS,
@@ -21,7 +19,7 @@ export const SettingsProvider = ({ children }) => {
   const loadSettings = async () => {
     try {
       const data = await settingsApi.get();
-      setSettings({ ...data, rooms: limitRooms(data.rooms) });
+      setSettings(data);
     } catch (error) {
       console.error("Failed to load settings:", error);
       // Keep default settings on error
@@ -35,12 +33,8 @@ export const SettingsProvider = ({ children }) => {
   }, []);
 
   const updateSettings = async (payload) => {
-    const cleanedPayload = { ...payload };
-    if (payload.rooms) {
-      cleanedPayload.rooms = limitRooms(payload.rooms);
-    }
-    const data = await settingsApi.update(cleanedPayload);
-    setSettings({ ...data, rooms: limitRooms(data.rooms) });
+    const data = await settingsApi.update(payload);
+    setSettings(data);
     return data;
   };
 
