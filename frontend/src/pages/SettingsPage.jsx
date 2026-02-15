@@ -32,9 +32,14 @@ export default function SettingsPage() {
   }, [loading, settings]);
 
   // Aktuelle Werte aus settings oder Drafts verwenden
-  const displayRooms = editingRooms ? roomDraft : (settings?.rooms || DEFAULT_ROOMS);
-  const displayCheckin = editingCheckin ? checkinDraft : (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n");
-  const displayCheckout = editingCheckout ? checkoutDraft : (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n");
+  // Prüfen, ob settings tatsächlich gültige Daten enthält
+  const hasValidRooms = settings?.rooms && Array.isArray(settings.rooms) && settings.rooms.length > 0;
+  const hasValidCheckin = settings?.checkin_template && Array.isArray(settings.checkin_template) && settings.checkin_template.length > 0;
+  const hasValidCheckout = settings?.checkout_template && Array.isArray(settings.checkout_template) && settings.checkout_template.length > 0;
+
+  const displayRooms = editingRooms ? roomDraft : (hasValidRooms ? settings.rooms : DEFAULT_ROOMS);
+  const displayCheckin = editingCheckin ? checkinDraft : (hasValidCheckin ? settings.checkin_template.join('\n') : DEFAULT_CHECKIN_TEMPLATE.join('\n'));
+  const displayCheckout = editingCheckout ? checkoutDraft : (hasValidCheckout ? settings.checkout_template.join('\n') : DEFAULT_CHECKOUT_TEMPLATE.join('\n'));
 
   const parseLines = (value) =>
     value
