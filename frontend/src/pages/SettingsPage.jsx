@@ -37,7 +37,7 @@ export default function SettingsPage() {
   const hasValidCheckin = settings?.checkin_template && Array.isArray(settings.checkin_template) && settings.checkin_template.length > 0;
   const hasValidCheckout = settings?.checkout_template && Array.isArray(settings.checkout_template) && settings.checkout_template.length > 0;
 
-  const displayRooms = editingRooms ? roomDraft : (hasValidRooms ? settings.rooms : DEFAULT_ROOMS);
+  const displayRooms = (editingRooms ? (roomDraft.length > 0 ? roomDraft : (hasValidRooms ? settings.rooms : DEFAULT_ROOMS)) : (hasValidRooms ? settings.rooms : DEFAULT_ROOMS));
   const displayCheckin = editingCheckin ? checkinDraft : (hasValidCheckin ? settings.checkin_template.join('\n') : DEFAULT_CHECKIN_TEMPLATE.join('\n'));
   const displayCheckout = editingCheckout ? checkoutDraft : (hasValidCheckout ? settings.checkout_template.join('\n') : DEFAULT_CHECKOUT_TEMPLATE.join('\n'));
 
