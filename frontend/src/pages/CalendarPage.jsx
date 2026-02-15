@@ -108,7 +108,7 @@ export default function CalendarPage() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-grid-card"
         >
-          <CardHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-col gap-4 md:flex-row md:items-center md:justify-between p-4">
+          <CardHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between gap-4 p-4">
             <CardTitle 
               className="text-white text-2xl"
               style={{ fontFamily: "'Bangers', cursive" }}
@@ -195,21 +195,21 @@ export default function CalendarPage() {
                         data-testid={`calendar-room-bottom-bar-${format(day, "yyyy-MM-dd")}`}
                       />
                     )}
-                    <div className="flex items-center justify-center mt-2">
+                    <div className="flex items-center justify-center gap-1 mt-2">
                       <span 
-                        className="font-bold"
+                        className={`font-bold ${isSameDay(day, selectedDate) ? "text-white" : "text-gray-800"}`}
                         style={{ fontFamily: "'Nunito', sans-serif" }}
                         data-testid={`calendar-day-label-${format(day, "yyyy-MM-dd")}`}
                       >
                         {format(day, "d")}
                       </span>
+                      {hasEvents && (
+                        <span
+                          className="h-3 w-3 rounded-full bg-cyan-400 border-2 border-black flex-shrink-0"
+                          data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
+                        />
+                      )}
                     </div>
-                    {hasEvents && (
-                      <span
-                        className="absolute bottom-1 right-1 h-3 w-3 rounded-full bg-cyan-400 border-2 border-black"
-                        data-testid={`calendar-event-dot-${format(day, "yyyy-MM-dd")}`}
-                      />
-                    )}
                   </button>
                 );
               })}

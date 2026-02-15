@@ -270,70 +270,133 @@ export default function Dashboard() {
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
         </div>
 
-        <section className="grid gap-6 lg:grid-cols-3 lg:grid-rows-[auto_1fr]">
-          {/* Active Stays - Top left */}
-          <Card 
-            className="lg:col-span-2 lg:row-span-1 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
-            data-testid="dashboard-active-stays"
-          >
-            <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
-              <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
-                data-testid="dashboard-active-title"
-              >
-                Aktive Aufenthalte
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-3">
-              {activeStays.length === 0 ? (
-                <p 
-                  className="text-sm text-gray-500"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                  data-testid="dashboard-no-active"
+        {/* Top Row: Stays + Plants */}
+        <section className="grid gap-6 lg:grid-cols-2">
+          {/* Left Column: Active Stays + Upcoming Check-ins stacked */}
+          <div className="flex flex-col gap-6">
+            {/* Active Stays */}
+            <Card 
+              className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+              data-testid="dashboard-active-stays"
+            >
+              <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
+                <CardTitle 
+                  className="text-white text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
+                  data-testid="dashboard-active-title"
                 >
-                  Keine aktiven Aufenthalte.
-                </p>
-              ) : (
-                activeStays.map((stay) => (
-                  <Link
-                    key={stay.id}
-                    to={`/aufenthalte/${stay.id}`}
-                    className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
-                    data-testid={`dashboard-active-link-${stay.id}`}
+                  Aktuelle Aufenthalte
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                {activeStays.length === 0 ? (
+                  <p 
+                    className="text-sm text-gray-500"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="dashboard-no-active"
                   >
-                    <div>
-                      <p
-                        className="text-lg font-bold text-gray-800"
-                        style={{ fontFamily: "'Nunito', sans-serif" }}
-                        data-testid={`dashboard-active-name-${stay.id}`}
-                      >
-                        {stay.occupant_name}
-                      </p>
-                      <p 
-                        className="text-sm text-gray-500"
-                        data-testid={`dashboard-active-dates-${stay.id}`}
-                      >
-                        {format(parseISO(stay.start_date), "dd.MM.")} -{" "}
-                        {format(parseISO(stay.end_date), "dd.MM.yyyy")}
-                      </p>
-                    </div>
-                    <Badge
-                      className="border-2 border-black text-gray-800 font-bold"
-                      style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
-                      data-testid={`dashboard-active-room-${stay.id}`}
+                    Keine aktiven Aufenthalte.
+                  </p>
+                ) : (
+                  activeStays.map((stay) => (
+                    <Link
+                      key={stay.id}
+                      to={`/aufenthalte/${stay.id}`}
+                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      data-testid={`dashboard-active-link-${stay.id}`}
                     >
-                      {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                    </Badge>
-                  </Link>
-                ))
-              )}
-            </CardContent>
-          </Card>
+                      <div>
+                        <p
+                          className="text-lg font-bold text-gray-800"
+                          style={{ fontFamily: "'Nunito', sans-serif" }}
+                          data-testid={`dashboard-active-name-${stay.id}`}
+                        >
+                          {stay.occupant_name}
+                        </p>
+                        <p 
+                          className="text-sm text-gray-500"
+                          data-testid={`dashboard-active-dates-${stay.id}`}
+                        >
+                          {format(parseISO(stay.start_date), "dd.MM.")} -{" "}
+                          {format(parseISO(stay.end_date), "dd.MM.yyyy")}
+                        </p>
+                      </div>
+                      <Badge
+                        className="border-2 border-black text-gray-800 font-bold"
+                        style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
+                        data-testid={`dashboard-active-room-${stay.id}`}
+                      >
+                        {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                      </Badge>
+                    </Link>
+                  ))
+                )}
+              </CardContent>
+            </Card>
 
-          {/* Plants Card - Right side */}
+            {/* Upcoming Check-ins */}
+            <Card 
+              className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+              data-testid="dashboard-upcoming-card"
+            >
+              <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
+                <CardTitle 
+                  className="text-white text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
+                  data-testid="dashboard-upcoming-title"
+                >
+                  Nachste Check-ins
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 space-y-3">
+                {upcomingStays.length === 0 ? (
+                  <p 
+                    className="text-sm text-gray-500"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                    data-testid="dashboard-no-upcoming"
+                  >
+                    Keine geplanten Check-ins.
+                  </p>
+                ) : (
+                  upcomingStays.map((stay) => (
+                    <Link
+                      key={stay.id}
+                      to={`/aufenthalte/${stay.id}`}
+                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      data-testid={`dashboard-upcoming-link-${stay.id}`}
+                    >
+                      <div>
+                        <p
+                          className="text-lg font-bold text-gray-800"
+                          style={{ fontFamily: "'Nunito', sans-serif" }}
+                          data-testid={`dashboard-upcoming-name-${stay.id}`}
+                        >
+                          {stay.occupant_name}
+                        </p>
+                        <p 
+                          className="text-sm text-gray-500"
+                          data-testid={`dashboard-upcoming-date-${stay.id}`}
+                        >
+                          {format(parseISO(stay.start_date), "dd.MM.yyyy")}
+                        </p>
+                      </div>
+                      <Badge
+                        className="border-2 border-black text-gray-800 font-bold"
+                        style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
+                        data-testid={`dashboard-upcoming-room-${stay.id}`}
+                      >
+                        {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                      </Badge>
+                    </Link>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column: Plants Card - Same height as left column */}
           <Card 
-            className="lg:col-span-1 lg:row-span-2 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+            className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
             data-testid="dashboard-plants-card"
           >
             <CardHeader className="bg-gradient-to-r from-emerald-400 to-teal-400 border-b-4 border-black p-4">
@@ -344,12 +407,16 @@ export default function Dashboard() {
                 Pflanzen
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
-              {/* Image placeholder */}
-              <div className="hidden lg:flex items-center justify-center h-40 bg-gradient-to-br from-emerald-100 to-teal-100 border-4 border-black">
-                <Droplet className="h-16 w-16 text-teal-500" />
+            <CardContent className="p-4 flex flex-col flex-1">
+              {/* Plant image */}
+              <div className="h-40 border-4 border-black mb-4 overflow-hidden">
+                <img 
+                  src="/plant.png" 
+                  alt="Pflanzen gießen" 
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <div className="border-4 border-black p-4 bg-gradient-to-r from-emerald-50 to-teal-50">
+              <div className="border-4 border-black p-4 bg-gradient-to-r from-emerald-50 to-teal-50 mb-4">
                 <p
                   className="text-lg font-bold text-gray-800"
                   style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -374,71 +441,13 @@ export default function Dashboard() {
               </Button>
             </CardContent>
           </Card>
+        </section>
 
-          {/* Upcoming Check-ins */}
-          <Card 
-            className="lg:col-span-2 lg:row-span-1 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
-            data-testid="dashboard-upcoming-card"
-          >
-            <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
-              <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
-                data-testid="dashboard-upcoming-title"
-              >
-                Nachste Check-ins
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 space-y-3">
-              {upcomingStays.length === 0 ? (
-                <p 
-                  className="text-sm text-gray-500"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                  data-testid="dashboard-no-upcoming"
-                >
-                  Keine geplanten Check-ins.
-                </p>
-              ) : (
-                upcomingStays.map((stay) => (
-                  <Link
-                    key={stay.id}
-                    to={`/aufenthalte/${stay.id}`}
-                    className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
-                    data-testid={`dashboard-upcoming-link-${stay.id}`}
-                  >
-                    <div>
-                      <p
-                        className="text-lg font-bold text-gray-800"
-                        style={{ fontFamily: "'Nunito', sans-serif" }}
-                        data-testid={`dashboard-upcoming-name-${stay.id}`}
-                      >
-                        {stay.occupant_name}
-                      </p>
-                      <p 
-                        className="text-sm text-gray-500"
-                        data-testid={`dashboard-upcoming-date-${stay.id}`}
-                      >
-                        {format(parseISO(stay.start_date), "dd.MM.yyyy")}
-                      </p>
-                    </div>
-                    <Badge
-                      className="border-2 border-black text-gray-800 font-bold"
-                      style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
-                      data-testid={`dashboard-upcoming-room-${stay.id}`}
-                    >
-                      {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                    </Badge>
-                  </Link>
-                ))
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Chat Card */}
-          <Card 
-            className="lg:col-span-3 bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
-            data-testid="dashboard-chat-card"
-          >
+        {/* Chat Card - Full width below */}
+        <Card 
+          className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
+          data-testid="dashboard-chat-card"
+        >
             <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 border-b-4 border-black p-4">
               <div className="flex items-center justify-between gap-4">
                 <CardTitle 
@@ -554,7 +563,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, name: event.target.value }))
                     }
                     placeholder="z.B. Lea"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400"
                     data-testid="chat-name-input"
                   />
                 </div>
@@ -573,7 +582,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, content: event.target.value }))
                     }
                     placeholder="Kurze Info fur alle"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400"
                     data-testid="chat-message-input"
                   />
                 </div>
@@ -590,7 +599,6 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </section>
       </div>
     </div>
   );
