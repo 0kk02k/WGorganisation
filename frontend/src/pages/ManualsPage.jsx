@@ -30,7 +30,7 @@ export default function ManualsPage() {
         <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2" data-testid="manuals-grid">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-testid="manuals-grid">
         {manuals.length === 0 ? (
           <Card className="border-dashed border-stone-300" data-testid="manuals-empty">
             <CardContent className="py-8 text-center text-sm text-stone-600">
@@ -58,16 +58,11 @@ export default function ManualsPage() {
                       className="h-full w-full object-cover"
                     />
                   </div>
-                <CardHeader>
-                  <CardTitle data-testid={`manual-title-${manual.id}`}>
+                <CardHeader className="p-3">
+                  <CardTitle className="text-base" data-testid={`manual-title-${manual.id}`}>
                     {manual.title}
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-stone-600" data-testid={`manual-description-${manual.id}`}>
-                    {manual.description}
-                  </p>
-                </CardContent>
                 </Card>
               </Link>
             );

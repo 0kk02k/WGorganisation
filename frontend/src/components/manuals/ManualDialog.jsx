@@ -18,7 +18,6 @@ export const ManualDialog = ({ onCreated }) => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     title: "",
-    description: "",
     steps: "",
     image_url: "",
     image_data: "",
@@ -28,7 +27,6 @@ export const ManualDialog = ({ onCreated }) => {
     if (!open) return;
     setForm({
       title: "",
-      description: "",
       steps: "",
       image_url: "",
       image_data: "",
@@ -47,8 +45,8 @@ export const ManualDialog = ({ onCreated }) => {
   };
 
   const handleSubmit = async () => {
-    if (!form.title || !form.description || !form.steps) {
-      toast.error("Bitte Titel, Beschreibung und Schritte ergänzen.");
+    if (!form.title || !form.steps) {
+      toast.error("Bitte Titel und Schritte ergänzen.");
       return;
     }
 
@@ -56,7 +54,6 @@ export const ManualDialog = ({ onCreated }) => {
       const stepsArray = form.steps.split("\n").filter(s => s.trim());
       const data = await manualsApi.create({
         title: form.title,
-        description: form.description,
         steps: stepsArray,
         image_url: form.image_url,
         image_data: form.image_data,
@@ -101,25 +98,6 @@ export const ManualDialog = ({ onCreated }) => {
               }
               placeholder="z.B. Geschirrspüler"
               data-testid="manual-form-title-input"
-            />
-          </div>
-          <div className="space-y-2">
-            <label
-              className="text-sm font-medium text-stone-700"
-              data-testid="manual-form-description-label"
-            >
-              Kurzbeschreibung
-            </label>
-            <Input
-              value={form.description}
-              onChange={(event) =>
-                setForm((prev) => ({
-                  ...prev,
-                  description: event.target.value,
-                }))
-              }
-              placeholder="Wofür ist das Gerät?"
-              data-testid="manual-form-description-input"
             />
           </div>
           <div className="space-y-2">

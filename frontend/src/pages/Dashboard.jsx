@@ -357,18 +357,29 @@ const EXPANDED_VISIBLE_COUNT = 15;
                 <Link
                   key={stay.id}
                   to={`/aufenthalte/${stay.id}`}
-                  className="hover-lift block rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
+                  className="hover-lift flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3"
                   data-testid={`dashboard-upcoming-link-${stay.id}`}
                 >
-                  <p
-                    className="text-sm font-semibold text-white"
-                    data-testid={`dashboard-upcoming-name-${stay.id}`}
+                  <div>
+                    <p
+                      className="text-sm font-semibold text-white"
+                      data-testid={`dashboard-upcoming-name-${stay.id}`}
+                    >
+                      {stay.occupant_name}
+                    </p>
+                    <p className="text-xs text-white/60" data-testid={`dashboard-upcoming-date-${stay.id}`}>
+                      {format(parseISO(stay.start_date), "dd.MM.yyyy")}
+                    </p>
+                  </div>
+                  <Badge
+                    style={getRoomBadgeStyle(
+                      rooms.find((room) => room.id === stay.room)?.color,
+                    )}
+                    className="border border-transparent text-stone-900"
+                    data-testid={`dashboard-upcoming-room-${stay.id}`}
                   >
-                    {stay.occupant_name}
-                  </p>
-                  <p className="text-xs text-white/60" data-testid={`dashboard-upcoming-date-${stay.id}`}>
-                    {format(parseISO(stay.start_date), "dd.MM.yyyy")}
-                  </p>
+                    {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
+                  </Badge>
                 </Link>
               ))
             )}
