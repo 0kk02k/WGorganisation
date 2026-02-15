@@ -403,12 +403,57 @@ export const settingsApi = {
       return await this.createDefault();
     }
     const doc = response.documents[0];
+    const rooms = parseJson(doc.rooms, []);
+    const checkin_template = parseJson(doc.checkin_template, []);
+    const checkout_template = parseJson(doc.checkout_template, []);
+    
+    // Wenn alle Felder leer sind, Standardwerte wiederherstellen
+    if (rooms.length === 0 && checkin_template.length === 0 && checkout_template.length === 0) {
+      return await this.restoreDefaults(doc.$id);
+    }
+    
     return {
       id: doc.id,
-      rooms: parseJson(doc.rooms, []),
-      checkin_template: parseJson(doc.checkin_template, []),
-      checkout_template: parseJson(doc.checkout_template, []),
+      rooms,
+      checkin_template,
+      checkout_template,
       updated_at: doc.updated_at,
+    };
+  },
+
+  async restoreDefaults(docId) {
+    const now = nowIso();
+    const defaultSettings = {
+      rooms: [
+        { id: 'A', name: 'Zimmer A', color: '#84cc16' },
+        { id: 'B', name: 'Zimmer B', color: '#0ea5e9' },
+      ],
+      checkin_template: [
+        'Schlüsselübergabe prüfen',
+        'WLAN-Zugang mitteilen',
+        'Fenster und Heizung kurz erklären',
+        'Bad & Küche zeigen',
+      ],
+      checkout_template: [
+        'Müll entsorgen',
+        'Bettwäsche abziehen',
+        'Fenster schließen',
+        'Heizung runterdrehen',
+        'Schlüssel zurücklegen',
+      ],
+    };
+    const updated = await databases.updateDocument(DATABASE_ID, COLLECTIONS.settings, docId, {
+      rooms: JSON.stringify(defaultSettings.rooms),
+      checkin_template: JSON.stringify(defaultSettings.checkin_template),
+      checkout_template: JSON.stringify(defaultSettings.checkout_template),
+      updated_at: now,
+    });
+    return {
+      id: updated.id,
+      rooms: parseJson(updated.rooms, []),
+      checkin_template: parseJson(updated.checkin_template, []),
+      checkout_template: parseJson(updated.checkout_template, []),
+      updated_at: updated.updated_at,
     };
   },
 
