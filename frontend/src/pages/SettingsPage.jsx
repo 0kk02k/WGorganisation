@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   DEFAULT_CHECKIN_TEMPLATE,
   DEFAULT_CHECKOUT_TEMPLATE,
@@ -13,31 +13,28 @@ import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { settings, updateSettings, loading } = useSettings();
-  const rooms = settings?.rooms || DEFAULT_ROOMS;
   const [editingRooms, setEditingRooms] = useState(false);
-  const [roomDraft, setRoomDraft] = useState(rooms);
   const [editingCheckin, setEditingCheckin] = useState(false);
   const [editingCheckout, setEditingCheckout] = useState(false);
-  const [checkinDraft, setCheckinDraft] = useState(
-    (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"),
-  );
-  const [checkoutDraft, setCheckoutDraft] = useState(
-    (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
-  );
+  const [roomDraft, setRoomDraft] = useState([]);
+  const [checkinDraft, setCheckinDraft] = useState("");
+  const [checkoutDraft, setCheckoutDraft] = useState("");
+  const initialized = useRef(false);
 
+  // Nur einmal initialisieren, wenn loading fertig ist
   useEffect(() => {
-    // Nur einmal ausführen, wenn loading von true auf false wechselt
-    if (!loading) {
+    if (!loading && !initialized.current) {
+      initialized.current = true;
       setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
-      setCheckinDraft(
-        (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"),
-      );
-      setCheckoutDraft(
-        (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"),
-      );
+      setCheckinDraft((settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
+      setCheckoutDraft((settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
+  }, [loading, settings]);
+
+  // Aktuelle Werte aus settings oder Drafts verwenden
+  const displayRooms = editingRooms ? roomDraft : (settings?.rooms || DEFAULT_ROOMS);
+  const displayCheckin = editingCheckin ? checkinDraft : (settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n");
+  const displayCheckout = editingCheckout ? checkoutDraft : (settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n");
 
   const parseLines = (value) =>
     value
@@ -99,7 +96,7 @@ export default function SettingsPage() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  setRoomDraft(rooms);
+                  setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
                   setEditingRooms(false);
                 }}
                 data-testid="settings-rooms-cancel-button"
@@ -116,7 +113,7 @@ export default function SettingsPage() {
           )}
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
-          {roomDraft.map((room, index) => (
+          {displayRooms.map((room, index) => (
             <div
               key={room.id}
               className="rounded-2xl border border-stone-200 bg-stone-50 px-4 py-3"
