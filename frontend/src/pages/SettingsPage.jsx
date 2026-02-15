@@ -49,7 +49,9 @@ export default function SettingsPage() {
 
   const handleSaveRooms = async () => {
     try {
-      await updateSettings({ rooms: roomDraft });
+      const data = await updateSettings({ rooms: roomDraft });
+      // Draft mit den gespeicherten Daten aktualisieren
+      setRoomDraft(data.rooms || DEFAULT_ROOMS);
       toast.success("Zimmer aktualisiert.");
       setEditingRooms(false);
     } catch (error) {
@@ -59,7 +61,9 @@ export default function SettingsPage() {
 
   const handleSaveCheckin = async () => {
     try {
-      await updateSettings({ checkin_template: parseLines(checkinDraft) });
+      const data = await updateSettings({ checkin_template: parseLines(checkinDraft) });
+      // Draft mit den gespeicherten Daten aktualisieren
+      setCheckinDraft((data.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
       toast.success("Check-in Vorlage gespeichert.");
       setEditingCheckin(false);
     } catch (error) {
@@ -69,7 +73,9 @@ export default function SettingsPage() {
 
   const handleSaveCheckout = async () => {
     try {
-      await updateSettings({ checkout_template: parseLines(checkoutDraft) });
+      const data = await updateSettings({ checkout_template: parseLines(checkoutDraft) });
+      // Draft mit den gespeicherten Daten aktualisieren
+      setCheckoutDraft((data.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
       toast.success("Check-out Vorlage gespeichert.");
       setEditingCheckout(false);
     } catch (error) {
@@ -91,7 +97,11 @@ export default function SettingsPage() {
           {!editingRooms ? (
             <Button
               variant="outline"
-              onClick={() => setEditingRooms(true)}
+              onClick={() => {
+                // Draft mit aktuellen Werten setzen vor dem Bearbeiten
+                setRoomDraft(settings?.rooms || DEFAULT_ROOMS);
+                setEditingRooms(true);
+              }}
               data-testid="settings-rooms-edit-button"
             >
               Bearbeiten
@@ -194,7 +204,11 @@ export default function SettingsPage() {
             {!editingCheckin ? (
               <Button
                 variant="outline"
-                onClick={() => setEditingCheckin(true)}
+                onClick={() => {
+                  // Draft mit aktuellen Werten setzen vor dem Bearbeiten
+                  setCheckinDraft((settings?.checkin_template || DEFAULT_CHECKIN_TEMPLATE).join("\n"));
+                  setEditingCheckin(true);
+                }}
                 data-testid="settings-checkin-edit-button"
               >
                 Bearbeiten
@@ -255,7 +269,11 @@ export default function SettingsPage() {
             {!editingCheckout ? (
               <Button
                 variant="outline"
-                onClick={() => setEditingCheckout(true)}
+                onClick={() => {
+                  // Draft mit aktuellen Werten setzen vor dem Bearbeiten
+                  setCheckoutDraft((settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE).join("\n"));
+                  setEditingCheckout(true);
+                }}
                 data-testid="settings-checkout-edit-button"
               >
                 Bearbeiten
