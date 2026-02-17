@@ -172,7 +172,7 @@ export default function ManualDetail() {
               {isEditing ? (
                 <div className="flex-1 space-y-2">
                   <label
-                    className="text-sm font-bold text-white"
+                    className="text-sm font-bold text-gray-800"
                     data-testid="manual-edit-title-label"
                   >
                     Titel
@@ -182,7 +182,7 @@ export default function ManualDetail() {
                     onChange={(event) =>
                       setForm((prev) => ({ ...prev, title: event.target.value }))
                     }
-                    className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                    className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800"
                     data-testid="manual-edit-title"
                   />
                 </div>
