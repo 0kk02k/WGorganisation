@@ -171,7 +171,7 @@ export default function StayDetail() {
               Hinweise
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-4 bg-amber-400/10">
             <p 
               className="text-gray-600"
               style={{ fontFamily: "'Nunito', sans-serif" }}

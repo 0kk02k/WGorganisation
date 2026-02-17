@@ -16,6 +16,9 @@ export const StayChecklistSection = ({
   const gradientClass = isCheckin 
     ? "from-teal-400 to-emerald-400" 
     : "from-rose-400 to-pink-400";
+  const bgClass = isCheckin 
+    ? "bg-teal-400/10" 
+    : "bg-rose-400/10";
 
   return (
     <Card 
@@ -31,7 +34,7 @@ export const StayChecklistSection = ({
           {title}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4 space-y-3">
+      <CardContent className={`p-4 space-y-3 ${bgClass}`}>
         {items.map((item) => (
           <div
             key={item.id}
