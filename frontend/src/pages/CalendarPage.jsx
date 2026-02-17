@@ -138,7 +138,7 @@ export default function CalendarPage() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-4 bg-teal-400/10">
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 gap-2 mb-2">
               {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((label) => (
@@ -228,7 +228,7 @@ export default function CalendarPage() {
               {format(selectedDate, "EEEE, dd.MM.yyyy", { locale: de })}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 space-y-4">
+          <CardContent className="p-4 space-y-4 bg-orange-500/10">
             {selectedStays.length === 0 ? (
               <p 
                 className="text-sm text-gray-500"

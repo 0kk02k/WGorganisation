@@ -466,7 +466,7 @@ export default function BerlinPage() {
                 Aktuelle Tipps
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4 space-y-4 bg-red-500/10">
               {filteredEvents.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
@@ -536,7 +536,7 @@ export default function BerlinPage() {
                 Dauerhafte Links
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4 space-y-4 bg-cyan-400/10">
               {filteredLinks.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>

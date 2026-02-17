@@ -142,7 +142,7 @@ export default function SettingsPage() {
               </div>
             )}
           </CardHeader>
-          <CardContent className="p-6 bg-white grid gap-4 md:grid-cols-2">
+          <CardContent className="p-6 bg-pink-500/10 grid gap-4 md:grid-cols-2">
             {(editingRooms ? roomDraft : displayRooms).map((room, index) => (
               <div
                 key={room.id}
@@ -274,8 +274,8 @@ export default function SettingsPage() {
                 </div>
               )}
             </CardHeader>
-            <CardContent className="p-4 bg-white">
-              {editingCheckin ? (
+            <CardContent className="p-4 bg-teal-400/10">
+               {editingCheckin ? (
                 <Textarea
                   className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
                   rows={6}
@@ -356,8 +356,8 @@ export default function SettingsPage() {
                 </div>
               )}
             </CardHeader>
-            <CardContent className="p-4 bg-white">
-              {editingCheckout ? (
+            <CardContent className="p-4 bg-rose-400/10">
+               {editingCheckout ? (
                 <Textarea
                   className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-rose-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
                   rows={6}
