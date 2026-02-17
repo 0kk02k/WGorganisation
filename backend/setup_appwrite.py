@@ -147,6 +147,25 @@ def create_database():
             return False
 
 
+def ensure_attributes(collection_id: str, attributes: list):
+    """Ensure all attributes exist in the collection"""
+    for attr in attributes:
+        try:
+            db_service.create_string_attribute(
+                DATABASE_ID,
+                collection_id,
+                attr["key"],
+                attr["size"],
+                attr.get("required", False)
+            )
+            print(f"    [OK] Attribut '{attr['key']}' erstellt")
+        except AppwriteException as attr_err:
+            if "already exists" not in str(attr_err).lower():
+                print(f"    [ERR] Fehler bei Attribut '{attr['key']}': {attr_err}")
+            else:
+                print(f"    [OK] Attribut '{attr['key']}' existiert bereits")
+
+
 def create_collection(collection_id: str, collection_data: dict):
     """Create a collection with attributes and public permissions"""
     try:
@@ -171,6 +190,8 @@ def create_collection(collection_id: str, collection_data: dict):
                     print(f"  [OK] Berechtigungen für '{collection_id}' aktualisiert")
                 except AppwriteException as perm_err:
                     print(f"  [WARN] Konnte Berechtigungen nicht aktualisieren: {perm_err}")
+                # Ensure all attributes exist
+                ensure_attributes(collection_id, collection_data["attributes"])
                 return True
         
         # Create collection with public permissions
@@ -189,21 +210,7 @@ def create_collection(collection_id: str, collection_data: dict):
         print(f"  [OK] Collection '{collection_id}' erstellt mit öffentlichen Berechtigungen")
         
         # Create attributes
-        for attr in collection_data["attributes"]:
-            try:
-                db_service.create_string_attribute(
-                    DATABASE_ID,
-                    collection_id,
-                    attr["key"],
-                    attr["size"],
-                    attr.get("required", False)
-                )
-                print(f"    [OK] Attribut '{attr['key']}' erstellt")
-            except AppwriteException as attr_err:
-                if "already exists" not in str(attr_err).lower():
-                    print(f"    [ERR] Fehler bei Attribut '{attr['key']}': {attr_err}")
-                else:
-                    print(f"    [OK] Attribut '{attr['key']}' existiert bereits")
+        ensure_attributes(collection_id, collection_data["attributes"])
         
         return True
     except AppwriteException as e:
