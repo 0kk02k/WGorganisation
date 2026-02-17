@@ -104,7 +104,7 @@ export default function SettingsPage() {
           >
             <CardTitle 
               className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive" }}
+              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="settings-rooms-title"
             >
               Zimmer
@@ -225,7 +225,7 @@ export default function SettingsPage() {
         </Card>
 
         {/* Check-in und Check-out Karten */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-2 items-start">
           {/* Check-in Vorlage */}
           <Card 
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
@@ -236,7 +236,7 @@ export default function SettingsPage() {
             >
               <CardTitle 
                 className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                 data-testid="settings-checkin-title"
               >
                 Check-in Vorlage
@@ -318,7 +318,7 @@ export default function SettingsPage() {
             >
               <CardTitle 
                 className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                 data-testid="settings-checkout-title"
               >
                 Check-out Vorlage
