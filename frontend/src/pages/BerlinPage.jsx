@@ -523,7 +523,7 @@ export default function BerlinPage() {
             <CardHeader className="bg-gradient-to-r from-red-500 to-orange-500 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                 data-testid="berlin-events-title"
               >
                 Aktuelle Tipps
@@ -604,7 +604,7 @@ export default function BerlinPage() {
             <CardHeader className="bg-gradient-to-r from-cyan-400 to-blue-500 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                 data-testid="berlin-links-title"
               >
                 Dauerhafte Links
