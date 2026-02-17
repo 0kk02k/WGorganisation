@@ -73,8 +73,14 @@ export const Layout = ({ children }) => {
       className="relative min-h-screen bg-white text-gray-800"
       data-testid="app-shell"
     >
-      {/* Dot-Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
+      {/* Dot-Pattern Overlay - same style as index.css body::before */}
+      <div 
+        className="absolute inset-0 pointer-events-none" 
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, rgba(50, 50, 55, 0.5) 1.5px, transparent 1.5px)",
+          backgroundSize: "20px 20px"
+        }} 
+      />
       
       {/* Decorative Elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
