@@ -89,7 +89,7 @@ export const ManualDialog = ({ onCreated }) => {
         className="max-w-xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
         data-testid="manual-dialog"
       >
-        <DialogHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4 -m-6 mb-0">
+        <DialogHeader className="bg-white border-b-4 border-black p-4 -m-6 mb-0">
           <DialogTitle 
             className="text-gray-800 text-2xl"
             style={{ fontFamily: "'Bangers', cursive" }}

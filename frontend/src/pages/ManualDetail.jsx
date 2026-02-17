@@ -167,7 +167,7 @@ export default function ManualDetail() {
           </div>
           
           {/* Header */}
-          <CardHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4">
+          <CardHeader className="bg-white border-b-4 border-black p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {isEditing ? (
                 <div className="flex-1 space-y-2">
