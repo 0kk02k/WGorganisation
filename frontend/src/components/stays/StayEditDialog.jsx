@@ -88,17 +88,15 @@ export const StayEditDialog = ({ stay, onSave }) => {
                 }
               >
                 <SelectTrigger 
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   data-testid="stay-edit-room"
                 >
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-4 border-black rounded-none">
+                <SelectContent>
                   {(settings?.rooms || DEFAULT_ROOMS).map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
-                      className="hover:bg-gray-100"
                       data-testid={`stay-edit-room-${room.id}`}
                     >
                       {room.name}

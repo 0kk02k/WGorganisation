@@ -143,17 +143,15 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }
               >
                 <SelectTrigger 
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   data-testid="stay-form-room-select"
                 >
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-4 border-black rounded-none">
+                <SelectContent>
                   {rooms.map((room) => (
                     <SelectItem
                       key={room.id}
                       value={room.id}
-                      className="hover:bg-gray-100"
                       data-testid={`stay-form-room-option-${room.id}`}
                     >
                       {room.name}
