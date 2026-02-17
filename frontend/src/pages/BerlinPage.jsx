@@ -63,9 +63,20 @@ export default function BerlinPage() {
     return Array.from(tagSet);
   }, [events, links]);
 
+  // Filter out past events (only show today and future events)
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const currentEvents = events.filter((event) => {
+    if (!event.date) return true;
+    const eventDate = new Date(event.date);
+    eventDate.setHours(0, 0, 0, 0);
+    return eventDate >= today;
+  });
+
   const filteredEvents = selectedTag
-    ? events.filter((event) => safeTags(event.hashtags).includes(selectedTag))
-    : events;
+    ? currentEvents.filter((event) => safeTags(event.hashtags).includes(selectedTag))
+    : currentEvents;
   const filteredLinks = selectedTag
     ? links.filter((link) => safeTags(link.hashtags).includes(selectedTag))
     : links;
@@ -503,7 +514,7 @@ export default function BerlinPage() {
         )}
 
         {/* Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-2" data-testid="berlin-columns">
+        <div className="grid gap-6 lg:grid-cols-2 items-start" data-testid="berlin-columns">
           {/* Events Section */}
           <Card 
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
