@@ -110,9 +110,13 @@ export default function Dashboard() {
 
   const handleResetWatered = async () => {
     try {
-      await updateSettings({ plantsWateredAt: new Date().toISOString() });
+      const now = new Date();
+      const result = await updateSettings({ plantsWateredAt: now.toISOString() });
+      console.log("Settings updated:", result);
+      setNow(now); // Update the now state to immediately show the counter
       toast.success("Gießzeit gespeichert.");
     } catch (error) {
+      console.error("Failed to save watered time:", error);
       toast.error("Speichern fehlgeschlagen.");
     }
   };

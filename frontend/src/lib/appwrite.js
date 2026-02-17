@@ -463,6 +463,7 @@ export const settingsApi = {
       rooms,
       checkin_template,
       checkout_template,
+      plantsWateredAt: doc.plantsWateredAt || null,
       updated_at: doc.updated_at,
     };
   },
@@ -492,6 +493,7 @@ export const settingsApi = {
       rooms: JSON.stringify(defaultSettings.rooms),
       checkin_template: JSON.stringify(defaultSettings.checkin_template),
       checkout_template: JSON.stringify(defaultSettings.checkout_template),
+      plantsWateredAt: null,
       updated_at: now,
     });
     return {
@@ -499,6 +501,7 @@ export const settingsApi = {
       rooms: parseJson(updated.rooms, []),
       checkin_template: parseJson(updated.checkin_template, []),
       checkout_template: parseJson(updated.checkout_template, []),
+      plantsWateredAt: updated.plantsWateredAt || null,
       updated_at: updated.updated_at,
     };
   },
@@ -529,6 +532,7 @@ export const settingsApi = {
       rooms: JSON.stringify(defaultSettings.rooms),
       checkin_template: JSON.stringify(defaultSettings.checkin_template),
       checkout_template: JSON.stringify(defaultSettings.checkout_template),
+      plantsWateredAt: null,
       updated_at: now,
     });
     return {
@@ -536,6 +540,7 @@ export const settingsApi = {
       rooms: parseJson(doc.rooms, []),
       checkin_template: parseJson(doc.checkin_template, []),
       checkout_template: parseJson(doc.checkout_template, []),
+      plantsWateredAt: doc.plantsWateredAt || null,
       updated_at: doc.updated_at,
     };
   },
@@ -551,6 +556,7 @@ export const settingsApi = {
       rooms: JSON.stringify(data.rooms || []),
       checkin_template: JSON.stringify(data.checkin_template || []),
       checkout_template: JSON.stringify(data.checkout_template || []),
+      plantsWateredAt: data.plantsWateredAt || null,
       updated_at: now,
     });
     return {
@@ -558,6 +564,7 @@ export const settingsApi = {
       rooms: parseJson(updated.rooms, []),
       checkin_template: parseJson(updated.checkin_template, []),
       checkout_template: parseJson(updated.checkout_template, []),
+      plantsWateredAt: updated.plantsWateredAt || null,
       updated_at: updated.updated_at,
     };
   },
