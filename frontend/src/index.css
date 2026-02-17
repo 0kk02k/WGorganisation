@@ -134,7 +134,7 @@ code {
 }
 
 .animate-ticker {
-    animation: ticker 20s steps(40) infinite;
+    animation: ticker 40s steps(40) infinite;
 }
 
 
