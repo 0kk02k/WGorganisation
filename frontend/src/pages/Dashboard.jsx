@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { RoomBadge } from "@/components/ui/RoomBadge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Droplet, ChevronDown, Search } from "lucide-react";
+import { Droplet, ChevronDown, Search, Maximize2, Minimize2 } from "lucide-react";
 import {
   format,
   parseISO,
@@ -34,6 +34,7 @@ export default function Dashboard() {
   const [now, setNow] = useState(new Date());
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
+  const [chatExpanded, setChatExpanded] = useState(false);
   const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
@@ -544,7 +545,8 @@ export default function Dashboard() {
             <CardContent className="p-4 space-y-4 bg-purple-500/10">
               <div
                 ref={chatContainerRef}
-                className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
+                className="space-y-3 overflow-y-auto pr-2 transition-all duration-300"
+                style={{ maxHeight: chatExpanded ? '800px' : '400px' }}
                 data-testid="chat-messages-list"
               >
                 {messages.length === 0 ? (
@@ -619,6 +621,21 @@ export default function Dashboard() {
                     );
                   })()
                 )}
+              </div>
+              {/* Expand/Collapse Button */}
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setChatExpanded(!chatExpanded)}
+                  className="p-2 bg-purple-500 hover:bg-purple-600 text-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150"
+                  title={chatExpanded ? "Chat verkleinern" : "Chat erweitern"}
+                  data-testid="chat-expand-button"
+                >
+                  {chatExpanded ? (
+                    <Minimize2 className="h-5 w-5" />
+                  ) : (
+                    <Maximize2 className="h-5 w-5" />
+                  )}
+                </button>
               </div>
               <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
                 <div className="space-y-2">
