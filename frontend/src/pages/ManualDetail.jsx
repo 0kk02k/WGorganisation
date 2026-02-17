@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { manualsApi } from "@/lib/appwrite";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Camera, Pencil, Trash2 } from "lucide-react";
 
 export default function ManualDetail() {
   const { id } = useParams();
@@ -14,6 +15,7 @@ export default function ManualDetail() {
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const loadManual = async () => {
@@ -44,10 +46,16 @@ export default function ManualDetail() {
     reader.readAsDataURL(file);
   };
 
+  const handleImageClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
   const handleSave = async () => {
     if (!form) return;
-    if (!form.title || !form.description || !form.steps) {
-      toast.error("Bitte alle Pflichtfelder ausfüllen.");
+    if (!form.title || !form.steps) {
+      toast.error("Bitte Titel und Schritte ausfüllen.");
       return false;
     }
     setSaving(true);
@@ -56,8 +64,11 @@ export default function ManualDetail() {
         ? form.steps.split("\n").filter(s => s.trim()) 
         : form.steps;
       const data = await manualsApi.update(id, {
-        ...form,
+        title: form.title,
+        description: form.title, // Use title as description for backward compatibility
         steps: stepsArray,
+        image_url: form.image_url || "",
+        image_data: form.image_data || "",
       });
       setManual(data);
       setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
@@ -125,15 +136,33 @@ export default function ManualDetail() {
 
         {/* Main Card */}
         <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-          {/* Image */}
+          {/* Image with edit overlay */}
           <div 
-            className="aspect-video overflow-hidden border-b-4 border-black bg-gray-100" 
+            className={`relative aspect-video overflow-hidden border-b-4 border-black bg-gray-100 ${isEditing ? 'cursor-pointer' : ''}`}
+            onClick={handleImageClick}
             data-testid="manual-detail-image"
           >
             <img
               src={imageSrc}
               alt={form.title}
               className="h-full w-full object-cover"
+            />
+            {/* Edit overlay when in editing mode */}
+            {isEditing && (
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
+                <div className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <Camera className="h-8 w-8 text-gray-800" />
+                </div>
+              </div>
+            )}
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              data-testid="manual-edit-image-file"
             />
           </div>
           
@@ -159,7 +188,7 @@ export default function ManualDetail() {
                 </div>
               ) : (
                 <CardTitle 
-                  className="text-white text-2xl"
+                  className="text-gray-800 text-2xl"
                   style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="manual-detail-title"
                 >
@@ -181,37 +210,11 @@ export default function ManualDetail() {
                     className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                     data-testid="manual-delete-button"
                   >
-                    Anleitung löschen
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>
             </div>
-            {isEditing ? (
-              <div className="space-y-2 mt-4">
-                <label
-                  className="text-sm font-bold text-white"
-                  data-testid="manual-edit-description-label"
-                >
-                  Beschreibung
-                </label>
-                <Input
-                  value={form.description}
-                  onChange={(event) =>
-                    setForm((prev) => ({ ...prev, description: event.target.value }))
-                  }
-                  className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                  data-testid="manual-edit-description"
-                />
-              </div>
-            ) : (
-              <p 
-                className="text-white/90 mt-2"
-                style={{ fontFamily: "'Nunito', sans-serif" }}
-                data-testid="manual-detail-description"
-              >
-                {manual.description}
-              </p>
-            )}
           </CardHeader>
           
           <CardContent className="p-4 space-y-4">
@@ -229,36 +232,6 @@ export default function ManualDetail() {
                   className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
                   data-testid="manual-edit-steps"
                 />
-              </div>
-            )}
-            {isEditing && (
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-800" data-testid="manual-edit-image-url-label">
-                    Bild-URL
-                  </label>
-                  <Input
-                    value={form.image_url || ""}
-                    onChange={(event) =>
-                      setForm((prev) => ({ ...prev, image_url: event.target.value }))
-                    }
-                    placeholder="https://..."
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="manual-edit-image-url"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-800" data-testid="manual-edit-image-file-label">
-                    Bild hochladen
-                  </label>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    data-testid="manual-edit-image-file"
-                  />
-                </div>
               </div>
             )}
             

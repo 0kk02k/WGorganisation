@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { manualsApi } from "@/lib/appwrite";
-import { Plus, ImageIcon } from "lucide-react";
+import { Plus, Camera } from "lucide-react";
 
 export const ManualDialog = ({ onCreated }) => {
   const [open, setOpen] = useState(false);
@@ -22,6 +22,7 @@ export const ManualDialog = ({ onCreated }) => {
     image_url: "",
     image_data: "",
   });
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
@@ -44,6 +45,10 @@ export const ManualDialog = ({ onCreated }) => {
     reader.readAsDataURL(file);
   };
 
+  const handleImageClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleSubmit = async () => {
     if (!form.title || !form.steps) {
       toast.error("Bitte Titel und Schritte ergänzen.");
@@ -54,6 +59,7 @@ export const ManualDialog = ({ onCreated }) => {
       const stepsArray = form.steps.split("\n").filter(s => s.trim());
       const data = await manualsApi.create({
         title: form.title,
+        description: form.title, // Use title as description for backward compatibility
         steps: stepsArray,
         image_url: form.image_url,
         image_data: form.image_data,
@@ -65,6 +71,9 @@ export const ManualDialog = ({ onCreated }) => {
       toast.error("Speichern fehlgeschlagen.");
     }
   };
+
+  const imageSrc = form.image_data || form.image_url;
+  const defaultImage = "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -82,7 +91,7 @@ export const ManualDialog = ({ onCreated }) => {
       >
         <DialogHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4 -m-6 mb-0">
           <DialogTitle 
-            className="text-white text-2xl"
+            className="text-gray-800 text-2xl"
             style={{ fontFamily: "'Bangers', cursive" }}
             data-testid="manual-dialog-title"
           >
@@ -90,6 +99,34 @@ export const ManualDialog = ({ onCreated }) => {
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-4 pt-8">
+          {/* Image with camera overlay */}
+          <div 
+            className="relative aspect-video overflow-hidden border-4 border-black bg-gray-100 cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            onClick={handleImageClick}
+            data-testid="manual-form-image-container"
+          >
+            <img
+              src={imageSrc || defaultImage}
+              alt="Bild auswählen"
+              className="h-full w-full object-cover"
+            />
+            {/* Camera overlay */}
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
+              <div className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <Camera className="h-8 w-8 text-gray-800" />
+              </div>
+            </div>
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              data-testid="manual-form-image-file-input"
+            />
+          </div>
+          
           <div className="space-y-2">
             <label
               className="text-sm font-bold text-gray-800"
@@ -125,66 +162,6 @@ export const ManualDialog = ({ onCreated }) => {
               data-testid="manual-form-steps-input"
             />
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <div className="space-y-2">
-              <label
-                className="text-sm font-bold text-gray-800"
-                data-testid="manual-form-image-url-label"
-              >
-                Bild-URL (optional)
-              </label>
-              <Input
-                value={form.image_url}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    image_url: event.target.value,
-                  }))
-                }
-                placeholder="https://..."
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="manual-form-image-url-input"
-              />
-            </div>
-            <div className="space-y-2">
-              <label
-                className="text-sm font-bold text-gray-800"
-                data-testid="manual-form-image-file-label"
-              >
-                Bild hochladen
-              </label>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                data-testid="manual-form-image-file-input"
-              />
-            </div>
-          </div>
-          {form.image_data && (
-            <div
-              className="overflow-hidden border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-              data-testid="manual-form-image-preview"
-            >
-              <img
-                src={form.image_data}
-                alt="Vorschau"
-                className="h-40 w-full object-cover"
-              />
-            </div>
-          )}
-          {!form.image_data && !form.image_url && (
-            <div
-              className="flex items-center gap-2 border-4 border-dashed border-gray-300 bg-gradient-to-r from-violet-50 to-fuchsia-50 p-4 text-sm text-gray-600"
-              data-testid="manual-form-image-hint"
-            >
-              <ImageIcon className="h-4 w-4" />
-              <span style={{ fontFamily: "'Nunito', sans-serif" }}>
-                Füge ein Bild hinzu, damit die Anleitung leichter zu erkennen ist.
-              </span>
-            </div>
-          )}
         </div>
         <DialogFooter className="gap-2 mt-4">
           <Button
