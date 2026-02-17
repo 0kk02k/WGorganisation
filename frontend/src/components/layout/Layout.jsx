@@ -91,18 +91,29 @@ export const Layout = ({ children }) => {
 
       {/* Title Bar - Desktop only, hides on scroll */}
       <div
-        className={`fixed inset-x-0 top-0 z-40 hidden border-b-4 border-black bg-white transition-transform duration-300 min-[755px]:block ${
+        className={`fixed inset-x-0 top-0 z-40 hidden border-b-4 border-black bg-white transition-transform duration-300 overflow-hidden min-[755px]:block ${
           titleVisible ? "translate-y-0" : "-translate-y-full"
         }`}
         data-testid="desktop-title-bar"
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8">
-          <span 
-            className="text-2xl tracking-wide text-gray-800"
-            style={{ fontFamily: "'Bangers', cursive" }}
+        <div className="relative py-3 overflow-hidden">
+          {/* Scrolling Ticker */}
+          <div 
+            className="flex whitespace-nowrap animate-ticker"
+            style={{
+              animation: 'ticker 10s linear infinite',
+            }}
           >
-            BODDIN14-WG HUB
-          </span>
+            {[...Array(10)].map((_, i) => (
+              <span 
+                key={i}
+                className="text-2xl tracking-wide text-gray-800 mx-4"
+                style={{ fontFamily: "'Bangers', cursive" }}
+              >
+                BODDINWG-HUB++++
+              </span>
+            ))}
+          </div>
           <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
         </div>
       </div>
@@ -140,17 +151,29 @@ export const Layout = ({ children }) => {
 
       {/* Mobile Brand Bar */}
       <div
-        className="fixed inset-x-0 top-0 z-40 flex items-center justify-center border-b-4 border-black bg-white px-4 py-3 min-[755px]:hidden"
+        className="fixed inset-x-0 top-0 z-40 border-b-4 border-black bg-white overflow-hidden min-[755px]:hidden"
         data-testid="mobile-brand-bar"
       >
-        <span
-          className="text-xl tracking-wide text-gray-800"
-          style={{ fontFamily: "'Bangers', cursive" }}
-          data-testid="mobile-brand-text"
-        >
-          BODDIN14 WG-HUB
-        </span>
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
+        <div className="relative py-3 overflow-hidden">
+          {/* Scrolling Ticker */}
+          <div 
+            className="flex whitespace-nowrap"
+            style={{
+              animation: 'ticker 10s linear infinite',
+            }}
+          >
+            {[...Array(10)].map((_, i) => (
+              <span 
+                key={i}
+                className="text-xl tracking-wide text-gray-800 mx-4"
+                style={{ fontFamily: "'Bangers', cursive" }}
+              >
+                BODDINWG-HUB++++
+              </span>
+            ))}
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
+        </div>
       </div>
 
       {/* Mobile Navigation Toggle Button */}

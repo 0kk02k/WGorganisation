@@ -123,6 +123,20 @@ code {
     box-shadow: 0 0 24px rgba(176, 38, 255, 0.18);
 }
 
+/* Ticker Animation */
+@keyframes ticker {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-ticker {
+    animation: ticker 10s linear infinite;
+}
+
 
 @layer base {
     [data-debug-wrapper="true"] {
