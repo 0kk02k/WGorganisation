@@ -5,6 +5,7 @@ import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { RoomBadge } from "@/components/ui/RoomBadge";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { StaysList } from "@/components/stays/StaysList";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -35,12 +36,6 @@ export default function CalendarPage() {
   const room2 = rooms[1];
   const room1Id = room1?.id || "A";
   const room2Id = room2?.id || "B";
-  
-  const getRoomLabel = (roomId) =>
-    rooms.find((room) => room.id === roomId)?.name || `Zimmer ${roomId}`;
-    
-  const getRoomById = (roomId) =>
-    rooms.find((room) => room.id === roomId);
 
   useEffect(() => {
     const loadData = async () => {
@@ -242,22 +237,28 @@ export default function CalendarPage() {
                 <Link
                   key={stay.id}
                   to={`/aufenthalte/${stay.id}`}
-                  className="block border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                  className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                   data-testid={`calendar-stay-link-${stay.id}`}
                 >
-                  <p
-                    className="text-lg font-bold text-gray-800"
-                    style={{ fontFamily: "'Nunito', sans-serif" }}
-                    data-testid={`calendar-stay-name-${stay.id}`}
-                  >
-                    {stay.occupant_name}
-                  </p>
-                  <p
-                    className="text-sm text-gray-500"
-                    data-testid={`calendar-stay-room-${stay.id}`}
-                  >
-                    {getRoomLabel(stay.room)}
-                  </p>
+                  <div>
+                    <p
+                      className="text-lg font-bold text-gray-800"
+                      style={{ fontFamily: "'Nunito', sans-serif" }}
+                      data-testid={`calendar-stay-name-${stay.id}`}
+                    >
+                      {stay.occupant_name}
+                    </p>
+                    <p
+                      className="text-sm text-gray-500"
+                      data-testid={`calendar-stay-dates-${stay.id}`}
+                    >
+                      {format(parseISO(stay.start_date), "dd.MM.")} - {format(parseISO(stay.end_date), "dd.MM.yyyy")}
+                    </p>
+                  </div>
+                  <RoomBadge
+                    roomId={stay.room}
+                    testId={`calendar-stay-room-${stay.id}`}
+                  />
                 </Link>
               ))
             )}

@@ -4,7 +4,7 @@ import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { RoomBadge } from "@/components/ui/RoomBadge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Droplet, ChevronDown, Search } from "lucide-react";
@@ -318,13 +318,10 @@ export default function Dashboard() {
                           {format(parseISO(stay.end_date), "dd.MM.yyyy")}
                         </p>
                       </div>
-                      <Badge
-                        className="border-2 border-black text-gray-800 font-bold"
-                        style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
-                        data-testid={`dashboard-active-room-${stay.id}`}
-                      >
-                        {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                      </Badge>
+                      <RoomBadge
+                        roomId={stay.room}
+                        testId={`dashboard-active-room-${stay.id}`}
+                      />
                     </Link>
                   ))
                 )}
@@ -377,13 +374,10 @@ export default function Dashboard() {
                           {format(parseISO(stay.start_date), "dd.MM.yyyy")}
                         </p>
                       </div>
-                      <Badge
-                        className="border-2 border-black text-gray-800 font-bold"
-                        style={{ backgroundColor: rooms.find((room) => room.id === stay.room)?.color || '#facc15' }}
-                        data-testid={`dashboard-upcoming-room-${stay.id}`}
-                      >
-                        {rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`}
-                      </Badge>
+                      <RoomBadge
+                        roomId={stay.room}
+                        testId={`dashboard-upcoming-room-${stay.id}`}
+                      />
                     </Link>
                   ))
                 )}

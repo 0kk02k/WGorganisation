@@ -1,17 +1,12 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { DEFAULT_ROOMS } from "@/lib/constants";
-import { useSettings } from "@/context/SettingsContext";
+import { RoomBadge } from "@/components/ui/RoomBadge";
 
 export const StaysList = ({
   stays,
   emptyLabel = "Keine Aufenthalte geplant.",
   testIdPrefix = "stays",
 }) => {
-  const { settings } = useSettings();
-  const rooms = settings?.rooms || DEFAULT_ROOMS;
-
   if (!stays || stays.length === 0) {
     return (
       <Card 
@@ -33,9 +28,6 @@ export const StaysList = ({
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {stays.map((stay) => {
-        const roomColor = rooms.find((room) => room.id === stay.room)?.color;
-        const roomLabel =
-          rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`;
         const openIn = stay.checklist_in?.filter((item) => !item.done).length;
         const openOut = stay.checklist_out?.filter((item) => !item.done).length;
         return (
@@ -76,13 +68,11 @@ export const StaysList = ({
                     </span>
                   </div>
                 </div>
-                <Badge
-                  className="text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] px-4 py-2"
-                  style={{ backgroundColor: roomColor || '#facc15' }}
-                  data-testid={`${testIdPrefix}-room-${stay.id}`}
-                >
-                  {roomLabel}
-                </Badge>
+                <RoomBadge
+                  roomId={stay.room}
+                  size="large"
+                  testId={`${testIdPrefix}-room-${stay.id}`}
+                />
               </CardContent>
             </Card>
           </Link>
