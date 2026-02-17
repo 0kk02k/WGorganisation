@@ -36,10 +36,7 @@ export function PasswordProtection({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center relative">
-      {/* Dot-Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-      
+    <div className="min-h-screen flex items-center justify-center relative">
       <div className="relative z-10 w-full max-w-md p-8">
         <div className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8">
           {/* Header */}

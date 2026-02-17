@@ -119,10 +119,7 @@ export default function StayDetail() {
     rooms.find((room) => room.id === stay.room)?.name || `Zimmer ${stay.room}`;
 
   return (
-    <div className="min-h-screen bg-white relative" data-testid="stay-detail-page">
-      {/* Dot-Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-      
+    <div className="min-h-screen relative" data-testid="stay-detail-page">
       <div className="relative z-10 space-y-6">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-4">

@@ -111,10 +111,7 @@ export default function ManualDetail() {
     "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
 
   return (
-    <div className="min-h-screen bg-white relative" data-testid="manual-detail-page">
-      {/* Dot-Pattern Overlay */}
-      <div className="absolute inset-0 opacity-5 [background-image:radial-gradient(circle_at_1px_1px,_black_1px,_transparent_1px)] [background-size:24px_24px] pointer-events-none" />
-      
+    <div className="min-h-screen relative" data-testid="manual-detail-page">
       <div className="relative z-10 space-y-6">
         {/* Back Button */}
         <Button 
