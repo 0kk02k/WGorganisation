@@ -101,7 +101,7 @@ export const Layout = ({ children }) => {
           <div 
             className="flex whitespace-nowrap animate-ticker"
           >
-            {[...Array(10)].map((_, i) => (
+            {[...Array(20)].map((_, i) => (
               <span 
                 key={i}
                 className="text-2xl tracking-wide text-gray-800"
@@ -156,7 +156,7 @@ export const Layout = ({ children }) => {
           <div 
             className="flex whitespace-nowrap animate-ticker"
           >
-            {[...Array(10)].map((_, i) => (
+            {[...Array(20)].map((_, i) => (
               <span 
                 key={i}
                 className="text-xl tracking-wide text-gray-800"
