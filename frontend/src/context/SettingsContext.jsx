@@ -13,6 +13,7 @@ export const SettingsProvider = ({ children }) => {
     rooms: DEFAULT_ROOMS,
     checkin_template: DEFAULT_CHECKIN_TEMPLATE,
     checkout_template: DEFAULT_CHECKOUT_TEMPLATE,
+    plantsWateredAt: null,
   });
   const [loading, setLoading] = useState(true);
 
@@ -38,6 +39,7 @@ export const SettingsProvider = ({ children }) => {
       rooms: payload.rooms !== undefined ? payload.rooms : settings.rooms,
       checkin_template: payload.checkin_template !== undefined ? payload.checkin_template : settings.checkin_template,
       checkout_template: payload.checkout_template !== undefined ? payload.checkout_template : settings.checkout_template,
+      plantsWateredAt: payload.plantsWateredAt !== undefined ? payload.plantsWateredAt : settings.plantsWateredAt,
     };
     const data = await settingsApi.update(mergedPayload);
     setSettings(data);

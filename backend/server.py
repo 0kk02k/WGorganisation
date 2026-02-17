@@ -234,6 +234,7 @@ class Settings(BaseModel):
     rooms: List[RoomConfig] = Field(default_factory=lambda: DEFAULT_ROOMS)
     checkin_template: List[str] = Field(default_factory=lambda: DEFAULT_CHECKIN_TEMPLATE)
     checkout_template: List[str] = Field(default_factory=lambda: DEFAULT_CHECKOUT_TEMPLATE)
+    plantsWateredAt: Optional[str] = None
     updated_at: str = Field(default_factory=now_iso)
 
 
@@ -243,6 +244,7 @@ class SettingsUpdate(BaseModel):
     rooms: Optional[List[RoomConfig]] = None
     checkin_template: Optional[List[str]] = None
     checkout_template: Optional[List[str]] = None
+    plantsWateredAt: Optional[str] = None
 
 
 # Helper functions for Appwrite
@@ -318,6 +320,7 @@ def doc_to_settings(doc: dict) -> dict:
         "rooms": json.loads(doc.get("rooms", json.dumps(DEFAULT_ROOMS))),
         "checkin_template": json.loads(doc.get("checkin_template", json.dumps(DEFAULT_CHECKIN_TEMPLATE))),
         "checkout_template": json.loads(doc.get("checkout_template", json.dumps(DEFAULT_CHECKOUT_TEMPLATE))),
+        "plantsWateredAt": doc.get("plantsWateredAt"),
         "updated_at": doc.get("updated_at"),
     }
 
@@ -701,6 +704,7 @@ async def get_or_create_settings() -> Settings:
                     "rooms": json.dumps([r if isinstance(r, dict) else r.model_dump() for r in default_settings.rooms]),
                     "checkin_template": json.dumps(default_settings.checkin_template),
                     "checkout_template": json.dumps(default_settings.checkout_template),
+                    "plantsWateredAt": default_settings.plantsWateredAt,
                     "updated_at": default_settings.updated_at,
                 }
             )
@@ -727,6 +731,8 @@ async def update_settings(payload: SettingsUpdate):
         update_data["checkin_template"] = json.dumps(update_data["checkin_template"])
     if "checkout_template" in update_data:
         update_data["checkout_template"] = json.dumps(update_data["checkout_template"])
+    if "plantsWateredAt" in update_data:
+        update_data["plantsWateredAt"] = update_data["plantsWateredAt"]
 
     update_data["updated_at"] = now_iso()
 

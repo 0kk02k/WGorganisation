@@ -96,6 +96,7 @@ COLLECTIONS = {
             {"key": "rooms", "type": "string", "size": 5000, "required": False},
             {"key": "checkin_template", "type": "string", "size": 5000, "required": False},
             {"key": "checkout_template", "type": "string", "size": 5000, "required": False},
+            {"key": "plantsWateredAt", "type": "string", "size": 50, "required": False},
             {"key": "updated_at", "type": "string", "size": 50, "required": False},
         ]
     }

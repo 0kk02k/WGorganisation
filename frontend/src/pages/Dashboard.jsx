@@ -23,7 +23,7 @@ const INITIAL_VISIBLE_COUNT = 7;
 const EXPANDED_VISIBLE_COUNT = 15;
 
 export default function Dashboard() {
-  const { settings } = useSettings();
+  const { settings, updateSettings } = useSettings();
   const [stays, setStays] = useState([]);
   const [messages, setMessages] = useState([]);
   const [messageForm, setMessageForm] = useState({ name: "", content: "" });
@@ -31,7 +31,6 @@ export default function Dashboard() {
   const [editingContent, setEditingContent] = useState("");
   const [replyingToId, setReplyingToId] = useState(null);
   const [replyForm, setReplyForm] = useState({ name: "", content: "" });
-  const [lastWatered, setLastWatered] = useState(null);
   const [now, setNow] = useState(new Date());
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
@@ -57,14 +56,6 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([loadStays(), loadMessages()]).catch(console.error);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem("plantsWateredAt");
-    if (stored) {
-      setLastWatered(new Date(stored));
-    }
   }, []);
 
   useEffect(() => {
@@ -105,8 +96,10 @@ export default function Dashboard() {
   );
 
   const getWateredTime = () => {
+    const lastWatered = settings?.plantsWateredAt;
     if (!lastWatered) return { days: 0, hours: 0, minutes: 0, hasData: false };
-    const totalMinutes = differenceInMinutes(now, lastWatered);
+    const lastWateredDate = new Date(lastWatered);
+    const totalMinutes = differenceInMinutes(now, lastWateredDate);
     const days = Math.floor(totalMinutes / (60 * 24));
     const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
     const minutes = totalMinutes % 60;
@@ -115,11 +108,12 @@ export default function Dashboard() {
 
   const wateredTime = getWateredTime();
 
-  const handleResetWatered = () => {
-    const next = new Date();
-    setLastWatered(next);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("plantsWateredAt", next.toISOString());
+  const handleResetWatered = async () => {
+    try {
+      await updateSettings({ plantsWateredAt: new Date().toISOString() });
+      toast.success("Gießzeit gespeichert.");
+    } catch (error) {
+      toast.error("Speichern fehlgeschlagen.");
     }
   };
 
