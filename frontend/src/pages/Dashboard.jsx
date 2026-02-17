@@ -279,7 +279,7 @@ export default function Dashboard() {
               <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
                 <CardTitle 
                   className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive" }}
+                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="dashboard-active-title"
                 >
                   Aktuelle Aufenthalte
@@ -336,7 +336,7 @@ export default function Dashboard() {
               <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
                 <CardTitle 
                   className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive" }}
+                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="dashboard-upcoming-title"
                 >
                   Nachste Check-ins
@@ -393,7 +393,7 @@ export default function Dashboard() {
             <CardHeader className="bg-gradient-to-r from-emerald-400 to-teal-400 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               >
                 Pflanzen
               </CardTitle>
@@ -526,7 +526,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between gap-4">
                 <CardTitle 
                   className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive" }}
+                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="dashboard-chat-title"
                 >
                   WG-Chat

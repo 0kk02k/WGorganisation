@@ -103,7 +103,7 @@ export default function CalendarPage() {
           <CardHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between gap-4 p-4">
             <CardTitle 
               className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive" }}
+              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="calendar-month-title"
             >
               {format(currentMonth, "MMMM yyyy", { locale: de })}
@@ -217,7 +217,7 @@ export default function CalendarPage() {
           <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 border-b-4 border-black p-4">
             <CardTitle 
               className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive" }}
+              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="calendar-selected-title"
             >
               {format(selectedDate, "EEEE, dd.MM.yyyy", { locale: de })}

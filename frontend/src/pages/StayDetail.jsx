@@ -165,7 +165,7 @@ export default function StayDetail() {
           <CardHeader className="bg-gradient-to-r from-amber-400 to-orange-400 border-b-4 border-black p-4">
             <CardTitle 
               className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive" }}
+              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="stay-notes-title"
             >
               Hinweise
@@ -265,3 +265,4 @@ export default function StayDetail() {
     </div>
   );
 }
+ 

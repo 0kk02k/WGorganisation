@@ -28,7 +28,7 @@ export const StayChecklistSection = ({
       <CardHeader className={`bg-gradient-to-r ${gradientClass} border-b-4 border-black p-4`}>
         <CardTitle 
           className="text-white text-2xl"
-          style={{ fontFamily: "'Bangers', cursive" }}
+          style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
           data-testid={`${testPrefix}-title`}
         >
           {title}
