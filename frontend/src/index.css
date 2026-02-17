@@ -27,8 +27,8 @@ body::before {
     content: "";
     position: fixed;
     inset: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
-    background-size: 24px 24px;
+    background-image: radial-gradient(circle at 1px 1px, rgba(50, 50, 55, 0.5) 1.5px, transparent 1.5px);
+    background-size: 20px 20px;
     pointer-events: none;
     z-index: 0;
 }
@@ -82,7 +82,7 @@ code {
         @apply border-border;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply text-foreground;
     }
 }
 

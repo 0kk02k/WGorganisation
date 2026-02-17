@@ -104,16 +104,16 @@ export default function Dashboard() {
     [stays, today],
   );
 
-  const getWateredLabel = () => {
-    if (!lastWatered) return "Noch nicht erfasst";
-    const minutes = differenceInMinutes(now, lastWatered);
-    if (minutes < 1) return "Gerade eben";
-    if (minutes < 60) return `vor ${minutes} Min.`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `vor ${hours} Std.`;
-    const days = Math.floor(hours / 24);
-    return `vor ${days} Tagen`;
+  const getWateredTime = () => {
+    if (!lastWatered) return { days: 0, hours: 0, minutes: 0, hasData: false };
+    const totalMinutes = differenceInMinutes(now, lastWatered);
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+    return { days, hours, minutes, hasData: true };
   };
+
+  const wateredTime = getWateredTime();
 
   const handleResetWatered = () => {
     const next = new Date();
@@ -285,7 +285,7 @@ export default function Dashboard() {
                   Aktuelle Aufenthalte
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-4 space-y-3 bg-pink-500/10">
                 {activeStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
@@ -345,7 +345,7 @@ export default function Dashboard() {
                   Nachste Check-ins
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-4 space-y-3 bg-teal-400/10">
                 {upcomingStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
@@ -404,7 +404,7 @@ export default function Dashboard() {
                 Pflanzen
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 flex flex-col flex-1">
+            <CardContent className="p-4 flex flex-col flex-1 bg-emerald-400/10">
               {/* Plant image */}
               <div className="h-40 border-4 border-black mb-4 overflow-hidden">
                 <img 
@@ -413,27 +413,110 @@ export default function Dashboard() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="border-4 border-black p-4 bg-gradient-to-r from-emerald-50 to-teal-50 mb-4">
-                <p
-                  className="text-lg font-bold text-gray-800"
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                  data-testid="dashboard-plants-status"
-                >
-                  Letzte Bewasserung
-                </p>
-                <p 
-                  className="text-sm text-gray-500"
-                  data-testid="dashboard-plants-timer"
-                >
-                  {getWateredLabel()}
-                </p>
-              </div>
+              
+              {/* Graphical Counter - directly under image */}
+              {wateredTime.hasData ? (
+                <div className="mb-4">
+                  {/* Digital Counter Display - stretched */}
+                  <div className="flex justify-center items-center gap-1">
+                    {/* Days */}
+                    <div className="flex flex-col items-center">
+                      <div 
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                        style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
+                      >
+                        <span 
+                          className="text-3xl font-bold text-emerald-400"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                        >
+                          {String(wateredTime.days).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <span 
+                        className="text-xs font-bold text-gray-600 mt-1"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        TAGE
+                      </span>
+                    </div>
+                    
+                    {/* Separator */}
+                    <span 
+                      className="text-2xl font-bold text-black animate-pulse"
+                      style={{ fontFamily: "'Bangers', cursive" }}
+                    >
+                      :
+                    </span>
+                    
+                    {/* Hours */}
+                    <div className="flex flex-col items-center">
+                      <div 
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                        style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
+                      >
+                        <span 
+                          className="text-3xl font-bold text-teal-400"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                        >
+                          {String(wateredTime.hours).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <span 
+                        className="text-xs font-bold text-gray-600 mt-1"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        STUNDEN
+                      </span>
+                    </div>
+                    
+                    {/* Separator */}
+                    <span 
+                      className="text-2xl font-bold text-black animate-pulse"
+                      style={{ fontFamily: "'Bangers', cursive" }}
+                    >
+                      :
+                    </span>
+                    
+                    {/* Minutes */}
+                    <div className="flex flex-col items-center">
+                      <div 
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                        style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
+                      >
+                        <span 
+                          className="text-3xl font-bold text-cyan-400"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                        >
+                          {String(wateredTime.minutes).padStart(2, '0')}
+                        </span>
+                      </div>
+                      <span 
+                        className="text-xs font-bold text-gray-600 mt-1"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        MIN
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mb-4 text-center">
+                  <p 
+                    className="text-gray-500 font-bold"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Noch nicht erfasst
+                  </p>
+                </div>
+              )}
+              
               <Button
                 onClick={handleResetWatered}
                 className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
                 data-testid="dashboard-plants-reset"
               >
+                <Droplet className="h-4 w-4 mr-2" />
                 Jetzt gegossen
               </Button>
             </CardContent>
@@ -466,7 +549,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4 space-y-4">
+            <CardContent className="p-4 space-y-4 bg-purple-500/10">
               <div
                 ref={chatContainerRef}
                 className="space-y-3 max-h-[400px] overflow-y-auto pr-2"
@@ -560,7 +643,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, name: event.target.value }))
                     }
                     placeholder="z.B. Lea"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
                     data-testid="chat-name-input"
                   />
                 </div>
@@ -579,7 +662,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, content: event.target.value }))
                     }
                     placeholder="Kurze Info fur alle"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400"
+                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
                     data-testid="chat-message-input"
                   />
                 </div>
