@@ -100,14 +100,11 @@ export const Layout = ({ children }) => {
           {/* Scrolling Ticker */}
           <div 
             className="flex whitespace-nowrap animate-ticker"
-            style={{
-              animation: 'ticker 10s linear infinite',
-            }}
           >
             {[...Array(10)].map((_, i) => (
               <span 
                 key={i}
-                className="text-2xl tracking-wide text-gray-800 mx-4"
+                className="text-2xl tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive" }}
               >
                 BODDINWG-HUB++++
@@ -157,15 +154,12 @@ export const Layout = ({ children }) => {
         <div className="relative py-3 overflow-hidden">
           {/* Scrolling Ticker */}
           <div 
-            className="flex whitespace-nowrap"
-            style={{
-              animation: 'ticker 10s linear infinite',
-            }}
+            className="flex whitespace-nowrap animate-ticker"
           >
             {[...Array(10)].map((_, i) => (
               <span 
                 key={i}
-                className="text-xl tracking-wide text-gray-800 mx-4"
+                className="text-xl tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive" }}
               >
                 BODDINWG-HUB++++
