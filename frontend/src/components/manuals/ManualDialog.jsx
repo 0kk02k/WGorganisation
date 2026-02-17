@@ -140,7 +140,7 @@ export const ManualDialog = ({ onCreated }) => {
                 setForm((prev) => ({ ...prev, title: event.target.value }))
               }
               placeholder="z.B. Geschirrspüler"
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800 bg-white"
               data-testid="manual-form-title-input"
             />
           </div>
@@ -158,7 +158,7 @@ export const ManualDialog = ({ onCreated }) => {
                 setForm((prev) => ({ ...prev, steps: event.target.value }))
               }
               placeholder="1. Gerät einschalten..."
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800 bg-white"
               data-testid="manual-form-steps-input"
             />
           </div>
