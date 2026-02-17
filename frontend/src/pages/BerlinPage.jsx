@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const parseTags = (value) =>
@@ -136,16 +136,33 @@ export default function BerlinPage() {
       return;
     }
     try {
-      const data = await eventsApi.create({
-        title: form.title,
-        date: form.date,
-        location: form.location,
-        description: form.description,
-        hashtags: parseTags(form.hashtags),
-      });
-      setEvents((prev) => [data, ...prev]);
+      if (editingType === "event" && editingId) {
+        // Update existing event
+        const data = await eventsApi.update(editingId, {
+          title: form.title,
+          date: form.date,
+          location: form.location,
+          description: form.description,
+          hashtags: parseTags(form.hashtags),
+        });
+        setEvents((prev) => prev.map((item) => (item.id === editingId ? data : item)));
+        toast.success("Tipp aktualisiert.");
+      } else {
+        // Create new event
+        const data = await eventsApi.create({
+          title: form.title,
+          date: form.date,
+          location: form.location,
+          description: form.description,
+          hashtags: parseTags(form.hashtags),
+        });
+        setEvents((prev) => [data, ...prev]);
+        toast.success("Tipp erstellt.");
+      }
       setForm({ title: "", date: "", location: "", description: "", hashtags: "" });
       setIsModalOpen(false);
+      setEditingType(null);
+      setEditingId(null);
     } catch (error) {
       toast.error("Tipp konnte nicht gespeichert werden.");
     }
@@ -170,14 +187,29 @@ export default function BerlinPage() {
       return;
     }
     try {
-      const data = await berlinLinksApi.create({
-        url: linkForm.url,
-        description: linkForm.description,
-        hashtags: parseTags(linkForm.hashtags),
-      });
-      setLinks((prev) => [data, ...prev]);
+      if (editingType === "link" && editingId) {
+        // Update existing link
+        const data = await berlinLinksApi.update(editingId, {
+          url: linkForm.url,
+          description: linkForm.description,
+          hashtags: parseTags(linkForm.hashtags),
+        });
+        setLinks((prev) => prev.map((item) => (item.id === editingId ? data : item)));
+        toast.success("Link aktualisiert.");
+      } else {
+        // Create new link
+        const data = await berlinLinksApi.create({
+          url: linkForm.url,
+          description: linkForm.description,
+          hashtags: parseTags(linkForm.hashtags),
+        });
+        setLinks((prev) => [data, ...prev]);
+        toast.success("Link erstellt.");
+      }
       setLinkForm({ url: "", description: "", hashtags: "" });
       setIsModalOpen(false);
+      setEditingType(null);
+      setEditingId(null);
     } catch (error) {
       toast.error("Link konnte nicht gespeichert werden.");
     }
@@ -227,14 +259,14 @@ export default function BerlinPage() {
             data-testid="berlin-create-modal"
           >
             <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
-              <DialogTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive" }}
-                data-testid="berlin-create-title"
-              >
-                Neuer Beitrag
-              </DialogTitle>
-            </DialogHeader>
+               <DialogTitle 
+                 className="text-white text-2xl"
+                 style={{ fontFamily: "'Bangers', cursive" }}
+                 data-testid="berlin-create-title"
+               >
+                 {editingType ? "Bearbeiten" : "Neuer Beitrag"}
+               </DialogTitle>
+             </DialogHeader>
             <Tabs
               value={postType}
               onValueChange={setPostType}
@@ -343,13 +375,23 @@ export default function BerlinPage() {
                   />
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    onClick={handleSubmit}
-                    className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
-                    data-testid="berlin-submit-button"
-                  >
-                    Tipp posten
-                  </Button>
+                   <Button
+                     onClick={handleSubmit}
+                     className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                     data-testid="berlin-submit-button"
+                   >
+                     {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
+                   </Button>
+                  {editingType === "event" && (
+                    <Button
+                      onClick={handleDeleteEvent}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                      data-testid="berlin-delete-button"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Löschen
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
               <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
@@ -408,13 +450,23 @@ export default function BerlinPage() {
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button
-                    onClick={handleLinkSubmit}
-                    className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
-                    data-testid="berlin-link-submit-button"
-                  >
-                    Link speichern
-                  </Button>
+                   <Button
+                     onClick={handleLinkSubmit}
+                     className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                     data-testid="berlin-link-submit-button"
+                   >
+                     {editingType === "link" ? "Aktualisieren" : "Link speichern"}
+                   </Button>
+                  {editingType === "link" && (
+                    <Button
+                      onClick={handleDeleteLink}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                      data-testid="berlin-link-delete-button"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Löschen
+                    </Button>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
@@ -477,9 +529,20 @@ export default function BerlinPage() {
                 filteredEvents.map((event) => (
                   <div 
                     key={event.id} 
-                    className="border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                     data-testid={`berlin-event-${event.id}`}
                   >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditEvent(event);
+                      }}
+                      className="absolute bottom-2 right-2 p-1.5 bg-white hover:bg-gray-100 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                      data-testid={`berlin-event-edit-${event.id}`}
+                      title="Bearbeiten"
+                    >
+                      <Pencil className="h-4 w-4 text-gray-700" />
+                    </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
                       style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -547,9 +610,20 @@ export default function BerlinPage() {
                 filteredLinks.map((link) => (
                   <div 
                     key={link.id} 
-                    className="border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                     data-testid={`berlin-link-${link.id}`}
                   >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEditLink(link);
+                      }}
+                      className="absolute bottom-2 right-2 p-1.5 bg-white hover:bg-gray-100 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                      data-testid={`berlin-link-edit-${link.id}`}
+                      title="Bearbeiten"
+                    >
+                      <Pencil className="h-4 w-4 text-gray-700" />
+                    </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
                       style={{ fontFamily: "'Nunito', sans-serif" }}
