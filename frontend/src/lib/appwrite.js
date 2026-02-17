@@ -342,6 +342,31 @@ export const eventsApi = {
     };
   },
 
+  async update(id, data) {
+    const docs = await databases.listDocuments(DATABASE_ID, COLLECTIONS.events, [
+      Query.equal('id', id),
+    ]);
+    if (docs.documents.length === 0) throw new Error('Event not found');
+    
+    const docId = docs.documents[0].$id;
+    const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.events, docId, {
+      title: data.title,
+      date: data.date,
+      location: data.location,
+      description: data.description,
+      hashtags: JSON.stringify(data.hashtags || []),
+    });
+    return {
+      id: doc.id,
+      title: doc.title,
+      date: doc.date,
+      location: doc.location,
+      description: doc.description,
+      hashtags: parseJson(doc.hashtags, []),
+      created_at: doc.created_at,
+    };
+  },
+
   async delete(id) {
     const docs = await databases.listDocuments(DATABASE_ID, COLLECTIONS.events, [
       Query.equal('id', id),
@@ -374,6 +399,27 @@ export const berlinLinksApi = {
       description: data.description,
       hashtags: JSON.stringify(data.hashtags || []),
       created_at: now,
+    });
+    return {
+      id: doc.id,
+      url: doc.url,
+      description: doc.description,
+      hashtags: parseJson(doc.hashtags, []),
+      created_at: doc.created_at,
+    };
+  },
+
+  async update(id, data) {
+    const docs = await databases.listDocuments(DATABASE_ID, COLLECTIONS.berlin_links, [
+      Query.equal('id', id),
+    ]);
+    if (docs.documents.length === 0) throw new Error('Link not found');
+    
+    const docId = docs.documents[0].$id;
+    const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.berlin_links, docId, {
+      url: data.url,
+      description: data.description,
+      hashtags: JSON.stringify(data.hashtags || []),
     });
     return {
       id: doc.id,

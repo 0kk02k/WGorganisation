@@ -537,11 +537,11 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditEvent(event);
                       }}
-                      className="absolute bottom-2 right-2 p-1.5 bg-white hover:bg-gray-100 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-event-edit-${event.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-4 w-4 text-gray-700" />
+                      <Pencil className="h-3 w-3 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
@@ -618,11 +618,11 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditLink(link);
                       }}
-                      className="absolute bottom-2 right-2 p-1.5 bg-white hover:bg-gray-100 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-link-edit-${link.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-4 w-4 text-gray-700" />
+                      <Pencil className="h-3 w-3 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
