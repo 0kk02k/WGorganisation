@@ -167,12 +167,13 @@ export default function ManualDetail() {
           </div>
           
           {/* Header */}
-          <CardHeader className="bg-white border-b-4 border-black p-4">
+          <CardHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {isEditing ? (
                 <div className="flex-1 space-y-2">
                   <label
-                    className="text-sm font-bold text-gray-800"
+                    className="text-sm font-bold text-white"
+                    style={{ textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                     data-testid="manual-edit-title-label"
                   >
                     Titel
@@ -188,8 +189,8 @@ export default function ManualDetail() {
                 </div>
               ) : (
                 <CardTitle 
-                  className="text-gray-800 text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive" }}
+                  className="text-white text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="manual-detail-title"
                 >
                   {manual.title}
