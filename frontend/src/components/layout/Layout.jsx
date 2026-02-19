@@ -143,7 +143,7 @@ export const Layout = ({ children }) => {
         </div>
       </header>
 
-      {/* Mobile Brand Bar */}
+      {/* Mobile Brand Bar with Hamburger Menu */}
       <div
         className="fixed inset-x-0 top-0 z-40 border-b-4 border-black bg-white overflow-hidden min-[755px]:hidden"
         data-testid="mobile-brand-bar"
@@ -163,23 +163,22 @@ export const Layout = ({ children }) => {
               </span>
             ))}
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
+        {/* Hamburger Menu Button - positioned absolute within the bar */}
+        <button
+          type="button"
+          onClick={toggleMobileNav}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          data-testid="mobile-nav-toggle"
+        >
+          {mobileNavOpen ? (
+            <X className="h-5 w-5" />
+          ) : (
+            <Menu className="h-5 w-5" />
+          )}
+        </button>
       </div>
-
-      {/* Mobile Navigation Toggle Button */}
-      <button
-        type="button"
-        onClick={toggleMobileNav}
-        className="fixed top-12 right-4 z-50 flex h-12 w-12 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] min-[755px]:hidden"
-        data-testid="mobile-nav-toggle"
-      >
-        {mobileNavOpen ? (
-          <X className="h-6 w-6" />
-        ) : (
-          <Menu className="h-6 w-6" />
-        )}
-      </button>
 
       {/* Mobile Navigation Overlay */}
       {mobileNavOpen && (
