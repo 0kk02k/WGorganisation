@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { staysApi, eventsApi } from "@/lib/appwrite";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
@@ -26,6 +26,7 @@ import { de } from "date-fns/locale";
 
 export default function CalendarPage() {
   const { settings } = useSettings();
+  const location = useLocation();
   const [stays, setStays] = useState([]);
   const [events, setEvents] = useState([]);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
@@ -51,7 +52,7 @@ export default function CalendarPage() {
       }
     };
     loadData();
-  }, []);
+  }, [location.key]); // Reload data when navigating back to this page
 
   const calendarDays = useMemo(() => {
     const start = startOfWeek(startOfMonth(currentMonth), { weekStartsOn: 1 });
