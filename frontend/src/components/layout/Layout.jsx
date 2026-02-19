@@ -89,37 +89,34 @@ export const Layout = ({ children }) => {
         <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />
       </div>
 
-      {/* Title Bar - Desktop only, hides on scroll */}
-      <div
-        className={`fixed inset-x-0 top-0 z-40 hidden border-b-4 border-black bg-white transition-transform duration-300 overflow-hidden min-[755px]:block ${
-          titleVisible ? "translate-y-0" : "-translate-y-full"
+      {/* Combined Title + Navigation Bar - Desktop only */}
+      <header 
+        className={`fixed inset-x-0 z-40 hidden border-b-4 border-black bg-white transition-all duration-300 overflow-hidden min-[755px]:block ${
+          titleVisible ? "h-32" : "h-14"
         }`}
-        data-testid="desktop-title-bar"
+        data-testid="desktop-header"
       >
-        <div className="relative py-3 overflow-hidden">
-          {/* Scrolling Ticker */}
-          <div 
-            className="flex whitespace-nowrap animate-ticker"
-          >
+        {/* Scrolling Ticker - Background layer, full height behind nav */}
+        <div 
+          className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${
+            titleVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
+          <div className="flex whitespace-nowrap animate-ticker h-full items-center">
             {[...Array(20)].map((_, i) => (
               <span 
                 key={i}
-                className="text-2xl tracking-wide text-gray-800"
-                style={{ fontFamily: "'Bangers', cursive" }}
+                className="tracking-wide text-gray-800"
+                style={{ fontFamily: "'Bangers', cursive", fontSize: '3.9rem' }}
               >
                 BODDINWG-HUB++++
               </span>
             ))}
           </div>
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
         </div>
-      </div>
-
-      {/* Desktop Navigation - sticky below title bar */}
-      <header className={`fixed inset-x-0 z-40 hidden border-b-4 border-black bg-white transition-all duration-300 min-[755px]:block ${
-        titleVisible ? "top-12" : "top-0"
-      }`}>
-        <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8">
+        
+        {/* Navigation - always visible, positioned at bottom */}
+        <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8`}>
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
             {navItems.map((item) => (
               <NavLink
@@ -227,8 +224,8 @@ export const Layout = ({ children }) => {
       </div>
 
       <main
-        className={`mx-auto w-full max-w-6xl px-2 pb-20 pt-20 transition-all duration-300 min-[755px]:px-4 min-[755px]:pb-28 min-[755px]:pt-36 md:px-8 ${
-          !titleVisible ? "min-[755px]:!pt-28" : ""
+        className={`mx-auto w-full max-w-6xl px-2 pb-20 pt-20 transition-all duration-300 min-[755px]:px-4 min-[755px]:pb-28 md:px-8 ${
+          titleVisible ? "min-[755px]:pt-36" : "min-[755px]:pt-20"
         }`}
         data-testid="main-content"
       >
