@@ -106,17 +106,22 @@ export const staysApi = {
     if (docs.documents.length === 0) throw new Error('Stay not found');
     
     const docId = docs.documents[0].$id;
+    const existingDoc = docs.documents[0];
+    
+    // Merge: Verwende neue Daten, oder behalte bestehende Daten
     const now = nowIso();
-    const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.stays, docId, {
-      room: data.room,
-      occupant_name: data.occupant_name,
-      start_date: data.start_date,
-      end_date: data.end_date,
-      notes: data.notes || '',
-      checklist_in: JSON.stringify(data.checklist_in || []),
-      checklist_out: JSON.stringify(data.checklist_out || []),
+    const updatePayload = {
+      room: data.room !== undefined ? data.room : existingDoc.room,
+      occupant_name: data.occupant_name !== undefined ? data.occupant_name : existingDoc.occupant_name,
+      start_date: data.start_date !== undefined ? data.start_date : existingDoc.start_date,
+      end_date: data.end_date !== undefined ? data.end_date : existingDoc.end_date,
+      notes: data.notes !== undefined ? data.notes : (existingDoc.notes || ''),
+      checklist_in: JSON.stringify(data.checklist_in !== undefined ? data.checklist_in : parseJson(existingDoc.checklist_in, [])),
+      checklist_out: JSON.stringify(data.checklist_out !== undefined ? data.checklist_out : parseJson(existingDoc.checklist_out, [])),
       updated_at: now,
-    });
+    };
+    
+    const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.stays, docId, updatePayload);
     return {
       id: doc.id,
       room: doc.room,
