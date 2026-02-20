@@ -56,6 +56,7 @@ export default function ManualsPage() {
           ) : (
             manuals.map((manual) => {
               const imageSrc =
+                manual.image_data ||
                 manual.image_url ||
                 "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
               return (

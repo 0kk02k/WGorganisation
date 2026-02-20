@@ -154,8 +154,9 @@ export const manualsApi = {
       id: doc.id,
       title: doc.title,
       description: doc.description,
-      // Nur image_url laden (klein), image_data (groß) nur in get()
+      steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
+      image_data: doc.image_data || '',
       view_count: doc.view_count || 0,
       created_at: doc.created_at,
       updated_at: doc.updated_at,
