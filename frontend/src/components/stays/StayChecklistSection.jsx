@@ -38,7 +38,7 @@ export const StayChecklistSection = ({
         {items.map((item) => (
           <div
             key={item.id}
-            className={`flex items-start gap-3 border-4 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
+            className={`grid grid-cols-[auto_1fr] gap-3 border-4 border-black p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
               item.done 
                 ? "bg-gray-100" 
                 : isCheckin 
@@ -50,11 +50,11 @@ export const StayChecklistSection = ({
             <Checkbox
               checked={item.done}
               onCheckedChange={(checked) => onToggle(item.id, checked)}
-              className="border-2 border-black data-[state=checked]:bg-black data-[state=checked]:text-white flex-shrink-0 mt-0.5"
+              className="border-2 border-black data-[state=checked]:bg-black data-[state=checked]:text-white mt-0.5 justify-self-start"
               data-testid={`${testPrefix}-toggle-${item.id}`}
             />
             <span
-              className={`text-gray-800 flex-1 ${item.done ? "line-through text-gray-400" : ""}`}
+              className={`text-gray-800 ${item.done ? "line-through text-gray-400" : ""}`}
               style={{ fontFamily: "'Nunito', sans-serif" }}
               data-testid={`${testPrefix}-text-${item.id}`}
             >
