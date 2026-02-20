@@ -74,9 +74,16 @@ export default function BerlinPage() {
     return eventDate >= today;
   });
 
+  // Sort events by date (closest to today first)
+  const sortedEvents = [...currentEvents].sort((a, b) => {
+    const dateA = a.date ? new Date(a.date).getTime() : Infinity;
+    const dateB = b.date ? new Date(b.date).getTime() : Infinity;
+    return dateA - dateB;
+  });
+
   const filteredEvents = selectedTag
-    ? currentEvents.filter((event) => safeTags(event.hashtags).includes(selectedTag))
-    : currentEvents;
+    ? sortedEvents.filter((event) => safeTags(event.hashtags).includes(selectedTag))
+    : sortedEvents;
   const filteredLinks = selectedTag
     ? links.filter((link) => safeTags(link.hashtags).includes(selectedTag))
     : links;
