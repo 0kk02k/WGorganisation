@@ -207,7 +207,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-notes-label"
               >
-                Hinweise
+                Notiz
               </label>
               <Textarea
                 rows={2}

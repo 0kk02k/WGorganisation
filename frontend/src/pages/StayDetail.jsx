@@ -168,7 +168,7 @@ export default function StayDetail() {
               style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="stay-notes-title"
             >
-              Hinweise
+              Notiz
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 bg-amber-400/10">
@@ -177,7 +177,7 @@ export default function StayDetail() {
               style={{ fontFamily: "'Nunito', sans-serif" }}
               data-testid="stay-notes-text"
             >
-              {stay.notes || "Noch keine Hinweise hinterlegt."}
+              {stay.notes || "Noch keine Notiz hinterlegt."}
             </p>
           </CardContent>
         </Card>

@@ -146,7 +146,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-edit-notes-label"
               >
-                Hinweise
+                Notiz
               </label>
               <Textarea
                 value={form.notes || ""}
