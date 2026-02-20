@@ -150,16 +150,19 @@ export const staysApi = {
 export const manualsApi = {
   async list() {
     const response = await databases.listDocuments(DATABASE_ID, COLLECTIONS.manuals);
-    return response.documents.map(doc => ({
+    const manuals = response.documents.map(doc => ({
       id: doc.id,
       title: doc.title,
       description: doc.description,
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',
+      view_count: doc.view_count || 0,
       created_at: doc.created_at,
       updated_at: doc.updated_at,
     }));
+    // Sortiere nach view_count absteigend (meistgeklickte zuerst)
+    return manuals.sort((a, b) => (b.view_count || 0) - (a.view_count || 0));
   },
 
   async get(id) {
@@ -168,6 +171,15 @@ export const manualsApi = {
     ]);
     if (docs.documents.length === 0) return null;
     const doc = docs.documents[0];
+    
+    // Inkrementiere view_count
+    const currentCount = doc.view_count || 0;
+    const docId = doc.$id;
+    // Async update - nicht auf Ergebnis warten
+    databases.updateDocument(DATABASE_ID, COLLECTIONS.manuals, docId, {
+      view_count: currentCount + 1,
+    }).catch(err => console.error('Failed to increment view_count:', err));
+    
     return {
       id: doc.id,
       title: doc.title,
@@ -175,6 +187,7 @@ export const manualsApi = {
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',
+      view_count: currentCount + 1, // Zeige den inkrementierten Wert
       created_at: doc.created_at,
       updated_at: doc.updated_at,
     };
@@ -190,6 +203,7 @@ export const manualsApi = {
       steps: JSON.stringify(data.steps || []),
       image_url: data.image_url || '',
       image_data: data.image_data || '',
+      view_count: 0,
       created_at: now,
       updated_at: now,
     });
@@ -200,6 +214,7 @@ export const manualsApi = {
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',
+      view_count: doc.view_count || 0,
       created_at: doc.created_at,
       updated_at: doc.updated_at,
     };
@@ -212,6 +227,7 @@ export const manualsApi = {
     if (docs.documents.length === 0) throw new Error('Manual not found');
     
     const docId = docs.documents[0].$id;
+    const existingDoc = docs.documents[0];
     const now = nowIso();
     const doc = await databases.updateDocument(DATABASE_ID, COLLECTIONS.manuals, docId, {
       title: data.title,
@@ -219,6 +235,7 @@ export const manualsApi = {
       steps: JSON.stringify(data.steps || []),
       image_url: data.image_url || '',
       image_data: data.image_data || '',
+      view_count: data.view_count !== undefined ? data.view_count : (existingDoc.view_count || 0),
       updated_at: now,
     });
     return {
@@ -228,6 +245,7 @@ export const manualsApi = {
       steps: parseJson(doc.steps, []),
       image_url: doc.image_url || '',
       image_data: doc.image_data || '',
+      view_count: doc.view_count || 0,
       created_at: doc.created_at,
       updated_at: doc.updated_at,
     };

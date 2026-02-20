@@ -53,6 +53,7 @@ COLLECTIONS = {
             {"key": "steps", "type": "string", "size": 50000, "required": True},
             {"key": "image_url", "type": "string", "size": 500, "required": False},
             {"key": "image_data", "type": "string", "size": 500000, "required": False},
+            {"key": "view_count", "type": "integer", "required": False},
             {"key": "created_at", "type": "string", "size": 50, "required": False},
             {"key": "updated_at", "type": "string", "size": 50, "required": False},
         ]
@@ -151,13 +152,21 @@ def ensure_attributes(collection_id: str, attributes: list):
     """Ensure all attributes exist in the collection"""
     for attr in attributes:
         try:
-            db_service.create_string_attribute(
-                DATABASE_ID,
-                collection_id,
-                attr["key"],
-                attr["size"],
-                attr.get("required", False)
-            )
+            if attr["type"] == "string":
+                db_service.create_string_attribute(
+                    DATABASE_ID,
+                    collection_id,
+                    attr["key"],
+                    attr["size"],
+                    attr.get("required", False)
+                )
+            elif attr["type"] == "integer":
+                db_service.create_integer_attribute(
+                    DATABASE_ID,
+                    collection_id,
+                    attr["key"],
+                    attr.get("required", False)
+                )
             print(f"    [OK] Attribut '{attr['key']}' erstellt")
         except AppwriteException as attr_err:
             if "already exists" not in str(attr_err).lower():

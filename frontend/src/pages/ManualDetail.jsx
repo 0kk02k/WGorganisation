@@ -110,6 +110,7 @@ export default function ManualDetail() {
         steps: stepsArray,
         image_url: form.image_url || "",
         image_data: form.image_data || "",
+        view_count: form.view_count, // Preserve view_count
       });
       setManual(data);
       setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
