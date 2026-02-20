@@ -39,9 +39,39 @@ export default function ManualDetail() {
   const handleFileChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    
+    // Bild komprimieren bevor es gespeichert wird
     const reader = new FileReader();
     reader.onload = () => {
-      setForm((prev) => ({ ...prev, image_data: reader.result }));
+      const img = new window.Image();
+      img.onload = () => {
+        // Maximal 1200px Breite/Höhe
+        const maxSize = 1200;
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = (height / width) * maxSize;
+            width = maxSize;
+          } else {
+            width = (width / height) * maxSize;
+            height = maxSize;
+          }
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Als JPEG mit 80% Qualität
+        const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+        console.log('[DEBUG] Original size:', reader.result.length, 'Compressed size:', compressedData.length);
+        setForm((prev) => ({ ...prev, image_data: compressedData }));
+      };
+      img.src = reader.result;
     };
     reader.readAsDataURL(file);
   };
@@ -63,6 +93,17 @@ export default function ManualDetail() {
       const stepsArray = typeof form.steps === "string" 
         ? form.steps.split("\n").filter(s => s.trim()) 
         : form.steps;
+      
+      // Prüfe Bildgröße (max 5MB nach Base64)
+      const maxImageSize = 5 * 1024 * 1024; // 5MB
+      if (form.image_data && form.image_data.length > maxImageSize) {
+        toast.error("Bild ist zu groß. Bitte wähle ein kleineres Bild.");
+        setSaving(false);
+        return false;
+      }
+      
+      console.log('[DEBUG] Saving manual with image_data length:', form.image_data?.length || 0);
+      
       const data = await manualsApi.update(id, {
         title: form.title,
         description: form.title, // Use title as description for backward compatibility
@@ -75,7 +116,8 @@ export default function ManualDetail() {
       toast.success("Anleitung aktualisiert.");
       return true;
     } catch (error) {
-      toast.error("Speichern fehlgeschlagen.");
+      console.error("[DEBUG] Save error:", error);
+      toast.error(`Speichern fehlgeschlagen: ${error.message || 'Unbekannter Fehler'}`);
       return false;
     } finally {
       setSaving(false);
