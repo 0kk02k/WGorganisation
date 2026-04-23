@@ -101,7 +101,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             Neue Belegung anlegen
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 overflow-y-auto pr-2">
+        <div className="space-y-4 overflow-y-auto pr-2 flex-1 min-h-0">
           <div className="space-y-2">
             <label
               className="text-sm font-medium text-stone-700"
