@@ -86,10 +86,10 @@ export const ManualDialog = ({ onCreated }) => {
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="max-w-xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
+        className="max-w-xl max-h-[95vh] overflow-hidden flex flex-col bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800 p-0"
         data-testid="manual-dialog"
       >
-        <DialogHeader className="bg-white border-b-4 border-black p-4 -m-6 mb-0">
+        <DialogHeader className="bg-white border-b-4 border-black p-4">
           <DialogTitle 
             className="text-gray-800 text-2xl"
             style={{ fontFamily: "'Bangers', cursive" }}
@@ -98,7 +98,7 @@ export const ManualDialog = ({ onCreated }) => {
             Neue Bedienungsanleitung
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-8">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
           {/* Image with camera overlay */}
           <div 
             className="relative aspect-video overflow-hidden border-4 border-black bg-gray-100 cursor-pointer shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
@@ -144,7 +144,7 @@ export const ManualDialog = ({ onCreated }) => {
               data-testid="manual-form-title-input"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 pb-2">
             <label
               className="text-sm font-bold text-gray-800"
               data-testid="manual-form-steps-label"
@@ -163,9 +163,9 @@ export const ManualDialog = ({ onCreated }) => {
             />
           </div>
         </div>
-        <DialogFooter className="gap-2 mt-4">
+        <DialogFooter className="flex-row items-center gap-2 p-4 border-t-4 border-black bg-gray-50">
           <Button
-            className="bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            className="flex-1 bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             onClick={() => setOpen(false)}
             data-testid="manual-dialog-cancel"
           >
@@ -173,10 +173,10 @@ export const ManualDialog = ({ onCreated }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            className="flex-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="manual-dialog-submit"
           >
-            Anleitung speichern
+            Speichern
           </Button>
         </DialogFooter>
       </DialogContent>

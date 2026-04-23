@@ -44,10 +44,10 @@ export const StayEditDialog = ({ stay, onSave }) => {
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="max-w-lg bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
+        className="max-w-lg max-h-[95vh] overflow-hidden flex flex-col bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800 p-0"
         data-testid="stay-edit-dialog"
       >
-        <DialogHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black p-4 -m-6 mb-0">
+        <DialogHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black p-4">
           <DialogTitle 
             className="text-white text-2xl"
             style={{ fontFamily: "'Bangers', cursive" }}
@@ -56,8 +56,8 @@ export const StayEditDialog = ({ stay, onSave }) => {
             Aufenthalt bearbeiten
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-8">
-          <div className="space-y-2">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div className="space-y-2 pt-2">
             <label
               className="text-sm font-bold text-gray-800"
               data-testid="stay-edit-name-label"
@@ -159,13 +159,13 @@ export const StayEditDialog = ({ stay, onSave }) => {
             </div>
           </div>
         </div>
-        <DialogFooter className="mt-4">
+        <DialogFooter className="p-4 border-t-4 border-black bg-gray-50">
           <Button
             onClick={() => {
               onSave(form);
               setOpen(false);
             }}
-            className="bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            className="w-full bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="stay-edit-save"
           >
             Änderungen speichern
