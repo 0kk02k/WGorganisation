@@ -44,7 +44,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
         <DialogHeader>
           <DialogTitle data-testid="stay-edit-title">Aufenthalt bearbeiten</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto pr-2">
           <div className="space-y-2">
             <label
               className="text-sm font-medium text-stone-700"
