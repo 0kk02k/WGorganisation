@@ -108,21 +108,22 @@ exports.handler = async (event) => {
         break;
       }
       case 'berlin-links': {
+        const blHandlers = handlers['berlin-links'];
         if (method === 'GET' && segments.length === 0) {
-          return { statusCode: 200, body: JSON.stringify(await handlers.berlinLinks.list()) };
+          return { statusCode: 200, body: JSON.stringify(await blHandlers.list()) };
         }
         if (method === 'POST' && segments.length === 0) {
           const data = JSON.parse(event.body);
-          const result = await handlers.berlinLinks.create(data);
+          const result = await blHandlers.create(data);
           return { statusCode: 200, body: JSON.stringify(result) };
         }
         if (method === 'PUT' && segments.length === 1) {
           const data = JSON.parse(event.body);
-          const result = await handlers.berlinLinks.update(segments[0], data);
+          const result = await blHandlers.update(segments[0], data);
           return { statusCode: 200, body: JSON.stringify(result) };
         }
         if (method === 'DELETE' && segments.length === 1) {
-          const result = await handlers.berlinLinks.deleteLink(segments[0]);
+          const result = await blHandlers.deleteLink(segments[0]);
           return { statusCode: 200, body: JSON.stringify(result) };
         }
         break;
