@@ -18,6 +18,8 @@ import {
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import ChatMessage from "@/components/ChatMessage";
+import { motion, AnimatePresence } from "framer-motion";
+import { staggerContainer, staggerItem, fadeInUp, springHover, chatMessage, flipDigit } from "@/lib/motion";
 
 const INITIAL_VISIBLE_COUNT = 7;
 const EXPANDED_VISIBLE_COUNT = 15;
@@ -254,24 +256,30 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen relative" data-testid="dashboard-page">
-      <div className="relative z-10 space-y-6" data-testid="dashboard-bento-grid">
+      <motion.div
+        className="relative z-10 space-y-6"
+        data-testid="dashboard-bento-grid"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="relative inline-block">
-          <h1 
+        <motion.div variants={fadeInUp} className="relative inline-block">
+          <h1
             className="text-4xl tracking-wide text-gray-800"
             style={{ fontFamily: "'Bangers', cursive" }}
           >
-            Übersicht
+            Ubersicht
           </h1>
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
-        </div>
-
+        </motion.div>
         {/* Top Row: Stays + Plants */}
-        <section className="grid gap-6 lg:grid-cols-2">
+        <motion.section variants={staggerItem} className="grid gap-6 lg:grid-cols-2">
           {/* Left Column: Active Stays + Upcoming Check-ins stacked */}
           <div className="flex flex-col gap-6">
             {/* Active Stays */}
-            <Card 
+            <motion.div variants={springHover}>
+            <Card
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-active-stays"
             >
@@ -326,9 +334,11 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+            </motion.div>
 
             {/* Upcoming Check-ins */}
-            <Card 
+            <motion.div variants={springHover}>
+            <Card
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-upcoming-card"
             >
@@ -382,10 +392,12 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+            </motion.div>
           </div>
 
-          {/* Right Column: Plants Card - Same height as left column */}
-          <Card 
+          {/* Right Column: Plants Card */}
+          <motion.div variants={springHover}>
+          <Card
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
             data-testid="dashboard-plants-card"
           >
@@ -414,16 +426,23 @@ export default function Dashboard() {
                   <div className="flex justify-center items-center gap-1">
                     {/* Days */}
                     <div className="flex flex-col items-center">
-                      <div 
-                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                      <div
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black overflow-hidden"
                         style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
                       >
-                        <span 
-                          className="text-3xl font-bold text-emerald-400"
-                          style={{ fontFamily: "'Bangers', cursive" }}
-                        >
-                          {String(wateredTime.days).padStart(2, '0')}
-                        </span>
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            key={`days-${wateredTime.days}`}
+                            className="text-3xl font-bold text-emerald-400"
+                            style={{ fontFamily: "'Bangers', cursive" }}
+                            variants={flipDigit}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                          >
+                            {String(wateredTime.days).padStart(2, '0')}
+                          </motion.span>
+                        </AnimatePresence>
                       </div>
                       <span 
                         className="text-xs font-bold text-gray-600 mt-1"
@@ -443,16 +462,23 @@ export default function Dashboard() {
                     
                     {/* Hours */}
                     <div className="flex flex-col items-center">
-                      <div 
-                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                      <div
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black overflow-hidden"
                         style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
                       >
-                        <span 
-                          className="text-3xl font-bold text-teal-400"
-                          style={{ fontFamily: "'Bangers', cursive" }}
-                        >
-                          {String(wateredTime.hours).padStart(2, '0')}
-                        </span>
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            key={`hours-${wateredTime.hours}`}
+                            className="text-3xl font-bold text-teal-400"
+                            style={{ fontFamily: "'Bangers', cursive" }}
+                            variants={flipDigit}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                          >
+                            {String(wateredTime.hours).padStart(2, '0')}
+                          </motion.span>
+                        </AnimatePresence>
                       </div>
                       <span 
                         className="text-xs font-bold text-gray-600 mt-1"
@@ -472,16 +498,23 @@ export default function Dashboard() {
                     
                     {/* Minutes */}
                     <div className="flex flex-col items-center">
-                      <div 
-                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black"
+                      <div
+                        className="w-20 h-14 bg-black flex items-center justify-center border-4 border-black overflow-hidden"
                         style={{ boxShadow: "4px 4px 0px 0px rgba(16, 185, 129, 1)" }}
                       >
-                        <span 
-                          className="text-3xl font-bold text-cyan-400"
-                          style={{ fontFamily: "'Bangers', cursive" }}
-                        >
-                          {String(wateredTime.minutes).padStart(2, '0')}
-                        </span>
+                        <AnimatePresence mode="popLayout">
+                          <motion.span
+                            key={`min-${wateredTime.minutes}`}
+                            className="text-3xl font-bold text-cyan-400"
+                            style={{ fontFamily: "'Bangers', cursive" }}
+                            variants={flipDigit}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                          >
+                            {String(wateredTime.minutes).padStart(2, '0')}
+                          </motion.span>
+                        </AnimatePresence>
                       </div>
                       <span 
                         className="text-xs font-bold text-gray-600 mt-1"
@@ -514,10 +547,12 @@ export default function Dashboard() {
               </Button>
             </CardContent>
           </Card>
-        </section>
+          </motion.div>
+        </motion.section>
 
-        {/* Chat Card - Full width below */}
-        <Card 
+        {/* Chat Card */}
+        <motion.div variants={staggerItem}>
+        <Card
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="dashboard-chat-card"
         >
@@ -687,8 +722,8 @@ export default function Dashboard() {
                 </div>
               </div>
             </CardContent>
-          </Card>
-      </div>
-    </div>
-  );
+        </Card>
+        </motion.div>
+      </motion.div>
+    </div>);
 }

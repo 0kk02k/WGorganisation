@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { manualsApi } from "@/lib/api";
 import { ManualDialog } from "@/components/manuals/ManualDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem, fadeInUp, scaleIn } from "@/lib/motion";
 
 export default function ManualsPage() {
   const [manuals, setManuals] = useState([]);
@@ -21,9 +23,14 @@ export default function ManualsPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="manuals-page">
-      <div className="relative z-10 space-y-6">
+      <motion.div
+        className="relative z-10 space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
             <h1 
               className="text-4xl tracking-wide text-gray-800"
@@ -35,10 +42,16 @@ export default function ManualsPage() {
             <div className="h-2 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 mt-2" />
           </div>
           <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
-        </div>
+        </motion.div>
 
         {/* Manuals Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" data-testid="manuals-grid">
+        <motion.div
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          data-testid="manuals-grid"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+        >
           {manuals.length === 0 ? (
             <Card 
               className="border-4 border-dashed border-gray-300 rounded-none bg-white col-span-full"
@@ -60,9 +73,12 @@ export default function ManualsPage() {
                 manual.image_url ||
                 "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
               return (
+                <motion.div
+                  key={manual.id}
+                  variants={scaleIn}
+                >
                 <Link
                   to={`/anleitungen/${manual.id}`}
-                  key={manual.id}
                   className="group block"
                   data-testid={`manual-card-${manual.id}`}
                 >
@@ -88,11 +104,12 @@ export default function ManualsPage() {
                     </CardHeader>
                   </Card>
                 </Link>
+                </motion.div>
               );
             })
           )}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

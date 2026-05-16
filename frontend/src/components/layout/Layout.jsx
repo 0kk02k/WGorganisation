@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { pageTransition, slideInRight, overlayFade } from "@/lib/motion";
 
 const navItems = [
   {
@@ -181,46 +183,60 @@ export const Layout = ({ children }) => {
       </div>
 
       {/* Mobile Navigation Overlay */}
-      {mobileNavOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 min-[755px]:hidden"
-          onClick={() => setMobileNavOpen(false)}
-          data-testid="mobile-nav-overlay"
-        />
-      )}
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <motion.div
+            key="mobile-overlay"
+            className="fixed inset-0 z-40 bg-black/50 min-[755px]:hidden"
+            onClick={() => setMobileNavOpen(false)}
+            data-testid="mobile-nav-overlay"
+            variants={overlayFade}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Mobile Navigation Panel */}
-      <div
-        className={`fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 transition-transform duration-300 min-[755px]:hidden ${
-          mobileNavOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-        data-testid="mobile-nav-panel"
-      >
-        <div className="flex flex-col gap-3" data-testid="mobile-nav-links">
-          {navItems.map((item) => (
-            <NavLink
-              key={`${item.to}-drawer`}
-              to={item.to}
-              onClick={() => setMobileNavOpen(false)}
-              className={({ isActive }) => {
-                const calendarActive =
-                  item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                return cn(
-                  "flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
-                  isActive || calendarActive
-                    ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
-                    : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                );
-              }}
-              data-testid={`mobile-${item.testId}`}
-              style={{ fontFamily: "'Nunito', sans-serif" }}
-            >
-              <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
-        </div>
-      </div>
+      <AnimatePresence>
+        {mobileNavOpen && (
+          <motion.div
+            key="mobile-nav-panel"
+            className="fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
+            data-testid="mobile-nav-panel"
+            variants={slideInRight}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <div className="flex flex-col gap-3" data-testid="mobile-nav-links">
+              {navItems.map((item) => (
+                <NavLink
+                  key={`${item.to}-drawer`}
+                  to={item.to}
+                  onClick={() => setMobileNavOpen(false)}
+                  className={({ isActive }) => {
+                    const calendarActive =
+                      item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
+                    return cn(
+                      "flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
+                      isActive || calendarActive
+                        ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+                        : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    );
+                  }}
+                  data-testid={`mobile-${item.testId}`}
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.label}</span>
+                </NavLink>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main
         className={`mx-auto w-full max-w-6xl px-2 pb-20 pt-20 transition-all duration-300 min-[755px]:px-4 min-[755px]:pb-28 md:px-8 ${
@@ -228,7 +244,17 @@ export const Layout = ({ children }) => {
         }`}
         data-testid="main-content"
       >
-        {children}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            variants={pageTransition}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
     </div>
   );

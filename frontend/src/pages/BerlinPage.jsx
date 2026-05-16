@@ -14,6 +14,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem, fadeInUp } from "@/lib/motion";
 
 const parseTags = (value) =>
   value
@@ -248,9 +250,14 @@ export default function BerlinPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="berlin-page">
-      <div className="relative z-10 space-y-6">
+      <motion.div
+        className="relative z-10 space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
             <h1 
               className="text-4xl tracking-wide text-gray-800"
@@ -268,7 +275,7 @@ export default function BerlinPage() {
           >
             <Plus className="h-6 w-6" />
           </Button>
-        </div>
+        </motion.div>
 
         {/* Modal */}
         <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
@@ -493,7 +500,7 @@ export default function BerlinPage() {
 
         {/* Tag Filters */}
         {availableTags.length > 0 && (
-          <div className="flex flex-wrap gap-2" data-testid="berlin-tags">
+          <motion.div variants={fadeInUp} className="flex flex-wrap gap-2" data-testid="berlin-tags">
             <Button
               variant={selectedTag ? "outline" : "default"}
               onClick={() => setSelectedTag(null)}
@@ -517,11 +524,11 @@ export default function BerlinPage() {
                 {tag}
               </Button>
             ))}
-          </div>
+          </motion.div>
         )}
 
         {/* Content Grid */}
-        <div className="grid gap-6 lg:grid-cols-2 items-start" data-testid="berlin-columns">
+        <motion.div variants={staggerItem} className="grid gap-6 lg:grid-cols-2 items-start" data-testid="berlin-columns">
           {/* Events Section */}
           <Card 
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
@@ -679,8 +686,8 @@ export default function BerlinPage() {
               )}
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

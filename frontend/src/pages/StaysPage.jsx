@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { staysApi } from "@/lib/api";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { StaysList } from "@/components/stays/StaysList";
+import { motion } from "framer-motion";
+import { staggerContainer, fadeInUp } from "@/lib/motion";
 
 export default function StaysPage() {
   const [stays, setStays] = useState([]);
@@ -20,9 +22,14 @@ export default function StaysPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="stays-page">
-      <div className="relative z-10 space-y-6">
+      <motion.div
+        className="relative z-10 space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
             <h1 
               className="text-4xl tracking-wide text-gray-800"
@@ -38,10 +45,10 @@ export default function StaysPage() {
             triggerTestId="stays-new-button"
             onCreated={(stay) => setStays((prev) => [stay, ...prev])}
           />
-        </div>
+        </motion.div>
 
         <StaysList stays={stays} testIdPrefix="stays" />
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -23,6 +23,8 @@ import {
   isToday,
 } from "date-fns";
 import { de } from "date-fns/locale";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem, fadeInUp, calendarCellHover } from "@/lib/motion";
 
 export default function CalendarPage() {
   const { settings } = useSettings();
@@ -76,11 +78,16 @@ export default function CalendarPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="calendar-page">
-      <div className="relative z-10 space-y-6">
+      <motion.div
+        className="relative z-10 space-y-6"
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
-            <h1 
+            <h1
               className="text-4xl tracking-wide text-gray-800"
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="calendar-title"
@@ -94,9 +101,10 @@ export default function CalendarPage() {
             triggerTestId="calendar-new-stay-button"
             onCreated={(stay) => setStays((prev) => [stay, ...prev])}
           />
-        </div>
+        </motion.div>
 
         {/* Calendar Grid Card */}
+        <motion.div variants={staggerItem}>
         <Card 
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-grid-card"
@@ -159,19 +167,20 @@ export default function CalendarPage() {
                 const hasEvents = eventsForDate(day).length > 0;
 
                 return (
-                  <button
+                  <motion.button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
                     className={`relative border-4 border-black p-2 text-left text-sm transition-all duration-150 min-h-[60px] ${
                       isSameDay(day, selectedDate)
                         ? "bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                        : "bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1"
+                        : "bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                     } ${!inMonth ? "opacity-40" : "opacity-100"} ${
                       isCurrentDay && !isSameDay(day, selectedDate)
                         ? "ring-4 ring-yellow-400"
                         : ""
                     }`}
                     data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
+                    {...calendarCellHover}
                   >
                     {/* Room indicators */}
                     {hasRoom1 && (
@@ -203,14 +212,16 @@ export default function CalendarPage() {
                         />
                       )}
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Selected Date Card */}
+        <motion.div variants={staggerItem}>
         <Card 
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-selected-card"
@@ -292,9 +303,10 @@ export default function CalendarPage() {
             )}
           </CardContent>
         </Card>
+        </motion.div>
 
         {/* Upcoming & Current Stays */}
-        <div className="space-y-4" data-testid="calendar-stays-section">
+        <motion.div variants={staggerItem} className="space-y-4" data-testid="calendar-stays-section">
           <div className="relative inline-block">
             <h2 
               className="text-3xl tracking-wide text-gray-800"
@@ -319,8 +331,8 @@ export default function CalendarPage() {
             testIdPrefix="calendar-stays"
             emptyLabel="Keine kommenden Aufenthalte."
           />
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

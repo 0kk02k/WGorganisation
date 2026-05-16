@@ -4,6 +4,8 @@ import { MessageCircle, Pencil } from "lucide-react";
 import ChatReplyList from "@/components/ChatReplyList";
 import ChatEditForm from "@/components/ChatEditForm";
 import ChatReplyForm from "@/components/ChatReplyForm";
+import { motion } from "framer-motion";
+import { chatMessage } from "@/lib/motion";
 
 export default function ChatMessage({
   message,
@@ -24,9 +26,14 @@ export default function ChatMessage({
   onDeleteReply,
 }) {
   return (
-    <div
+    <motion.div
       className="border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4"
       data-testid={`chat-message-${message.id}`}
+      variants={chatMessage}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      layout
     >
       <div className="flex items-start justify-between gap-3">
         <p 
@@ -106,6 +113,6 @@ export default function ChatMessage({
           onDeleteReply={onDeleteReply}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

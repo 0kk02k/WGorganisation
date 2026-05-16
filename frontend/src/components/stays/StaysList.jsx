@@ -6,6 +6,8 @@ import { useSettings } from "@/context/SettingsContext";
 import { Calendar, CheckCircle2, Circle } from "lucide-react";
 import { format, parseISO, isFuture, isWithinInterval } from "date-fns";
 import { de } from "date-fns/locale";
+import { motion } from "framer-motion";
+import { staggerContainer, staggerItem, springHover } from "@/lib/motion";
 
 export const StaysList = ({
   stays,
@@ -53,7 +55,12 @@ export const StaysList = ({
   };
 
   return (
-    <div className="space-y-4">
+    <motion.div
+      className="space-y-4"
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
       {stays.map((stay) => {
         const openIn = stay.checklist_in?.filter((item) => !item.done).length || 0;
         const openOut = stay.checklist_out?.filter((item) => !item.done).length || 0;
@@ -61,9 +68,9 @@ export const StaysList = ({
         const roomColor = getRoomColor(stay.room);
 
         return (
+          <motion.div key={stay.id} variants={staggerItem} {...springHover}>
           <Link
             to={`/aufenthalte/${stay.id}`}
-            key={stay.id}
             className="group block"
             data-testid={`${testIdPrefix}-card-${stay.id}`}
           >
@@ -152,8 +159,9 @@ export const StaysList = ({
               </CardContent>
             </Card>
           </Link>
+          </motion.div>
         );
       })}
-    </div>
+    </motion.div>
   );
 };
