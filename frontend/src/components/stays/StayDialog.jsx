@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/select";
 import { CalendarDays, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { staysApi } from "@/lib/appwrite";
+import { staysApi } from "@/lib/api";
 import {
   DEFAULT_CHECKIN_TEMPLATE,
   DEFAULT_CHECKOUT_TEMPLATE,

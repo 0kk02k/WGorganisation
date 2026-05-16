@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { settingsApi } from "@/lib/appwrite";
+import { settingsApi } from "@/lib/api";
 import {
   DEFAULT_CHECKIN_TEMPLATE,
   DEFAULT_CHECKOUT_TEMPLATE,

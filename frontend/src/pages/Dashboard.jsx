@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, useRef } from "react";
-import { staysApi, messagesApi } from "@/lib/appwrite";
+import { staysApi, messagesApi } from "@/lib/api";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

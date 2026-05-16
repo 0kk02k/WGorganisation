@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { manualsApi } from "@/lib/appwrite";
+import { manualsApi } from "@/lib/api";
 import { Plus, Camera } from "lucide-react";
 
 export const ManualDialog = ({ onCreated }) => {

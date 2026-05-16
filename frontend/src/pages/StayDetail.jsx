@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { staysApi } from "@/lib/appwrite";
+import { staysApi } from "@/lib/api";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

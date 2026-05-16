@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { eventsApi, berlinLinksApi } from "@/lib/appwrite";
+import { eventsApi, berlinLinksApi } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";

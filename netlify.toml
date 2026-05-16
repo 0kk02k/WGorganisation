@@ -1,23 +1,73 @@
 [build]
 command = "cd frontend && yarn install && yarn build"
 publish = "frontend/build"
+functions = "netlify/functions"
 
 [build.environment]
 NODE_VERSION = "20"
 ENABLE_HEALTH_CHECK = "false"
 
-# SPA-Routing für React Router
+# API-Routes zu Netlify Functions
+[[redirects]]
+from = "/api/stays/*"
+to = "/.netlify/functions/api-stays/:splat"
+status = 200
+
+[[redirects]]
+from = "/api/stays"
+to = "/.netlify/functions/api-stays"
+status = 200
+
+[[redirects]]
+from = "/api/manuals/*"
+to = "/.netlify/functions/api-manuals/:splat"
+status = 200
+
+[[redirects]]
+from = "/api/manuals"
+to = "/.netlify/functions/api-manuals"
+status = 200
+
+[[redirects]]
+from = "/api/messages/*"
+to = "/.netlify/functions/api-messages/:splat"
+status = 200
+
+[[redirects]]
+from = "/api/messages"
+to = "/.netlify/functions/api-messages"
+status = 200
+
+[[redirects]]
+from = "/api/events/*"
+to = "/.netlify/functions/api-events/:splat"
+status = 200
+
+[[redirects]]
+from = "/api/events"
+to = "/.netlify/functions/api-events"
+status = 200
+
+[[redirects]]
+from = "/api/berlin-links/*"
+to = "/.netlify/functions/api-berlin-links/:splat"
+status = 200
+
+[[redirects]]
+from = "/api/berlin-links"
+to = "/.netlify/functions/api-berlin-links"
+status = 200
+
+[[redirects]]
+from = "/api/settings"
+to = "/.netlify/functions/api-settings"
+status = 200
+
+# SPA-Routing für React Router (muss letzter Redirect sein!)
 [[redirects]]
 from = "/*"
 to = "/index.html"
 status = 200
-
-# API-Weiterleitung (Backend muss separat gehostet werden)
-# Für lokale Entwicklung oder separates Backend:
-# [[redirects]]
-#   from = "/api/*"
-#   to = "https://dein-backend.herokuapp.com/api/:splat"
-#   status = 200
 
 [context.production.environment]
 NODE_ENV = "production"

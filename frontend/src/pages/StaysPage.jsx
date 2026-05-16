@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { staysApi } from "@/lib/appwrite";
+import { staysApi } from "@/lib/api";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { StaysList } from "@/components/stays/StaysList";
 

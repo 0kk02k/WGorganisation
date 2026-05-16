@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { staysApi, eventsApi } from "@/lib/appwrite";
+import { staysApi, eventsApi } from "@/lib/api";
 import { DEFAULT_ROOMS } from "@/lib/constants";
 import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
