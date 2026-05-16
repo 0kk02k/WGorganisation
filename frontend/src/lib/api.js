@@ -1,9 +1,9 @@
 import axios from "axios";
 
-// API über Netlify Functions (gleiche Domain, kein CORS-Problem)
+// API über Netlify Functions (direkter Aufruf, kein Redirect nötig)
 const API_BASE = process.env.REACT_APP_BACKEND_URL 
   ? `${process.env.REACT_APP_BACKEND_URL}/api`
-  : "/api";
+  : "/.netlify/functions/api";
 
 export const api = axios.create({
   baseURL: API_BASE,
