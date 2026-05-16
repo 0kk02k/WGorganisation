@@ -1,5 +1,5 @@
 [build]
-command = "cd frontend && yarn install && yarn build"
+command = "cd netlify/functions && npm install && cd ../../frontend && yarn install && yarn build"
 publish = "frontend/build"
 functions = "netlify/functions"
 

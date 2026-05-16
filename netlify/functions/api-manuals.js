@@ -1,4 +1,4 @@
-const { handlers } = require('./turso-helpers');
+const { handlers } = require('./neon-helpers');
 
 exports.handler = async (event) => {
   const method = event.httpMethod;
