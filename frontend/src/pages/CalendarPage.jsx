@@ -293,7 +293,7 @@ export default function CalendarPage() {
           </CardContent>
         </Card>
 
-        {/* Stays List Section */}
+        {/* Upcoming & Current Stays */}
         <div className="space-y-4" data-testid="calendar-stays-section">
           <div className="relative inline-block">
             <h2 
@@ -301,14 +301,23 @@ export default function CalendarPage() {
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="calendar-stays-title"
             >
-              Aufenthalte
+              Kommende Aufenthalte
             </h2>
             <div className="h-2 bg-gradient-to-r from-pink-500 to-rose-500 mt-2" />
           </div>
           <StaysList
-            stays={stays}
+            stays={useMemo(() => {
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              return stays
+                .filter((stay) => {
+                  const end = parseISO(stay.end_date);
+                  return end >= today;
+                })
+                .sort((a, b) => parseISO(a.start_date) - parseISO(b.start_date));
+            }, [stays])}
             testIdPrefix="calendar-stays"
-            emptyLabel="Keine Aufenthalte geplant."
+            emptyLabel="Keine kommenden Aufenthalte."
           />
         </div>
       </div>
