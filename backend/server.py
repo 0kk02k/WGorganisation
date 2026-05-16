@@ -1,9 +1,7 @@
 from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from appwrite.client import Client
-from appwrite.services.databases import Databases
-from appwrite.exception import AppwriteException
+from libsql_experimental import connect
 import os
 import logging
 from pathlib import Path
@@ -17,22 +15,11 @@ import json
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-# Appwrite client setup
-client = Client()
-client.set_endpoint(os.environ["APPWRITE_ENDPOINT"])
-client.set_project(os.environ["APPWRITE_PROJECT_ID"])
-client.set_key(os.environ["APPWRITE_API_KEY"])
+# Turso database connection
+TURSO_URL = os.environ["TURSO_DATABASE_URL"]
+TURSO_TOKEN = os.environ["TURSO_AUTH_TOKEN"]
 
-db_service = Databases(client)
-DATABASE_ID = os.environ["APPWRITE_DATABASE_ID"]
-
-# Collection IDs
-COLLECTION_STAYS = "stays"
-COLLECTION_MANUALS = "manuals"
-COLLECTION_MESSAGES = "messages"
-COLLECTION_EVENTS = "events"
-COLLECTION_BERLIN_LINKS = "berlin_links"
-COLLECTION_SETTINGS = "settings"
+conn = connect(TURSO_URL, auth_token=TURSO_TOKEN)
 
 # Create the main app without a prefix
 app = FastAPI()
@@ -42,7 +29,7 @@ api_router = APIRouter(prefix="/api")
 
 
 def now_iso() -> str:
-    """Return ISO timestamp without microseconds (max 30 chars for Appwrite)"""
+    """Return ISO timestamp without microseconds"""
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
@@ -247,143 +234,78 @@ class SettingsUpdate(BaseModel):
     plantsWateredAt: Optional[str] = None
 
 
-# Helper functions for Appwrite
-def doc_to_stay(doc: dict) -> dict:
-    """Convert Appwrite document to Stay dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "room": doc.get("room"),
-        "occupant_name": doc.get("occupant_name"),
-        "start_date": doc.get("start_date"),
-        "end_date": doc.get("end_date"),
-        "notes": doc.get("notes", ""),
-        "checklist_in": json.loads(doc.get("checklist_in", "[]")),
-        "checklist_out": json.loads(doc.get("checklist_out", "[]")),
-        "created_at": doc.get("created_at"),
-        "updated_at": doc.get("updated_at"),
-    }
-
-
-def doc_to_manual(doc: dict) -> dict:
-    """Convert Appwrite document to Manual dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "title": doc.get("title"),
-        "description": doc.get("description"),
-        "steps": doc.get("steps"),
-        "image_url": doc.get("image_url"),
-        "image_data": doc.get("image_data"),
-        "created_at": doc.get("created_at"),
-        "updated_at": doc.get("updated_at"),
-    }
-
-
-def doc_to_message(doc: dict) -> dict:
-    """Convert Appwrite document to Message dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "name": doc.get("name"),
-        "content": doc.get("content"),
-        "created_at": doc.get("created_at"),
-        "replies": json.loads(doc.get("replies", "[]")),
-    }
-
-
-def doc_to_event(doc: dict) -> dict:
-    """Convert Appwrite document to Event dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "title": doc.get("title"),
-        "date": doc.get("date"),
-        "location": doc.get("location"),
-        "description": doc.get("description"),
-        "hashtags": json.loads(doc.get("hashtags", "[]")),
-        "created_at": doc.get("created_at"),
-    }
-
-
-def doc_to_berlin_link(doc: dict) -> dict:
-    """Convert Appwrite document to BerlinLink dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "url": doc.get("url"),
-        "description": doc.get("description"),
-        "hashtags": json.loads(doc.get("hashtags", "[]")),
-        "created_at": doc.get("created_at"),
-    }
-
-
-def doc_to_settings(doc: dict) -> dict:
-    """Convert Appwrite document to Settings dict"""
-    return {
-        "id": doc.get("id", doc.get("$id")),
-        "rooms": json.loads(doc.get("rooms", json.dumps(DEFAULT_ROOMS))),
-        "checkin_template": json.loads(doc.get("checkin_template", json.dumps(DEFAULT_CHECKIN_TEMPLATE))),
-        "checkout_template": json.loads(doc.get("checkout_template", json.dumps(DEFAULT_CHECKOUT_TEMPLATE))),
-        "plantsWateredAt": doc.get("plantsWateredAt"),
-        "updated_at": doc.get("updated_at"),
-    }
+# Helper: convert a DB row (tuple) to a dict using column names
+def row_to_dict(cursor, row) -> dict:
+    """Convert a database row to a dictionary using cursor column descriptions."""
+    columns = [desc[0] for desc in cursor.description]
+    return dict(zip(columns, row))
 
 
 @api_router.get("/")
 async def root():
-    return {"message": "WG Check-in API (Appwrite)"}
+    return {"message": "WG Check-in API (Turso)"}
 
 
 # ==================== STAYS ====================
 
 @api_router.get("/stays", response_model=List[Stay])
 async def list_stays():
-    try:
-        result = db_service.list_documents(DATABASE_ID, COLLECTION_STAYS)
-        stays = [doc_to_stay(doc) for doc in result.get("documents", [])]
-        return stays
-    except AppwriteException as e:
-        if "Collection not found" in str(e):
-            return []
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM stays")
+    rows = cursor.fetchall()
+    stays = []
+    for row in rows:
+        d = row_to_dict(cursor, row)
+        d["checklist_in"] = json.loads(d.get("checklist_in", "[]"))
+        d["checklist_out"] = json.loads(d.get("checklist_out", "[]"))
+        stays.append(d)
+    return stays
 
 
 @api_router.post("/stays", response_model=Stay)
 async def create_stay(input: StayCreate):
     stay = Stay(**input.model_dump())
-    try:
-        db_service.create_document(
-            DATABASE_ID,
-            COLLECTION_STAYS,
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO stays
+           (id, room, occupant_name, start_date, end_date, notes,
+            checklist_in, checklist_out, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
             stay.id,
-            {
-                "id": stay.id,
-                "room": stay.room,
-                "occupant_name": stay.occupant_name,
-                "start_date": stay.start_date,
-                "end_date": stay.end_date,
-                "notes": stay.notes,
-                "checklist_in": json.dumps([c.model_dump() for c in stay.checklist_in]),
-                "checklist_out": json.dumps([c.model_dump() for c in stay.checklist_out]),
-                "created_at": stay.created_at,
-                "updated_at": stay.updated_at,
-            }
-        )
-        return stay
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+            stay.room,
+            stay.occupant_name,
+            stay.start_date,
+            stay.end_date,
+            stay.notes,
+            json.dumps([c.model_dump() for c in stay.checklist_in]),
+            json.dumps([c.model_dump() for c in stay.checklist_out]),
+            stay.created_at,
+            stay.updated_at,
+        ),
+    )
+    conn.commit()
+    return stay
 
 
 @api_router.get("/stays/{stay_id}", response_model=Stay)
 async def get_stay(stay_id: str):
-    try:
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_STAYS, stay_id)
-        return doc_to_stay(doc)
-    except AppwriteException as e:
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM stays WHERE id = ?", (stay_id,))
+    row = cursor.fetchone()
+    if not row:
         raise HTTPException(status_code=404, detail="Aufenthalt nicht gefunden")
+    d = row_to_dict(cursor, row)
+    d["checklist_in"] = json.loads(d.get("checklist_in", "[]"))
+    d["checklist_out"] = json.loads(d.get("checklist_out", "[]"))
+    return d
 
 
 @api_router.put("/stays/{stay_id}", response_model=Stay)
 async def update_stay(stay_id: str, input: StayUpdate):
-    try:
-        existing = db_service.get_document(DATABASE_ID, COLLECTION_STAYS, stay_id)
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM stays WHERE id = ?", (stay_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Aufenthalt nicht gefunden")
 
     update_data = input.model_dump(exclude_unset=True)
@@ -392,137 +314,147 @@ async def update_stay(stay_id: str, input: StayUpdate):
 
     # Convert checklist items to JSON
     if "checklist_in" in update_data:
-        update_data["checklist_in"] = json.dumps([c.model_dump() if hasattr(c, 'model_dump') else c for c in update_data["checklist_in"]])
+        update_data["checklist_in"] = json.dumps(
+            [c.model_dump() if hasattr(c, "model_dump") else c for c in update_data["checklist_in"]]
+        )
     if "checklist_out" in update_data:
-        update_data["checklist_out"] = json.dumps([c.model_dump() if hasattr(c, 'model_dump') else c for c in update_data["checklist_out"]])
+        update_data["checklist_out"] = json.dumps(
+            [c.model_dump() if hasattr(c, "model_dump") else c for c in update_data["checklist_out"]]
+        )
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_STAYS, stay_id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_STAYS, stay_id)
-        return doc_to_stay(doc)
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (stay_id,)
+
+    cursor.execute(
+        f"UPDATE stays SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM stays WHERE id = ?", (stay_id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["checklist_in"] = json.loads(d.get("checklist_in", "[]"))
+    d["checklist_out"] = json.loads(d.get("checklist_out", "[]"))
+    return d
 
 
 @api_router.delete("/stays/{stay_id}")
 async def delete_stay(stay_id: str):
-    try:
-        db_service.delete_document(DATABASE_ID, COLLECTION_STAYS, stay_id)
-        return {"ok": True}
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM stays WHERE id = ?", (stay_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Aufenthalt nicht gefunden")
+    cursor.execute("DELETE FROM stays WHERE id = ?", (stay_id,))
+    conn.commit()
+    return {"ok": True}
 
 
 # ==================== MANUALS ====================
 
 @api_router.get("/manuals", response_model=List[Manual])
 async def list_manuals():
-    try:
-        result = db_service.list_documents(DATABASE_ID, COLLECTION_MANUALS)
-        manuals = [doc_to_manual(doc) for doc in result.get("documents", [])]
-        return manuals
-    except AppwriteException as e:
-        if "Collection not found" in str(e):
-            return []
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM manuals")
+    rows = cursor.fetchall()
+    return [row_to_dict(cursor, row) for row in rows]
 
 
 @api_router.post("/manuals", response_model=Manual)
 async def create_manual(input: ManualCreate):
     manual = Manual(**input.model_dump())
-    try:
-        db_service.create_document(
-            DATABASE_ID,
-            COLLECTION_MANUALS,
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO manuals
+           (id, title, description, steps, image_url, image_data, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+        (
             manual.id,
-            {
-                "id": manual.id,
-                "title": manual.title,
-                "description": manual.description,
-                "steps": manual.steps,
-                "image_url": manual.image_url,
-                "image_data": manual.image_data,
-                "created_at": manual.created_at,
-                "updated_at": manual.updated_at,
-            }
-        )
-        return manual
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+            manual.title,
+            manual.description,
+            manual.steps,
+            manual.image_url,
+            manual.image_data,
+            manual.created_at,
+            manual.updated_at,
+        ),
+    )
+    conn.commit()
+    return manual
 
 
 @api_router.get("/manuals/{manual_id}", response_model=Manual)
 async def get_manual(manual_id: str):
-    try:
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_MANUALS, manual_id)
-        return doc_to_manual(doc)
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM manuals WHERE id = ?", (manual_id,))
+    row = cursor.fetchone()
+    if not row:
         raise HTTPException(status_code=404, detail="Anleitung nicht gefunden")
+    return row_to_dict(cursor, row)
 
 
 @api_router.put("/manuals/{manual_id}", response_model=Manual)
 async def update_manual(manual_id: str, input: ManualUpdate):
-    try:
-        existing = db_service.get_document(DATABASE_ID, COLLECTION_MANUALS, manual_id)
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM manuals WHERE id = ?", (manual_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Anleitung nicht gefunden")
 
     update_data = input.model_dump(exclude_unset=True)
     update_data = {key: value for key, value in update_data.items() if value is not None}
     update_data["updated_at"] = now_iso()
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_MANUALS, manual_id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_MANUALS, manual_id)
-        return doc_to_manual(doc)
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (manual_id,)
+
+    cursor.execute(
+        f"UPDATE manuals SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM manuals WHERE id = ?", (manual_id,))
+    row = cursor.fetchone()
+    return row_to_dict(cursor, row)
 
 
 @api_router.delete("/manuals/{manual_id}")
 async def delete_manual(manual_id: str):
-    try:
-        db_service.delete_document(DATABASE_ID, COLLECTION_MANUALS, manual_id)
-        return {"ok": True}
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM manuals WHERE id = ?", (manual_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Anleitung nicht gefunden")
+    cursor.execute("DELETE FROM manuals WHERE id = ?", (manual_id,))
+    conn.commit()
+    return {"ok": True}
 
 
 # ==================== MESSAGES ====================
 
 @api_router.get("/messages", response_model=List[Message])
 async def list_messages():
-    try:
-        result = db_service.list_documents(DATABASE_ID, COLLECTION_MESSAGES)
-        messages = [doc_to_message(doc) for doc in result.get("documents", [])]
-        # Sort by created_at descending
-        messages.sort(key=lambda x: x.get("created_at", ""), reverse=True)
-        return messages
-    except AppwriteException as e:
-        if "Collection not found" in str(e):
-            return []
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM messages ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    messages = []
+    for row in rows:
+        d = row_to_dict(cursor, row)
+        d["replies"] = json.loads(d.get("replies", "[]"))
+        messages.append(d)
+    return messages
 
 
 @api_router.post("/messages", response_model=Message)
 async def create_message(payload: MessageBase):
     message = Message(**payload.model_dump())
-    try:
-        db_service.create_document(
-            DATABASE_ID,
-            COLLECTION_MESSAGES,
-            message.id,
-            {
-                "id": message.id,
-                "name": message.name,
-                "content": message.content,
-                "created_at": message.created_at,
-                "replies": json.dumps([]),
-            }
-        )
-        return message
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO messages (id, name, content, created_at, replies)
+           VALUES (?, ?, ?, ?, ?)""",
+        (message.id, message.name, message.content, message.created_at, "[]"),
+    )
+    conn.commit()
+    return message
 
 
 @api_router.put("/messages/{message_id}", response_model=Message)
@@ -531,186 +463,241 @@ async def update_message(message_id: str, payload: MessageUpdate):
     if not update_data:
         raise HTTPException(status_code=400, detail="No updates provided")
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_MESSAGES, message_id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_MESSAGES, message_id)
-        return doc_to_message(doc)
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM messages WHERE id = ?", (message_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Message not found")
+
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (message_id,)
+
+    cursor.execute(
+        f"UPDATE messages SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM messages WHERE id = ?", (message_id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["replies"] = json.loads(d.get("replies", "[]"))
+    return d
 
 
 @api_router.delete("/messages/{message_id}")
 async def delete_message(message_id: str):
-    try:
-        db_service.delete_document(DATABASE_ID, COLLECTION_MESSAGES, message_id)
-        return {"status": "ok"}
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM messages WHERE id = ?", (message_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Message not found")
+    cursor.execute("DELETE FROM messages WHERE id = ?", (message_id,))
+    conn.commit()
+    return {"status": "ok"}
 
 
 @api_router.post("/messages/{message_id}/replies", response_model=Message)
 async def create_reply(message_id: str, payload: MessageReplyCreate):
     reply = MessageReply(name=payload.name, content=payload.content)
-    try:
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_MESSAGES, message_id)
-        replies = json.loads(doc.get("replies", "[]"))
-        replies.append(reply.model_dump())
-        db_service.update_document(DATABASE_ID, COLLECTION_MESSAGES, message_id, {"replies": json.dumps(replies)})
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_MESSAGES, message_id)
-        return doc_to_message(doc)
-    except AppwriteException:
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT replies FROM messages WHERE id = ?", (message_id,))
+    row = cursor.fetchone()
+    if not row:
         raise HTTPException(status_code=404, detail="Message not found")
+
+    d = row_to_dict(cursor, row)
+    replies = json.loads(d.get("replies", "[]"))
+    replies.append(reply.model_dump())
+
+    cursor.execute(
+        "UPDATE messages SET replies = ? WHERE id = ?",
+        (json.dumps(replies), message_id),
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM messages WHERE id = ?", (message_id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["replies"] = json.loads(d.get("replies", "[]"))
+    return d
 
 
 # ==================== EVENTS ====================
 
 @api_router.get("/events", response_model=List[Event])
 async def list_events():
-    try:
-        result = db_service.list_documents(DATABASE_ID, COLLECTION_EVENTS)
-        events = [doc_to_event(doc) for doc in result.get("documents", [])]
-        # Sort by created_at descending
-        events.sort(key=lambda x: x.get("created_at", ""), reverse=True)
-        return events
-    except AppwriteException as e:
-        if "Collection not found" in str(e):
-            return []
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM events ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    events = []
+    for row in rows:
+        d = row_to_dict(cursor, row)
+        d["hashtags"] = json.loads(d.get("hashtags", "[]"))
+        events.append(d)
+    return events
 
 
 @api_router.post("/events", response_model=Event)
 async def create_event(payload: EventBase):
     event = Event(**payload.model_dump())
-    try:
-        db_service.create_document(
-            DATABASE_ID,
-            COLLECTION_EVENTS,
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO events (id, title, date, location, description, hashtags, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+        (
             event.id,
-            {
-                "id": event.id,
-                "title": event.title,
-                "date": event.date,
-                "location": event.location,
-                "description": event.description,
-                "hashtags": json.dumps(event.hashtags),
-                "created_at": event.created_at,
-            }
-        )
-        return event
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+            event.title,
+            event.date,
+            event.location,
+            event.description,
+            json.dumps(event.hashtags),
+            event.created_at,
+        ),
+    )
+    conn.commit()
+    return event
 
 
 @api_router.put("/events/{event_id}", response_model=Event)
 async def update_event(event_id: str, payload: EventUpdate):
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM events WHERE id = ?", (event_id,))
+    if not cursor.fetchone():
+        raise HTTPException(status_code=404, detail="Event not found")
+
     update_data = payload.model_dump()
     update_data["hashtags"] = json.dumps(update_data.get("hashtags", []))
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_EVENTS, event_id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_EVENTS, event_id)
-        return doc_to_event(doc)
-    except AppwriteException:
-        raise HTTPException(status_code=404, detail="Event not found")
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (event_id,)
+
+    cursor.execute(
+        f"UPDATE events SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM events WHERE id = ?", (event_id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["hashtags"] = json.loads(d.get("hashtags", "[]"))
+    return d
 
 
 @api_router.delete("/events/{event_id}")
 async def delete_event(event_id: str):
-    try:
-        db_service.delete_document(DATABASE_ID, COLLECTION_EVENTS, event_id)
-        return {"status": "ok"}
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM events WHERE id = ?", (event_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Event not found")
+    cursor.execute("DELETE FROM events WHERE id = ?", (event_id,))
+    conn.commit()
+    return {"status": "ok"}
 
 
 # ==================== BERLIN LINKS ====================
 
 @api_router.get("/berlin-links", response_model=List[BerlinLink])
 async def list_berlin_links():
-    try:
-        result = db_service.list_documents(DATABASE_ID, COLLECTION_BERLIN_LINKS)
-        links = [doc_to_berlin_link(doc) for doc in result.get("documents", [])]
-        # Sort by created_at descending
-        links.sort(key=lambda x: x.get("created_at", ""), reverse=True)
-        return links
-    except AppwriteException as e:
-        if "Collection not found" in str(e):
-            return []
-        raise HTTPException(status_code=500, detail=str(e))
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM berlin_links ORDER BY created_at DESC")
+    rows = cursor.fetchall()
+    links = []
+    for row in rows:
+        d = row_to_dict(cursor, row)
+        d["hashtags"] = json.loads(d.get("hashtags", "[]"))
+        links.append(d)
+    return links
 
 
 @api_router.post("/berlin-links", response_model=BerlinLink)
 async def create_berlin_link(payload: BerlinLinkBase):
     link = BerlinLink(**payload.model_dump())
-    try:
-        db_service.create_document(
-            DATABASE_ID,
-            COLLECTION_BERLIN_LINKS,
+    cursor = conn.cursor()
+    cursor.execute(
+        """INSERT INTO berlin_links (id, url, description, hashtags, created_at)
+           VALUES (?, ?, ?, ?, ?)""",
+        (
             link.id,
-            {
-                "id": link.id,
-                "url": link.url,
-                "description": link.description,
-                "hashtags": json.dumps(link.hashtags),
-                "created_at": link.created_at,
-            }
-        )
-        return link
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+            link.url,
+            link.description,
+            json.dumps(link.hashtags),
+            link.created_at,
+        ),
+    )
+    conn.commit()
+    return link
 
 
 @api_router.put("/berlin-links/{link_id}", response_model=BerlinLink)
 async def update_berlin_link(link_id: str, payload: BerlinLinkUpdate):
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM berlin_links WHERE id = ?", (link_id,))
+    if not cursor.fetchone():
+        raise HTTPException(status_code=404, detail="Link not found")
+
     update_data = payload.model_dump()
     update_data["hashtags"] = json.dumps(update_data.get("hashtags", []))
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_BERLIN_LINKS, link_id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_BERLIN_LINKS, link_id)
-        return doc_to_berlin_link(doc)
-    except AppwriteException:
-        raise HTTPException(status_code=404, detail="Link not found")
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (link_id,)
+
+    cursor.execute(
+        f"UPDATE berlin_links SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM berlin_links WHERE id = ?", (link_id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["hashtags"] = json.loads(d.get("hashtags", "[]"))
+    return d
 
 
 @api_router.delete("/berlin-links/{link_id}")
 async def delete_berlin_link(link_id: str):
-    try:
-        db_service.delete_document(DATABASE_ID, COLLECTION_BERLIN_LINKS, link_id)
-        return {"status": "ok"}
-    except AppwriteException:
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM berlin_links WHERE id = ?", (link_id,))
+    if not cursor.fetchone():
         raise HTTPException(status_code=404, detail="Link not found")
+    cursor.execute("DELETE FROM berlin_links WHERE id = ?", (link_id,))
+    conn.commit()
+    return {"status": "ok"}
 
 
 # ==================== SETTINGS ====================
 
 async def get_or_create_settings() -> Settings:
-    try:
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_SETTINGS, "wg-settings")
-        settings_dict = doc_to_settings(doc)
-        if len(settings_dict.get("rooms", [])) > 2:
-            settings_dict["rooms"] = settings_dict.get("rooms", [])[:2]
-        return Settings(**settings_dict)
-    except AppwriteException:
-        # Create default settings
-        default_settings = Settings()
-        try:
-            db_service.create_document(
-                DATABASE_ID,
-                COLLECTION_SETTINGS,
-                default_settings.id,
-                {
-                    "id": default_settings.id,
-                    "rooms": json.dumps([r if isinstance(r, dict) else r.model_dump() for r in default_settings.rooms]),
-                    "checkin_template": json.dumps(default_settings.checkin_template),
-                    "checkout_template": json.dumps(default_settings.checkout_template),
-                    "plantsWateredAt": default_settings.plantsWateredAt,
-                    "updated_at": default_settings.updated_at,
-                }
-            )
-        except AppwriteException:
-            pass
-        return default_settings
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM settings WHERE id = ?", ("wg-settings",))
+    row = cursor.fetchone()
+    if row:
+        d = row_to_dict(cursor, row)
+        d["rooms"] = json.loads(d.get("rooms", json.dumps(DEFAULT_ROOMS)))
+        d["checkin_template"] = json.loads(d.get("checkin_template", json.dumps(DEFAULT_CHECKIN_TEMPLATE)))
+        d["checkout_template"] = json.loads(d.get("checkout_template", json.dumps(DEFAULT_CHECKOUT_TEMPLATE)))
+        if len(d.get("rooms", [])) > 2:
+            d["rooms"] = d["rooms"][:2]
+        return Settings(**d)
+
+    # Create default settings
+    default_settings = Settings()
+    cursor.execute(
+        """INSERT INTO settings
+           (id, rooms, checkin_template, checkout_template, plantsWateredAt, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?)""",
+        (
+            default_settings.id,
+            json.dumps([r if isinstance(r, dict) else r.model_dump() for r in default_settings.rooms]),
+            json.dumps(default_settings.checkin_template),
+            json.dumps(default_settings.checkout_template),
+            default_settings.plantsWateredAt,
+            default_settings.updated_at,
+        ),
+    )
+    conn.commit()
+    return default_settings
 
 
 @api_router.get("/settings", response_model=Settings)
@@ -726,7 +713,9 @@ async def update_settings(payload: SettingsUpdate):
     update_data = {key: value for key, value in update_data.items() if value is not None}
 
     if "rooms" in update_data and update_data["rooms"]:
-        update_data["rooms"] = json.dumps([r.model_dump() if hasattr(r, 'model_dump') else r for r in update_data["rooms"][:2]])
+        update_data["rooms"] = json.dumps(
+            [r.model_dump() if hasattr(r, "model_dump") else r for r in update_data["rooms"][:2]]
+        )
     if "checkin_template" in update_data:
         update_data["checkin_template"] = json.dumps(update_data["checkin_template"])
     if "checkout_template" in update_data:
@@ -736,12 +725,23 @@ async def update_settings(payload: SettingsUpdate):
 
     update_data["updated_at"] = now_iso()
 
-    try:
-        db_service.update_document(DATABASE_ID, COLLECTION_SETTINGS, current.id, update_data)
-        doc = db_service.get_document(DATABASE_ID, COLLECTION_SETTINGS, current.id)
-        return Settings(**doc_to_settings(doc))
-    except AppwriteException as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    set_clauses = [f"{key} = ?" for key in update_data.keys()]
+    values = tuple(update_data.values()) + (current.id,)
+
+    cursor = conn.cursor()
+    cursor.execute(
+        f"UPDATE settings SET {', '.join(set_clauses)} WHERE id = ?",
+        values,
+    )
+    conn.commit()
+
+    cursor.execute("SELECT * FROM settings WHERE id = ?", (current.id,))
+    row = cursor.fetchone()
+    d = row_to_dict(cursor, row)
+    d["rooms"] = json.loads(d.get("rooms", json.dumps(DEFAULT_ROOMS)))
+    d["checkin_template"] = json.loads(d.get("checkin_template", json.dumps(DEFAULT_CHECKIN_TEMPLATE)))
+    d["checkout_template"] = json.loads(d.get("checkout_template", json.dumps(DEFAULT_CHECKOUT_TEMPLATE)))
+    return Settings(**d)
 
 
 # Include the router in the main app
