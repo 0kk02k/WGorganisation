@@ -7,70 +7,10 @@ functions = "netlify/functions"
 NODE_VERSION = "20"
 ENABLE_HEALTH_CHECK = "false"
 
-# API-Routes zu Netlify Functions (force = true damit sie VOR dem SPA-Catch-all greifen)
+# API-Routes: alle /api/* gehen an die api.js Function
 [[redirects]]
-from = "/api/stays"
-to = "/.netlify/functions/api-stays"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/stays/*"
-to = "/.netlify/functions/api-stays/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/manuals"
-to = "/.netlify/functions/api-manuals"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/manuals/*"
-to = "/.netlify/functions/api-manuals/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/messages"
-to = "/.netlify/functions/api-messages"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/messages/*"
-to = "/.netlify/functions/api-messages/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/events"
-to = "/.netlify/functions/api-events"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/events/*"
-to = "/.netlify/functions/api-events/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/berlin-links"
-to = "/.netlify/functions/api-berlin-links"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/berlin-links/*"
-to = "/.netlify/functions/api-berlin-links/:splat"
-status = 200
-force = true
-
-[[redirects]]
-from = "/api/settings"
-to = "/.netlify/functions/api-settings"
+from = "/api/*"
+to = "/.netlify/functions/api/:splat"
 status = 200
 force = true
 
