@@ -409,7 +409,7 @@ const settingsHandlers = {
       UPDATE settings SET rooms = ${JSON.stringify(defaultSettings.rooms)},
         checkin_template = ${JSON.stringify(defaultSettings.checkin_template)},
         checkout_template = ${JSON.stringify(defaultSettings.checkout_template)},
-        plantsWateredAt = NULL, updated_at = ${now}
+        plantswateredat = NULL, updated_at = ${now}
       WHERE id = ${id}
     `;
     return await settingsHandlers.get();
@@ -438,7 +438,7 @@ const settingsHandlers = {
       ],
     };
     await sql`
-      INSERT INTO settings (id, rooms, checkin_template, checkout_template, plantsWateredAt, updated_at)
+      INSERT INTO settings (id, rooms, checkin_template, checkout_template, plantswateredat, updated_at)
       VALUES (${id}, ${JSON.stringify(defaultSettings.rooms)}, ${JSON.stringify(defaultSettings.checkin_template)},
               ${JSON.stringify(defaultSettings.checkout_template)}, NULL, ${now})
     `;
@@ -453,7 +453,7 @@ const settingsHandlers = {
       UPDATE settings SET rooms = ${JSON.stringify(data.rooms || [])},
         checkin_template = ${JSON.stringify(data.checkin_template || [])},
         checkout_template = ${JSON.stringify(data.checkout_template || [])},
-        plantsWateredAt = ${data.plantsWateredAt || null}, updated_at = ${now}
+        plantswateredat = ${data.plantsWateredAt || null}, updated_at = ${now}
       WHERE id = ${current.id}
     `;
     return await settingsHandlers.get();
