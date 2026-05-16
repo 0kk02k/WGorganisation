@@ -13,7 +13,7 @@ export const api = axios.create({
 export const staysApi = {
   async list() {
     const response = await api.get('/stays');
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   async get(id) {
@@ -41,7 +41,7 @@ export const staysApi = {
 export const manualsApi = {
   async list() {
     const response = await api.get('/manuals');
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   async get(id) {
@@ -69,7 +69,7 @@ export const manualsApi = {
 export const messagesApi = {
   async list() {
     const response = await api.get('/messages');
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   async create(data) {
@@ -92,7 +92,7 @@ export const messagesApi = {
 export const eventsApi = {
   async list() {
     const response = await api.get('/events');
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   async create(data) {
@@ -115,7 +115,7 @@ export const eventsApi = {
 export const berlinLinksApi = {
   async list() {
     const response = await api.get('/berlin-links');
-    return response.data;
+    return Array.isArray(response.data) ? response.data : [];
   },
 
   async create(data) {
