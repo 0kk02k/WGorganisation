@@ -2,8 +2,13 @@ const { handlers } = require('./neon-helpers');
 
 exports.handler = async (event) => {
   const method = event.httpMethod;
-  const path = event.path.replace('/api/', '').replace('stays', '').replace(/\/$/, '');
-  const segments = path.split('/').filter(Boolean);
+  // Extract the ID from the path - handle both redirect and direct call
+  const rawPath = event.path || '';
+  // Remove known prefixes to get just the ID part
+  const id = rawPath
+    .replace(/^\/?(api|\.netlify\/functions\/api-stays)\/?stays\/?/i, '')
+    .replace(/\/$/, '');
+  const segments = id ? [id] : [];
 
   try {
     if (method === 'GET' && segments.length === 0) {

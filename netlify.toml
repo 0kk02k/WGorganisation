@@ -7,61 +7,72 @@ functions = "netlify/functions"
 NODE_VERSION = "20"
 ENABLE_HEALTH_CHECK = "false"
 
-# API-Routes zu Netlify Functions
-[[redirects]]
-from = "/api/stays/*"
-to = "/.netlify/functions/api-stays/:splat"
-status = 200
-
+# API-Routes zu Netlify Functions (force = true damit sie VOR dem SPA-Catch-all greifen)
 [[redirects]]
 from = "/api/stays"
 to = "/.netlify/functions/api-stays"
 status = 200
+force = true
 
 [[redirects]]
-from = "/api/manuals/*"
-to = "/.netlify/functions/api-manuals/:splat"
+from = "/api/stays/*"
+to = "/.netlify/functions/api-stays/:splat"
 status = 200
+force = true
 
 [[redirects]]
 from = "/api/manuals"
 to = "/.netlify/functions/api-manuals"
 status = 200
+force = true
 
 [[redirects]]
-from = "/api/messages/*"
-to = "/.netlify/functions/api-messages/:splat"
+from = "/api/manuals/*"
+to = "/.netlify/functions/api-manuals/:splat"
 status = 200
+force = true
 
 [[redirects]]
 from = "/api/messages"
 to = "/.netlify/functions/api-messages"
 status = 200
+force = true
 
 [[redirects]]
-from = "/api/events/*"
-to = "/.netlify/functions/api-events/:splat"
+from = "/api/messages/*"
+to = "/.netlify/functions/api-messages/:splat"
 status = 200
+force = true
 
 [[redirects]]
 from = "/api/events"
 to = "/.netlify/functions/api-events"
 status = 200
+force = true
 
 [[redirects]]
-from = "/api/berlin-links/*"
-to = "/.netlify/functions/api-berlin-links/:splat"
+from = "/api/events/*"
+to = "/.netlify/functions/api-events/:splat"
 status = 200
+force = true
 
 [[redirects]]
 from = "/api/berlin-links"
 to = "/.netlify/functions/api-berlin-links"
 status = 200
+force = true
+
+[[redirects]]
+from = "/api/berlin-links/*"
+to = "/.netlify/functions/api-berlin-links/:splat"
+status = 200
+force = true
 
 [[redirects]]
 from = "/api/settings"
 to = "/.netlify/functions/api-settings"
 status = 200
+force = true
 
 # SPA-Routing für React Router (muss letzter Redirect sein!)
 [[redirects]]

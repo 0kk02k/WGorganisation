@@ -2,8 +2,11 @@ const { handlers } = require('./neon-helpers');
 
 exports.handler = async (event) => {
   const method = event.httpMethod;
-  const path = event.path.replace('/api/', '').replace('berlin-links', '').replace(/\/$/, '');
-  const segments = path.split('/').filter(Boolean);
+  const rawPath = event.path || '';
+  const id = rawPath
+    .replace(/^\/?(api|\.netlify\/functions\/api-berlin-links)\/?berlin-links\/?/i, '')
+    .replace(/\/$/, '');
+  const segments = id ? [id] : [];
 
   try {
     if (method === 'GET' && segments.length === 0) {
