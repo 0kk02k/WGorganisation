@@ -8,11 +8,13 @@ NODE_VERSION = "20"
 ENABLE_HEALTH_CHECK = "false"
 
 # API-Routes: alle /api/* gehen an die api.js Function
+# WICHTIG: muss VOR dem SPA-Catch-all stehen und force=true haben
 [[redirects]]
 from = "/api/*"
 to = "/.netlify/functions/api/:splat"
 status = 200
 force = true
+headers = {X-From = "netlify-redirect"}
 
 # SPA-Routing für React Router (muss letzter Redirect sein!)
 [[redirects]]
