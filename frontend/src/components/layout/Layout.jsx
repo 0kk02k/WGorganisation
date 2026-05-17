@@ -66,7 +66,7 @@ export const Layout = ({ children }) => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const y = window.scrollY;
-          const offset = y * 0.3;
+          const offset = y * 0.15;
           if (parallaxRef.current) {
             parallaxRef.current.style.transform = `translateY(${offset}px)`;
           }
@@ -100,11 +100,13 @@ export const Layout = ({ children }) => {
       className="relative min-h-screen bg-white text-gray-800"
       data-testid="app-shell"
     >
-      {/* Dot-Pattern Overlay - parallax: scrolls at 30% speed */}
+      {/* Dot-Pattern Overlay - parallax: scrolls at 15% speed */}
       <div
         ref={dotsRef}
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute left-0 right-0"
         style={{
+          top: "-50vh",
+          height: "200vh",
           backgroundImage: "radial-gradient(circle at 1px 1px, rgba(50, 50, 55, 0.5) 1.5px, transparent 1.5px)",
           backgroundSize: "20px 20px",
           zIndex: 0,
@@ -112,8 +114,17 @@ export const Layout = ({ children }) => {
         }}
       />
 
-      {/* Decorative Elements - parallax: scrolls at 30% speed */}
-      <div ref={parallaxRef} className="pointer-events-none absolute inset-0 overflow-hidden" style={{ zIndex: 0, willChange: "transform" }}>
+      {/* Decorative Elements - parallax: scrolls at 15% speed */}
+      <div
+        ref={parallaxRef}
+        className="pointer-events-none absolute left-0 right-0 overflow-hidden"
+        style={{
+          top: "-50vh",
+          height: "200vh",
+          zIndex: 0,
+          willChange: "transform"
+        }}
+      >
         <div className="absolute -top-20 left-1/4 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-20" />
         <div className="absolute top-1/3 right-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />

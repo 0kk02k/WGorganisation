@@ -22,17 +22,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Dot pattern overlay for paper effect */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image: radial-gradient(circle at 1px 1px, rgba(50, 50, 55, 0.5) 1.5px, transparent 1.5px);
-    background-size: 20px 20px;
-    pointer-events: none;
-    z-index: 0;
-}
-
 #root {
     position: relative;
     z-index: 1;
