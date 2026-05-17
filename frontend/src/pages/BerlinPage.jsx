@@ -250,6 +250,227 @@ export default function BerlinPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="berlin-page">
+      {/* Modal - outside stagger container since it's an overlay */}
+      <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
+        <DialogContent
+          className="max-w-2xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
+          data-testid="berlin-create-modal"
+        >
+          <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
+             <DialogTitle 
+               className="text-white text-2xl"
+               style={{ fontFamily: "'Bangers', cursive" }}
+               data-testid="berlin-create-title"
+             >
+               {editingType ? "Bearbeiten" : "Neuer Beitrag"}
+             </DialogTitle>
+           </DialogHeader>
+          <Tabs
+            value={postType}
+            onValueChange={setPostType}
+            className="space-y-4 pt-8"
+            data-testid="berlin-create-tabs"
+          >
+            <TabsList className="grid w-full grid-cols-2 bg-gray-100 border-4 border-black rounded-none h-12">
+              <TabsTrigger 
+                value="event" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-400 data-[state=active]:to-emerald-400 data-[state=active]:text-white font-bold rounded-none"
+                data-testid="berlin-tab-event"
+              >
+                Veranstaltung
+              </TabsTrigger>
+              <TabsTrigger 
+                value="link" 
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-400 data-[state=active]:to-blue-400 data-[state=active]:text-white font-bold rounded-none"
+                data-testid="berlin-tab-link"
+              >
+                Link
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-title-label"
+                  >
+                    Titel
+                  </label>
+                  <Input
+                    value={form.title}
+                    onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                    placeholder="z.B. Jazz Night"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-title-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-date-label"
+                  >
+                    Datum
+                  </label>
+                  <Input
+                    type="date"
+                    value={form.date}
+                    onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-date-input"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-location-label"
+                  >
+                    Ort
+                  </label>
+                  <Input
+                    value={form.location}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, location: event.target.value }))
+                    }
+                    placeholder="z.B. Kreuzberg"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-location-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-description-label"
+                  >
+                    Beschreibung
+                  </label>
+                  <Textarea
+                    rows={2}
+                    value={form.description}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, description: event.target.value }))
+                    }
+                    placeholder="Was lohnt sich?"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-description-input"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label 
+                  className="text-sm font-bold text-gray-800"
+                  data-testid="berlin-hashtags-label"
+                >
+                  Hashtags
+                </label>
+                <Input
+                  value={form.hashtags}
+                  onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
+                  placeholder="#club, #openair"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                  data-testid="berlin-hashtags-input"
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                 <Button
+                   onClick={handleSubmit}
+                   className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   data-testid="berlin-submit-button"
+                 >
+                   {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
+                 </Button>
+                {editingType === "event" && (
+                  <Button
+                    onClick={handleDeleteEvent}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                    data-testid="berlin-delete-button"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Löschen
+                  </Button>
+                )}
+              </div>
+            </TabsContent>
+            <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
+              <div className="space-y-2">
+                <label 
+                  className="text-sm font-bold text-gray-800"
+                  data-testid="berlin-link-description-label"
+                >
+                  Beschreibung
+                </label>
+                <Textarea
+                  rows={2}
+                  value={linkForm.description}
+                  onChange={(event) =>
+                    setLinkForm((prev) => ({ ...prev, description: event.target.value }))
+                  }
+                  placeholder="Warum ist der Link hilfreich?"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                  data-testid="berlin-link-description-input"
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-link-url-label"
+                  >
+                    URL
+                  </label>
+                  <Input
+                    value={linkForm.url}
+                    onChange={(event) =>
+                      setLinkForm((prev) => ({ ...prev, url: event.target.value }))
+                    }
+                    placeholder="https://..."
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-link-url-input"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label 
+                    className="text-sm font-bold text-gray-800"
+                    data-testid="berlin-link-hashtags-label"
+                  >
+                    Hashtags
+                  </label>
+                  <Input
+                    value={linkForm.hashtags}
+                    onChange={(event) =>
+                      setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
+                    }
+                    placeholder="#tickets, #club"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    data-testid="berlin-link-hashtags-input"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                 <Button
+                   onClick={handleLinkSubmit}
+                   className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   data-testid="berlin-link-submit-button"
+                 >
+                   {editingType === "link" ? "Aktualisieren" : "Link speichern"}
+                 </Button>
+                {editingType === "link" && (
+                  <Button
+                    onClick={handleDeleteLink}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                    data-testid="berlin-link-delete-button"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Löschen
+                  </Button>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+
       <motion.div
         className="relative z-10 space-y-6"
         variants={staggerContainer}
@@ -276,227 +497,6 @@ export default function BerlinPage() {
             <Plus className="h-6 w-6" />
           </Button>
         </motion.div>
-
-        {/* Modal */}
-        <Dialog open={isModalOpen} onOpenChange={handleModalChange}>
-          <DialogContent
-            className="max-w-2xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
-            data-testid="berlin-create-modal"
-          >
-            <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
-               <DialogTitle 
-                 className="text-white text-2xl"
-                 style={{ fontFamily: "'Bangers', cursive" }}
-                 data-testid="berlin-create-title"
-               >
-                 {editingType ? "Bearbeiten" : "Neuer Beitrag"}
-               </DialogTitle>
-             </DialogHeader>
-            <Tabs
-              value={postType}
-              onValueChange={setPostType}
-              className="space-y-4 pt-8"
-              data-testid="berlin-create-tabs"
-            >
-              <TabsList className="grid w-full grid-cols-2 bg-gray-100 border-4 border-black rounded-none h-12">
-                <TabsTrigger 
-                  value="event" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-400 data-[state=active]:to-emerald-400 data-[state=active]:text-white font-bold rounded-none"
-                  data-testid="berlin-tab-event"
-                >
-                  Veranstaltung
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="link" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-400 data-[state=active]:to-blue-400 data-[state=active]:text-white font-bold rounded-none"
-                  data-testid="berlin-tab-link"
-                >
-                  Link
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-title-label"
-                    >
-                      Titel
-                    </label>
-                    <Input
-                      value={form.title}
-                      onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
-                      placeholder="z.B. Jazz Night"
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-title-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-date-label"
-                    >
-                      Datum
-                    </label>
-                    <Input
-                      type="date"
-                      value={form.date}
-                      onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-date-input"
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-location-label"
-                    >
-                      Ort
-                    </label>
-                    <Input
-                      value={form.location}
-                      onChange={(event) =>
-                        setForm((prev) => ({ ...prev, location: event.target.value }))
-                      }
-                      placeholder="z.B. Kreuzberg"
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-location-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-description-label"
-                    >
-                      Beschreibung
-                    </label>
-                    <Textarea
-                      rows={2}
-                      value={form.description}
-                      onChange={(event) =>
-                        setForm((prev) => ({ ...prev, description: event.target.value }))
-                      }
-                      placeholder="Was lohnt sich?"
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-description-input"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label 
-                    className="text-sm font-bold text-gray-800"
-                    data-testid="berlin-hashtags-label"
-                  >
-                    Hashtags
-                  </label>
-                  <Input
-                    value={form.hashtags}
-                    onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
-                    placeholder="#club, #openair"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-hashtags-input"
-                  />
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                   <Button
-                     onClick={handleSubmit}
-                     className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
-                     data-testid="berlin-submit-button"
-                   >
-                     {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
-                   </Button>
-                  {editingType === "event" && (
-                    <Button
-                      onClick={handleDeleteEvent}
-                      className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                      data-testid="berlin-delete-button"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Löschen
-                    </Button>
-                  )}
-                </div>
-              </TabsContent>
-              <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
-                <div className="space-y-2">
-                  <label 
-                    className="text-sm font-bold text-gray-800"
-                    data-testid="berlin-link-description-label"
-                  >
-                    Beschreibung
-                  </label>
-                  <Textarea
-                    rows={2}
-                    value={linkForm.description}
-                    onChange={(event) =>
-                      setLinkForm((prev) => ({ ...prev, description: event.target.value }))
-                    }
-                    placeholder="Warum ist der Link hilfreich?"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-link-description-input"
-                  />
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-link-url-label"
-                    >
-                      URL
-                    </label>
-                    <Input
-                      value={linkForm.url}
-                      onChange={(event) =>
-                        setLinkForm((prev) => ({ ...prev, url: event.target.value }))
-                      }
-                      placeholder="https://..."
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-link-url-input"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label 
-                      className="text-sm font-bold text-gray-800"
-                      data-testid="berlin-link-hashtags-label"
-                    >
-                      Hashtags
-                    </label>
-                    <Input
-                      value={linkForm.hashtags}
-                      onChange={(event) =>
-                        setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
-                      }
-                      placeholder="#tickets, #club"
-                      className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                      data-testid="berlin-link-hashtags-input"
-                    />
-                  </div>
-                </div>
-                <div className="flex flex-wrap items-center gap-3">
-                   <Button
-                     onClick={handleLinkSubmit}
-                     className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
-                     data-testid="berlin-link-submit-button"
-                   >
-                     {editingType === "link" ? "Aktualisieren" : "Link speichern"}
-                   </Button>
-                  {editingType === "link" && (
-                    <Button
-                      onClick={handleDeleteLink}
-                      className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                      data-testid="berlin-link-delete-button"
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Löschen
-                    </Button>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
 
         {/* Tag Filters */}
         {availableTags.length > 0 && (
