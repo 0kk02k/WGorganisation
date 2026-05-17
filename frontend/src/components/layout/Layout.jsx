@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -52,35 +52,10 @@ export const Layout = ({ children }) => {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [titleVisible, setTitleVisible] = useState(true);
-  const parallaxRef = useRef(null);
-  const dotsRef = useRef(null);
 
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
-
-  // Parallax scroll: move background at 30% of scroll speed
-  useEffect(() => {
-    let ticking = false;
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const y = window.scrollY;
-          const offset = y * 0.15;
-          if (parallaxRef.current) {
-            parallaxRef.current.style.transform = `translateY(${offset}px)`;
-          }
-          if (dotsRef.current) {
-            dotsRef.current.style.transform = `translateY(${offset}px)`;
-          }
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
 
   // Hide title bar on scroll
   useEffect(() => {
@@ -100,31 +75,18 @@ export const Layout = ({ children }) => {
       className="relative min-h-screen bg-white text-gray-800"
       data-testid="app-shell"
     >
-      {/* Dot-Pattern Overlay - parallax: scrolls at 15% speed */}
+      {/* Dot-Pattern Overlay - CSS parallax via background-attachment: fixed */}
       <div
-        ref={dotsRef}
-        className="pointer-events-none absolute left-0 right-0"
+        className="pointer-events-none fixed inset-0"
         style={{
-          top: "-50vh",
-          height: "200vh",
           backgroundImage: "radial-gradient(circle at 1px 1px, rgba(50, 50, 55, 0.5) 1.5px, transparent 1.5px)",
           backgroundSize: "20px 20px",
-          zIndex: 0,
-          willChange: "transform"
+          zIndex: 0
         }}
       />
 
-      {/* Decorative Elements - parallax: scrolls at 15% speed */}
-      <div
-        ref={parallaxRef}
-        className="pointer-events-none absolute left-0 right-0 overflow-hidden"
-        style={{
-          top: "-50vh",
-          height: "200vh",
-          zIndex: 0,
-          willChange: "transform"
-        }}
-      >
+      {/* Decorative Elements - CSS parallax: fixed so they stay while content scrolls */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
         <div className="absolute -top-20 left-1/4 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-20" />
         <div className="absolute top-1/3 right-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20" />
         <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />
