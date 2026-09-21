@@ -7,6 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Camera, Pencil, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ManualDetail() {
   const { id } = useParams();
@@ -68,7 +79,6 @@ export default function ManualDetail() {
         
         // Als JPEG mit 80% Qualität
         const compressedData = canvas.toDataURL('image/jpeg', 0.8);
-        console.log('[DEBUG] Original size:', reader.result.length, 'Compressed size:', compressedData.length);
         setForm((prev) => ({ ...prev, image_data: compressedData }));
       };
       img.src = reader.result;
@@ -101,9 +111,7 @@ export default function ManualDetail() {
         setSaving(false);
         return false;
       }
-      
-      console.log('[DEBUG] Saving manual with image_data length:', form.image_data?.length || 0);
-      
+
       const data = await manualsApi.update(id, {
         title: form.title,
         description: form.title, // Use title as description for backward compatibility
@@ -117,12 +125,20 @@ export default function ManualDetail() {
       toast.success("Anleitung aktualisiert.");
       return true;
     } catch (error) {
-      console.error("[DEBUG] Save error:", error);
+      console.error("Save error:", error);
       toast.error(`Speichern fehlgeschlagen: ${error.message || 'Unbekannter Fehler'}`);
       return false;
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setForm({
+      ...manual,
+      steps: Array.isArray(manual.steps) ? manual.steps.join("\n") : "",
+    });
+    setIsEditing(false);
   };
 
   const handleEditToggle = async () => {
@@ -210,7 +226,7 @@ export default function ManualDetail() {
           </div>
           
           {/* Header */}
-          <CardHeader className="bg-gradient-to-r from-violet-500 to-fuchsia-500 border-b-4 border-black p-4">
+          <CardHeader className="bg-gradient-to-r from-teal-700 to-emerald-700 border-b-4 border-black p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               {isEditing ? (
                 <div className="flex-1 space-y-2">
@@ -249,13 +265,62 @@ export default function ManualDetail() {
                   {saving ? "Speichern..." : isEditing ? "Speichern" : "Bearbeiten"}
                 </Button>
                 {isEditing && (
-                  <Button
-                    onClick={handleDelete}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
-                    data-testid="manual-delete-button"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <>
+                    <Button
+                      onClick={handleCancelEdit}
+                      disabled={saving}
+                      className="bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      data-testid="manual-cancel-edit-button"
+                    >
+                      Abbrechen
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                          data-testid="manual-delete-button"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent
+                        className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                        data-testid="manual-delete-dialog"
+                      >
+                        <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                          <AlertDialogTitle
+                            className="text-white text-2xl"
+                            style={{ fontFamily: "'Bangers', cursive" }}
+                            data-testid="manual-delete-title"
+                          >
+                            Anleitung wirklich löschen?
+                          </AlertDialogTitle>
+                        </AlertDialogHeader>
+                        <AlertDialogDescription
+                          className="text-gray-600 pt-8"
+                          style={{ fontFamily: "'Nunito', sans-serif" }}
+                          data-testid="manual-delete-description"
+                        >
+                          „{manual.title}" und alle Schritte werden dauerhaft entfernt.
+                        </AlertDialogDescription>
+                        <AlertDialogFooter className="flex gap-2 mt-4">
+                          <AlertDialogCancel
+                            className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                            data-testid="manual-delete-cancel"
+                          >
+                            Abbrechen
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleDelete}
+                            className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                            data-testid="manual-delete-confirm"
+                          >
+                            Löschen
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </>
                 )}
               </div>
             </div>
@@ -292,12 +357,12 @@ export default function ManualDetail() {
                 {steps.map((step, index) => (
                   <li
                     key={`${manual.id}-step-${index}`}
-                    className="border-4 border-black p-4 bg-gradient-to-r from-violet-50 to-fuchsia-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-yellow-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                     data-testid={`manual-step-${index}`}
                   >
                     <div className="flex items-start gap-3">
-                      <span 
-                        className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold flex items-center justify-center border-2 border-black"
+                      <span
+                        className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-teal-700 to-emerald-700 text-white font-bold flex items-center justify-center border-2 border-black"
                         style={{ fontFamily: "'Bangers', cursive" }}
                       >
                         {index + 1}

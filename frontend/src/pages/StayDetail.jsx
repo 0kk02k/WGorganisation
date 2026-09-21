@@ -58,10 +58,19 @@ export default function StayDetail() {
   const handleToggle = async (listKey, itemId, checked) => {
     if (!stay) return;
     const nextValue = checked === true;
-    const updatedList = stay[listKey].map((item) =>
+    const previousList = stay[listKey];
+    const updatedList = previousList.map((item) =>
       item.id === itemId ? { ...item, done: nextValue } : item,
     );
-    await updateStay({ [listKey]: updatedList });
+    // Optimistisch setzen, bei Fehler zurückrollen
+    setStay({ ...stay, [listKey]: updatedList });
+    try {
+      await updateStay({ [listKey]: updatedList });
+    } catch (error) {
+      console.error("Failed to update stay:", error);
+      setStay((prev) => (prev ? { ...prev, [listKey]: previousList } : prev));
+      toast.error("Änderung konnte nicht gespeichert werden. Bitte erneut versuchen.");
+    }
   };
 
   const handleAddItem = async (listKey, text) => {
@@ -70,7 +79,12 @@ export default function StayDetail() {
       ...stay[listKey],
       { id: createId(), text: text.trim(), done: false },
     ];
-    await updateStay({ [listKey]: updatedList });
+    try {
+      await updateStay({ [listKey]: updatedList });
+    } catch (error) {
+      console.error("Failed to add checklist item:", error);
+      toast.error("Punkt konnte nicht hinzugefügt werden. Bitte erneut versuchen.");
+    }
   };
 
   const handleDelete = async () => {
@@ -162,7 +176,7 @@ export default function StayDetail() {
 
         {/* Notes Card */}
         <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-amber-400 to-orange-400 border-b-4 border-black p-4">
+          <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-700 border-b-4 border-black p-4">
             <CardTitle 
               className="text-white text-2xl"
               style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}

@@ -12,6 +12,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -256,7 +267,7 @@ export default function BerlinPage() {
           className="max-w-2xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
           data-testid="berlin-create-modal"
         >
-          <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
+          <DialogHeader className="bg-gradient-to-r from-pink-600 to-orange-700 border-b-4 border-black p-4 -m-6 mb-0">
              <DialogTitle 
                className="text-white text-2xl"
                style={{ fontFamily: "'Bangers', cursive" }}
@@ -272,22 +283,29 @@ export default function BerlinPage() {
             data-testid="berlin-create-tabs"
           >
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 border-4 border-black rounded-none h-12">
-              <TabsTrigger 
-                value="event" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-400 data-[state=active]:to-emerald-400 data-[state=active]:text-white font-bold rounded-none"
+              <TabsTrigger
+                value="event"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-700 data-[state=active]:to-emerald-700 data-[state=active]:text-white font-bold rounded-none"
                 data-testid="berlin-tab-event"
               >
                 Veranstaltung
               </TabsTrigger>
-              <TabsTrigger 
-                value="link" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-400 data-[state=active]:to-blue-400 data-[state=active]:text-white font-bold rounded-none"
+              <TabsTrigger
+                value="link"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-700 data-[state=active]:to-blue-700 data-[state=active]:text-white font-bold rounded-none"
                 data-testid="berlin-tab-link"
               >
                 Link
               </TabsTrigger>
             </TabsList>
             <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSubmit();
+                }}
+                className="space-y-4"
+              >
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label 
@@ -374,25 +392,72 @@ export default function BerlinPage() {
               </div>
               <div className="flex flex-wrap items-center gap-3">
                  <Button
-                   onClick={handleSubmit}
-                   className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   type="submit"
+                   className="bg-gradient-to-r from-pink-600 to-orange-700 hover:from-pink-700 hover:to-orange-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-submit-button"
                  >
                    {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
                  </Button>
                 {editingType === "event" && (
-                  <Button
-                    onClick={handleDeleteEvent}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                    data-testid="berlin-delete-button"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Löschen
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                        data-testid="berlin-delete-button"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Löschen
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent
+                      className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                      data-testid="berlin-delete-dialog"
+                    >
+                      <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                        <AlertDialogTitle
+                          className="text-white text-2xl"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                          data-testid="berlin-delete-title"
+                        >
+                          Tipp wirklich löschen?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription
+                        className="text-gray-600 pt-8"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid="berlin-delete-description"
+                      >
+                        „{form.title}" wird dauerhaft entfernt.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter className="flex gap-2 mt-4">
+                        <AlertDialogCancel
+                          className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-delete-cancel"
+                        >
+                          Abbrechen
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteEvent}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-delete-confirm"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
+              </form>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleLinkSubmit();
+                }}
+                className="space-y-4"
+              >
               <div className="space-y-2">
                 <label 
                   className="text-sm font-bold text-gray-800"
@@ -449,23 +514,63 @@ export default function BerlinPage() {
               </div>
               <div className="flex flex-wrap items-center gap-3">
                  <Button
-                   onClick={handleLinkSubmit}
-                   className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   type="submit"
+                   className="bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-800 hover:to-blue-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-link-submit-button"
                  >
                    {editingType === "link" ? "Aktualisieren" : "Link speichern"}
                  </Button>
                 {editingType === "link" && (
-                  <Button
-                    onClick={handleDeleteLink}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                    data-testid="berlin-link-delete-button"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Löschen
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                        data-testid="berlin-link-delete-button"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Löschen
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent
+                      className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                      data-testid="berlin-link-delete-dialog"
+                    >
+                      <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                        <AlertDialogTitle
+                          className="text-white text-2xl"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                          data-testid="berlin-link-delete-title"
+                        >
+                          Link wirklich löschen?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription
+                        className="text-gray-600 pt-8"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid="berlin-link-delete-description"
+                      >
+                        „{linkForm.description}" wird dauerhaft entfernt.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter className="flex gap-2 mt-4">
+                        <AlertDialogCancel
+                          className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-link-delete-cancel"
+                        >
+                          Abbrechen
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteLink}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-link-delete-confirm"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
+              </form>
             </TabsContent>
           </Tabs>
         </DialogContent>
@@ -534,7 +639,7 @@ export default function BerlinPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="berlin-events-section"
           >
-            <CardHeader className="bg-gradient-to-r from-red-500 to-orange-500 border-b-4 border-black p-4">
+            <CardHeader className="bg-gradient-to-r from-red-600 to-orange-700 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
                 style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -562,11 +667,12 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditEvent(event);
                       }}
-                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      aria-label={`Tipp "${event.title}" bearbeiten`}
+                      className="absolute bottom-0 right-0 p-2 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-event-edit-${event.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-3 w-3 text-gray-600" />
+                      <Pencil className="h-4 w-4 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
@@ -615,7 +721,7 @@ export default function BerlinPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="berlin-links-section"
           >
-            <CardHeader className="bg-gradient-to-r from-cyan-400 to-blue-500 border-b-4 border-black p-4">
+            <CardHeader className="bg-gradient-to-r from-cyan-700 to-blue-700 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
                 style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -643,11 +749,12 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditLink(link);
                       }}
-                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      aria-label={`Link "${link.description}" bearbeiten`}
+                      className="absolute bottom-0 right-0 p-2 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-link-edit-${link.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-3 w-3 text-gray-600" />
+                      <Pencil className="h-4 w-4 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"

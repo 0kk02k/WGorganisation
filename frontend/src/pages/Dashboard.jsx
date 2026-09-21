@@ -23,20 +23,32 @@ import { staggerContainer, staggerItem, fadeInUp, springHover, chatMessage, flip
 
 const INITIAL_VISIBLE_COUNT = 7;
 const EXPANDED_VISIBLE_COUNT = 15;
+const CHAT_NAME_KEY = "boddin-chat-name";
+
+const readSavedChatName = () => {
+  try {
+    return window.localStorage.getItem(CHAT_NAME_KEY) || "";
+  } catch {
+    return "";
+  }
+};
 
 export default function Dashboard() {
   const { settings, updateSettings } = useSettings();
   const [stays, setStays] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+  const [messageForm, setMessageForm] = useState({ name: readSavedChatName(), content: "" });
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [replyingToId, setReplyingToId] = useState(null);
-  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+  const [replyForm, setReplyForm] = useState({ name: readSavedChatName(), content: "" });
   const [now, setNow] = useState(new Date());
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
   const [chatExpanded, setChatExpanded] = useState(false);
+  // Bewahrte Entwürfe, wenn Bearbeiten/Antworten quer gewechselt wird
+  const [stashedReply, setStashedReply] = useState(null);
+  const [stashedEdit, setStashedEdit] = useState(null);
   const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
@@ -59,6 +71,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([loadStays(), loadMessages()]).catch(console.error);
+  }, []);
+
+  // Nachrichten periodisch aktualisieren, damit Beiträge der Mitbewohner ankommen
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadMessages();
+    }, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -114,13 +134,12 @@ export default function Dashboard() {
   const handleResetWatered = async () => {
     try {
       const now = new Date();
-      const result = await updateSettings({ plantsWateredAt: now.toISOString() });
-      console.log("Settings updated:", result);
+      await updateSettings({ plantsWateredAt: now.toISOString() });
       setNow(now); // Update the now state to immediately show the counter
       toast.success("Gießzeit gespeichert.");
     } catch (error) {
       console.error("Failed to save watered time:", error);
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error("Speichern fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
@@ -135,15 +154,31 @@ export default function Dashboard() {
         content: messageForm.content.trim(),
       });
       setMessages((prev) => [data, ...prev]);
-      setMessageForm({ name: "", content: "" });
+      try {
+        window.localStorage.setItem(CHAT_NAME_KEY, messageForm.name.trim());
+      } catch {
+        /* localStorage nicht verfügbar */
+      }
+      setMessageForm((prev) => ({ name: prev.name, content: "" }));
     } catch (error) {
-      toast.error("Nachricht konnte nicht gesendet werden.");
+      toast.error("Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
   const startEditMessage = (message) => {
+    if (replyingToId && replyForm.content.trim()) {
+      setStashedReply({
+        messageId: replyingToId,
+        name: replyForm.name,
+        content: replyForm.content,
+      });
+      toast.info("Antwort-Entwurf gemerkt.", {
+        description: "Tippe erneut auf Antworten bei derselben Nachricht, um weiterzuschreiben.",
+      });
+    }
+    const stashed = stashedEdit?.messageId === message.id ? stashedEdit : null;
     setEditingMessageId(message.id);
-    setEditingContent(message.content);
+    setEditingContent(stashed ? stashed.content : message.content);
     setReplyingToId(null);
   };
 
@@ -163,8 +198,9 @@ export default function Dashboard() {
       );
       setEditingMessageId(null);
       setEditingContent("");
+      setStashedEdit(null);
     } catch (error) {
-      toast.error("Nachricht konnte nicht gespeichert werden.");
+      toast.error("Nachricht konnte nicht gespeichert werden. Bitte erneut versuchen.");
     }
   };
 
@@ -185,8 +221,19 @@ export default function Dashboard() {
   };
 
   const startReply = (message) => {
+    if (editingMessageId && editingContent.trim()) {
+      setStashedEdit({ messageId: editingMessageId, content: editingContent });
+      toast.info("Bearbeiten-Entwurf gemerkt.", {
+        description: "Tippe erneut auf Bearbeiten, um weiterzuschreiben.",
+      });
+    }
+    const stashed = stashedReply?.messageId === message.id ? stashedReply : null;
     setReplyingToId(message.id);
-    setReplyForm({ name: messageForm.name || "", content: "" });
+    setReplyForm({
+      name: stashed?.name || messageForm.name || "",
+      content: stashed?.content || "",
+    });
+    setStashedReply(null);
     setEditingMessageId(null);
   };
 
@@ -212,9 +259,15 @@ export default function Dashboard() {
         prev.map((item) => (item.id === messageId ? data : item)),
       );
       setReplyingToId(null);
-      setReplyForm({ name: "", content: "" });
+      setReplyForm((prev) => ({ name: prev.name, content: "" }));
+      setStashedReply(null);
+      try {
+        window.localStorage.setItem(CHAT_NAME_KEY, replyForm.name.trim());
+      } catch {
+        /* localStorage nicht verfügbar */
+      }
     } catch (error) {
-      toast.error("Antwort konnte nicht gesendet werden.");
+      toast.error("Antwort konnte nicht gesendet werden. Bitte erneut versuchen.");
     }
   };
 
@@ -269,7 +322,7 @@ export default function Dashboard() {
             className="text-4xl tracking-wide text-gray-800"
             style={{ fontFamily: "'Bangers', cursive" }}
           >
-            Ubersicht
+            Übersicht
           </h1>
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
         </motion.div>
@@ -283,7 +336,7 @@ export default function Dashboard() {
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-active-stays"
             >
-              <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
+              <CardHeader className="bg-gradient-to-r from-pink-600 to-orange-700 border-b-4 border-black p-4">
                 <CardTitle 
                   className="text-white text-2xl"
                   style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -342,13 +395,13 @@ export default function Dashboard() {
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-upcoming-card"
             >
-              <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
+              <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-700 border-b-4 border-black p-4">
                 <CardTitle 
                   className="text-white text-2xl"
                   style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="dashboard-upcoming-title"
                 >
-                  Nachste Check-ins
+                  Nächste Check-ins
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 bg-teal-400/10">
@@ -401,7 +454,7 @@ export default function Dashboard() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
             data-testid="dashboard-plants-card"
           >
-            <CardHeader className="bg-gradient-to-r from-emerald-400 to-teal-400 border-b-4 border-black p-4">
+            <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
                 style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -556,7 +609,7 @@ export default function Dashboard() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="dashboard-chat-card"
         >
-            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 border-b-4 border-black p-4">
+            <CardHeader className="bg-gradient-to-r from-purple-700 to-fuchsia-700 border-b-4 border-black p-4">
               <div className="flex items-center justify-between gap-4">
                 <CardTitle 
                   className="text-white text-2xl"
@@ -611,7 +664,7 @@ export default function Dashboard() {
                     if (filteredMessages.length === 0) {
                       return (
                         <p className="text-sm text-gray-500">
-                          Keine Nachrichten gefunden fur "{chatSearch}"
+                          Keine Nachrichten gefunden für "{chatSearch}"
                         </p>
                       );
                     }
@@ -649,7 +702,7 @@ export default function Dashboard() {
                             data-testid="chat-show-more"
                           >
                             <ChevronDown className="h-4 w-4 mr-2" />
-                            {filteredMessages.length - INITIAL_VISIBLE_COUNT} altere Nachrichten anzeigen
+                            {filteredMessages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
                           </Button>
                         )}
                       </>
@@ -672,9 +725,16 @@ export default function Dashboard() {
                   )}
                 </button>
               </div>
-              <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSendMessage();
+                }}
+                className="grid gap-3 md:grid-cols-[1fr_2fr_auto]"
+              >
                 <div className="space-y-2">
                   <label
+                    htmlFor="chat-name-input"
                     className="text-sm font-semibold text-gray-800"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-name-label"
@@ -682,6 +742,7 @@ export default function Dashboard() {
                     Dein Name
                   </label>
                   <Input
+                    id="chat-name-input"
                     value={messageForm.name}
                     onChange={(event) =>
                       setMessageForm((prev) => ({ ...prev, name: event.target.value }))
@@ -693,6 +754,7 @@ export default function Dashboard() {
                 </div>
                 <div className="space-y-2">
                   <label
+                    htmlFor="chat-message-input"
                     className="text-sm font-semibold text-gray-800"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-message-label"
@@ -700,19 +762,26 @@ export default function Dashboard() {
                     Nachricht
                   </label>
                   <Textarea
+                    id="chat-message-input"
                     rows={2}
                     value={messageForm.content}
                     onChange={(event) =>
                       setMessageForm((prev) => ({ ...prev, content: event.target.value }))
                     }
-                    placeholder="Kurze Info fur alle"
+                    placeholder="Kurze Info für alle (Strg+Enter sendet)"
                     className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
                     data-testid="chat-message-input"
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+                        event.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-end">
                   <Button
-                    onClick={handleSendMessage}
+                    type="submit"
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-send-button"
@@ -720,7 +789,7 @@ export default function Dashboard() {
                     Senden
                   </Button>
                 </div>
-              </div>
+              </form>
             </CardContent>
         </Card>
         </motion.div>

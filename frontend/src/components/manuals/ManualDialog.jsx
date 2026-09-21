@@ -68,7 +68,7 @@ export const ManualDialog = ({ onCreated }) => {
       onCreated?.(data);
       setOpen(false);
     } catch (error) {
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error(`Speichern fehlgeschlagen: ${error.message || "Unbekannter Fehler"}`);
     }
   };
 
@@ -110,12 +110,14 @@ export const ManualDialog = ({ onCreated }) => {
               alt="Bild auswählen"
               className="h-full w-full object-cover"
             />
-            {/* Camera overlay */}
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
-              <div className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                <Camera className="h-8 w-8 text-gray-800" />
+            {/* Camera overlay - nur solange kein Bild gewählt ist */}
+            {!imageSrc && (
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
+                <div className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                  <Camera className="h-8 w-8 text-gray-800" />
+                </div>
               </div>
-            </div>
+            )}
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -173,7 +175,7 @@ export const ManualDialog = ({ onCreated }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:opacity-90 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            className="flex-1 bg-amber-500 hover:bg-amber-600 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="manual-dialog-submit"
           >
             Speichern

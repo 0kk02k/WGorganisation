@@ -39,7 +39,7 @@ export default function ManualsPage() {
             >
               How to.....
             </h1>
-            <div className="h-2 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 mt-2" />
+            <div className="h-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 mt-2" />
           </div>
           <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
         </motion.div>
@@ -58,11 +58,11 @@ export default function ManualsPage() {
               data-testid="manuals-empty"
             >
               <CardContent className="py-12 text-center">
-                <p 
+                <p
                   className="text-gray-500 text-lg"
                   style={{ fontFamily: "'Nunito', sans-serif" }}
                 >
-                  Noch keine Anleitungen. Lege eine neue an.
+                  Noch keine Anleitungen. Tippe oben rechts auf +, um die erste anzulegen.
                 </p>
               </CardContent>
             </Card>
@@ -93,7 +93,7 @@ export default function ManualsPage() {
                         className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <CardHeader className="p-4 bg-gradient-to-r from-violet-100 to-fuchsia-100">
+                    <CardHeader className="p-4 bg-gradient-to-r from-amber-100 to-yellow-100">
                       <CardTitle 
                         className="text-lg font-bold text-gray-800"
                         style={{ fontFamily: "'Nunito', sans-serif" }}

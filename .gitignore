@@ -85,3 +85,6 @@ android-sdk/ -e
 # Environment files
 *.env
 *.env.*
+
+# Impeccable local critique archive
+.impeccable/

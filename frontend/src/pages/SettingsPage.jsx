@@ -231,8 +231,8 @@ export default function SettingsPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="settings-checkin-card"
           >
-            <CardHeader 
-              className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
+            <CardHeader
+              className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b-4 border-black flex flex-row items-center justify-between p-4"
             >
               <CardTitle 
                 className="text-white text-2xl"
@@ -265,7 +265,7 @@ export default function SettingsPage() {
                     Abbrechen
                   </Button>
                   <Button
-                    className="bg-teal-500 hover:bg-teal-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    className="bg-teal-700 hover:bg-teal-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     onClick={handleSaveCheckin}
                     data-testid="settings-checkin-save-button"
                   >
@@ -276,13 +276,22 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-4 bg-teal-400/10">
                {editingCheckin ? (
-                <Textarea
-                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
-                  rows={6}
-                  value={checkinDraft}
-                  onChange={(event) => setCheckinDraft(event.target.value)}
-                  data-testid="settings-checkin-textarea"
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
+                    rows={6}
+                    value={checkinDraft}
+                    onChange={(event) => setCheckinDraft(event.target.value)}
+                    aria-label="Check-in Vorlage bearbeiten"
+                    data-testid="settings-checkin-textarea"
+                  />
+                  <p
+                    className="text-xs text-gray-600"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Eine Zeile = ein Punkt auf der Checkliste. Neue Aufenthalte bekommen diese Liste automatisch.
+                  </p>
+                </div>
               ) : (
                 <ul className="space-y-2">
                   {displayCheckin.split('\n').filter(Boolean).map((item, index) => (
@@ -313,8 +322,8 @@ export default function SettingsPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="settings-checkout-card"
           >
-            <CardHeader 
-              className="bg-gradient-to-r from-rose-400 to-pink-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
+            <CardHeader
+              className="bg-gradient-to-r from-rose-600 to-pink-700 border-b-4 border-black flex flex-row items-center justify-between p-4"
             >
               <CardTitle 
                 className="text-white text-2xl"
@@ -347,7 +356,7 @@ export default function SettingsPage() {
                     Abbrechen
                   </Button>
                   <Button
-                    className="bg-rose-500 hover:bg-rose-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    className="bg-rose-700 hover:bg-rose-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     onClick={handleSaveCheckout}
                     data-testid="settings-checkout-save-button"
                   >
@@ -358,13 +367,22 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-4 bg-rose-400/10">
                {editingCheckout ? (
-                <Textarea
-                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-rose-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
-                  rows={6}
-                  value={checkoutDraft}
-                  onChange={(event) => setCheckoutDraft(event.target.value)}
-                  data-testid="settings-checkout-textarea"
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-rose-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
+                    rows={6}
+                    value={checkoutDraft}
+                    onChange={(event) => setCheckoutDraft(event.target.value)}
+                    aria-label="Check-out Vorlage bearbeiten"
+                    data-testid="settings-checkout-textarea"
+                  />
+                  <p
+                    className="text-xs text-gray-600"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Eine Zeile = ein Punkt auf der Checkliste. Neue Aufenthalte bekommen diese Liste automatisch.
+                  </p>
+                </div>
               ) : (
                 <ul className="space-y-2">
                   {displayCheckout.split('\n').filter(Boolean).map((item, index) => (

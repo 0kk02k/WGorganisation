@@ -24,8 +24,8 @@ const navItems = [
   },
   {
     to: "/anleitungen",
-    label: "How to.....",
-    short: "How to",
+    label: "Anleitungen",
+    short: "Anleitungen",
     icon: BookOpen,
     testId: "nav-manuals-link",
     color: "from-pink-500 to-rose-500",
@@ -47,6 +47,12 @@ const navItems = [
     color: "from-purple-500 to-pink-500",
   },
 ];
+
+const isNavItemActive = (item, pathname) => {
+  if (item.to === "/kalender" && pathname.startsWith("/aufenthalte")) return true;
+  if (item.to === "/") return pathname === "/";
+  return pathname.startsWith(item.to);
+};
 
 export const Layout = ({ children }) => {
   const location = useLocation();
@@ -107,12 +113,12 @@ export const Layout = ({ children }) => {
         >
           <div className="flex whitespace-nowrap animate-ticker h-full items-center">
             {[...Array(20)].map((_, i) => (
-              <span 
+              <span
                 key={i}
                 className="tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive", fontSize: '3.9rem' }}
               >
-                BODDINWG-HUB++++
+                BODDIN14 WG-HUB++++
               </span>
             ))}
           </div>
@@ -121,27 +127,33 @@ export const Layout = ({ children }) => {
         {/* Navigation - always visible, positioned at bottom */}
         <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8`}>
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) => {
-                  const calendarActive =
-                    item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                  return cn(
-                    "flex items-center gap-2 px-4 py-2 text-sm font-bold border-4 border-black rounded-none transition-all duration-150",
-                    isActive || calendarActive
-                      ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+            {navItems.map((item) => {
+              const active = isNavItemActive(item, location.pathname);
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex items-center gap-2 px-4 py-2 text-sm font-bold border-4 border-black rounded-none transition-all duration-150",
+                    active
+                      ? "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                       : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                  );
-                }}
-                data-testid={item.testId}
-                style={{ fontFamily: "'Nunito', sans-serif" }}
-              >
-                <item.icon className="h-4 w-4" />
-                <span data-testid={`${item.testId}-label`}>{item.label}</span>
-              </NavLink>
-            ))}
+                  )}
+                  data-testid={item.testId}
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span data-testid={`${item.testId}-label`}>{item.label}</span>
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r ${item.color}`}
+                    />
+                  )}
+                </NavLink>
+              );
+            })}
           </nav>
         </div>
       </header>
@@ -153,35 +165,39 @@ export const Layout = ({ children }) => {
       >
         <div className="relative py-3 overflow-hidden">
           {/* Scrolling Ticker */}
-          <div 
+          <div
             className="flex whitespace-nowrap animate-ticker"
           >
             {[...Array(20)].map((_, i) => (
-              <span 
+              <span
                 key={i}
                 className="text-xl tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive" }}
               >
-                BODDINWG-HUB++++
+                BODDIN14 WG-HUB++++
               </span>
             ))}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
-        {/* Hamburger Menu Button - positioned absolute within the bar */}
-        <button
-          type="button"
-          onClick={toggleMobileNav}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          data-testid="mobile-nav-toggle"
-        >
-          {mobileNavOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </button>
       </div>
+
+      {/* Hamburger/Close - root-level fixed mit z-[60], damit das geöffnete
+          Panel (z-50) den Button nicht überdecken kann */}
+      <button
+        type="button"
+        onClick={toggleMobileNav}
+        aria-label={mobileNavOpen ? "Menü schließen" : "Menü öffnen"}
+        aria-expanded={mobileNavOpen}
+        className="fixed right-2 top-1.5 z-[60] flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] min-[755px]:hidden"
+        data-testid="mobile-nav-toggle"
+      >
+        {mobileNavOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
+      </button>
 
       {/* Mobile Navigation Overlay */}
       <AnimatePresence>
@@ -212,28 +228,34 @@ export const Layout = ({ children }) => {
             exit="exit"
           >
             <div className="flex flex-col gap-3" data-testid="mobile-nav-links">
-              {navItems.map((item) => (
-                <NavLink
-                  key={`${item.to}-drawer`}
-                  to={item.to}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={({ isActive }) => {
-                    const calendarActive =
-                      item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                    return cn(
-                      "flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
-                      isActive || calendarActive
-                        ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+              {navItems.map((item) => {
+                const active = isNavItemActive(item, location.pathname);
+                return (
+                  <NavLink
+                    key={`${item.to}-drawer`}
+                    to={item.to}
+                    onClick={() => setMobileNavOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
+                      active
+                        ? "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                    );
-                  }}
-                  data-testid={`mobile-${item.testId}`}
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
+                    )}
+                    data-testid={`mobile-${item.testId}`}
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                    {active && (
+                      <span
+                        aria-hidden="true"
+                        className={`absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r ${item.color}`}
+                      />
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
           </motion.div>
         )}

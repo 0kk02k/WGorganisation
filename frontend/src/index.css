@@ -1,18 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Bangers&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Bewusste Globalskalierung: alle rem-Einheiten von Tailwind liegen 12,5% höher */
 html {
     font-size: 18px;
 }
 
 body {
     margin: 0;
-    font-family: "Space Grotesk", sans-serif;
+    font-family: "Nunito", sans-serif;
     background: #f5f5f0;
     color: #1a1a1a;
     min-height: 100%;
@@ -32,37 +32,38 @@ code {
 }
 
 ::selection {
-    background: rgba(204, 255, 0, 0.25);
-    color: #050505;
+    background: rgba(250, 204, 21, 0.45);
+    color: #1a1a1a;
 }
 
 @layer base {
     :root {
-        --background: 0 0% 2%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 10%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 12%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 72 100% 50%;
-        --primary-foreground: 0 0% 5%;
-        --secondary: 0 0% 14%;
-        --secondary-foreground: 0 0% 90%;
-        --muted: 0 0% 16%;
-        --muted-foreground: 0 0% 65%;
-        --accent: 280 96% 58%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 80% 55%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 18%;
-        --input: 0 0% 18%;
-        --ring: 72 100% 50%;
-        --chart-1: 72 100% 50%;
-        --chart-2: 280 96% 58%;
-        --chart-3: 198 70% 40%;
-        --chart-4: 43 74% 66%;
-        --chart-5: 27 87% 67%;
-        --radius: 1rem;
+        /* Pop-Art-Palette: Papierweiß, Tinte-Schwarz, Gelb als Primärfarbe */
+        --background: 60 20% 95%;
+        --foreground: 240 6% 10%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 6% 10%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 6% 10%;
+        --primary: 48 96% 53%;
+        --primary-foreground: 240 6% 10%;
+        --secondary: 48 100% 88%;
+        --secondary-foreground: 240 6% 10%;
+        --muted: 240 5% 96%;
+        --muted-foreground: 220 9% 35%;
+        --accent: 329 86% 55%;
+        --accent-foreground: 0 0% 100%;
+        --destructive: 0 84% 60%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 240 6% 10%;
+        --input: 240 6% 10%;
+        --ring: 240 6% 10%;
+        --chart-1: 48 96% 53%;
+        --chart-2: 329 86% 55%;
+        --chart-3: 173 80% 40%;
+        --chart-4: 27 96% 53%;
+        --chart-5: 199 89% 48%;
+        --radius: 0rem;
     }
 }
 
@@ -73,43 +74,6 @@ code {
     body {
         @apply text-foreground;
     }
-}
-
-.text-stone-900 {
-    color: rgba(248, 250, 252, 0.95) !important;
-}
-
-.text-stone-700 {
-    color: rgba(248, 250, 252, 0.8) !important;
-}
-
-.text-stone-600 {
-    color: rgba(248, 250, 252, 0.65) !important;
-}
-
-.bg-stone-50 {
-    background-color: rgba(255, 255, 255, 0.04) !important;
-}
-
-.bg-stone-100 {
-    background-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-.border-stone-200 {
-    border-color: rgba(255, 255, 255, 0.04) !important;
-}
-
-.border-stone-300 {
-    border-color: rgba(255, 255, 255, 0.06) !important;
-}
-
-.hover-lift {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 24px rgba(176, 38, 255, 0.18);
 }
 
 /* Ticker Animation - steps every 0.5s */
@@ -124,6 +88,26 @@ code {
 
 .animate-ticker {
     animation: ticker 40s steps(40) infinite;
+}
+
+/* Barrierefreiheit: reduzierte Bewegung respektieren */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .animate-ticker,
+    .animate-pulse {
+        animation: none !important;
+    }
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
 }
 
 
@@ -143,7 +127,6 @@ code {
         padding-bottom: inherit;
         column-gap: inherit;
         row-gap: inherit;
-        gap: inherit;
         border-left-width: inherit;
         border-right-width: inherit;
         border-top-width: inherit;

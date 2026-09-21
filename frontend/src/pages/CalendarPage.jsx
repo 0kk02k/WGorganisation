@@ -34,11 +34,6 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(new Date());
   const rooms = settings?.rooms || DEFAULT_ROOMS;
-  
-  const room1 = rooms[0];
-  const room2 = rooms[1];
-  const room1Id = room1?.id || "A";
-  const room2Id = room2?.id || "B";
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,6 +71,17 @@ export default function CalendarPage() {
   const selectedStays = staysForDate(selectedDate);
   const selectedEvents = eventsForDate(selectedDate);
 
+  const upcomingOrCurrentStays = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return stays
+      .filter((stay) => {
+        const end = parseISO(stay.end_date);
+        return end >= today;
+      })
+      .sort((a, b) => parseISO(a.start_date) - parseISO(b.start_date));
+  }, [stays]);
+
   return (
     <div className="min-h-screen relative" data-testid="calendar-page">
       <motion.div
@@ -109,7 +115,7 @@ export default function CalendarPage() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-grid-card"
         >
-          <CardHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between gap-4 p-4">
+          <CardHeader className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b-4 border-black flex flex-row items-center justify-between gap-4 p-4">
             <CardTitle 
               className="text-white text-2xl"
               style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -126,8 +132,9 @@ export default function CalendarPage() {
                   )
                 }
                 data-testid="calendar-prev-month"
+                aria-label="Vorheriger Monat"
               >
-                <ChevronLeft className="h-5 w-5" />
+                <ChevronLeft className="!h-5 !w-5" />
               </Button>
               <Button
                 className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150 p-2"
@@ -137,8 +144,9 @@ export default function CalendarPage() {
                   )
                 }
                 data-testid="calendar-next-month"
+                aria-label="Nächster Monat"
               >
-                <ChevronRight className="h-5 w-5" />
+                <ChevronRight className="!h-5 !w-5" />
               </Button>
             </div>
           </CardHeader>
@@ -156,51 +164,89 @@ export default function CalendarPage() {
                 </div>
               ))}
             </div>
+            {/* Room Legend */}
+            <div
+              className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-3"
+              data-testid="calendar-room-legend"
+            >
+              <span
+                className="text-sm font-bold text-gray-800"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              >
+                Legende:
+              </span>
+              {rooms.map((room) => (
+                <span key={room.id} className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-6 border-2 border-black"
+                    style={{ backgroundColor: room.color }}
+                    aria-hidden="true"
+                  />
+                  <span
+                    className="text-sm text-gray-800"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    {room.name}
+                  </span>
+                </span>
+              ))}
+            </div>
             {/* Calendar Days */}
             <div className="grid grid-cols-7 gap-2">
               {calendarDays.map((day) => {
                 const inMonth = isSameMonth(day, currentMonth);
                 const isCurrentDay = isToday(day);
                 const dayStays = staysForDate(day);
-                const hasRoom1 = dayStays.some((stay) => stay.room === room1Id);
-                const hasRoom2 = dayStays.some((stay) => stay.room === room2Id);
+                const isSelected = isSameDay(day, selectedDate);
+                const activeRooms = rooms.filter((room) =>
+                  dayStays.some((stay) => stay.room === room.id),
+                );
                 const hasEvents = eventsForDate(day).length > 0;
 
                 return (
                   <motion.button
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
+                    aria-pressed={isSelected}
+                    aria-label={`${format(day, "EEEE, dd.MM.yyyy", { locale: de })}${
+                      dayStays.length > 0
+                        ? `, ${dayStays.length} Belegung${dayStays.length > 1 ? "en" : ""}`
+                        : ", keine Belegung"
+                    }${hasEvents ? ", Veranstaltungstipp" : ""}`}
                     className={`relative border-4 border-black p-2 text-left text-sm transition-all duration-150 min-h-[60px] ${
-                      isSameDay(day, selectedDate)
-                        ? "bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                      isSelected
+                        ? "bg-gradient-to-r from-pink-600 to-orange-600 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         : "bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                     } ${!inMonth ? "opacity-40" : "opacity-100"} ${
-                      isCurrentDay && !isSameDay(day, selectedDate)
+                      isCurrentDay && !isSelected
                         ? "ring-4 ring-yellow-400"
                         : ""
                     }`}
                     data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                     {...calendarCellHover}
                   >
-                    {/* Room indicators */}
-                    {hasRoom1 && (
+                    {/* Room indicators - gestapelte Farbbalken, eines pro Zimmer */}
+                    {activeRooms.map((room, index) => (
                       <span
-                        className="absolute left-1 right-1 top-1 h-2 border-2 border-black"
-                        style={{ backgroundColor: room1?.color || '#facc15' }}
-                        data-testid={`calendar-room-top-bar-${format(day, "yyyy-MM-dd")}`}
+                        key={room.id}
+                        className="absolute left-1 right-1 h-2 border-2 border-black"
+                        style={{
+                          top: `${4 + index * 10}px`,
+                          backgroundColor: room.color,
+                        }}
+                        data-testid={`calendar-room-bar-${room.id}-${format(day, "yyyy-MM-dd")}`}
+                        aria-hidden="true"
                       />
-                    )}
-                    {hasRoom2 && (
-                      <span
-                        className="absolute left-1 right-1 bottom-1 h-2 border-2 border-black"
-                        style={{ backgroundColor: room2?.color || '#0ea5e9' }}
-                        data-testid={`calendar-room-bottom-bar-${format(day, "yyyy-MM-dd")}`}
-                      />
-                    )}
+                    ))}
                     <div className="flex items-center justify-center gap-1 mt-2">
-                      <span 
-                        className={`font-bold ${isSameDay(day, selectedDate) ? "text-white" : "text-gray-800"}`}
-                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      <span
+                        className={`font-bold ${isSelected ? "text-white" : "text-gray-800"}`}
+                        style={{
+                          fontFamily: "'Nunito', sans-serif",
+                          ...(isSelected
+                            ? { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
+                            : {}),
+                        }}
                         data-testid={`calendar-day-label-${format(day, "yyyy-MM-dd")}`}
                       >
                         {format(day, "d")}
@@ -226,8 +272,8 @@ export default function CalendarPage() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-selected-card"
         >
-          <CardHeader className="bg-gradient-to-r from-orange-500 to-red-500 border-b-4 border-black p-4">
-            <CardTitle 
+          <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-600 border-b-4 border-black p-4">
+            <CardTitle
               className="text-white text-2xl"
               style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
               data-testid="calendar-selected-title"
@@ -235,7 +281,7 @@ export default function CalendarPage() {
               {format(selectedDate, "EEEE, dd.MM.yyyy", { locale: de })}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-4 space-y-4 bg-orange-500/10">
+          <CardContent className="p-4 space-y-4 bg-amber-500/10">
             {selectedStays.length === 0 ? (
               <p 
                 className="text-sm text-gray-500"
@@ -318,16 +364,7 @@ export default function CalendarPage() {
             <div className="h-2 bg-gradient-to-r from-pink-500 to-rose-500 mt-2" />
           </div>
           <StaysList
-            stays={useMemo(() => {
-              const today = new Date();
-              today.setHours(0, 0, 0, 0);
-              return stays
-                .filter((stay) => {
-                  const end = parseISO(stay.end_date);
-                  return end >= today;
-                })
-                .sort((a, b) => parseISO(a.start_date) - parseISO(b.start_date));
-            }, [stays])}
+            stays={upcomingOrCurrentStays}
             testIdPrefix="calendar-stays"
             emptyLabel="Keine kommenden Aufenthalte."
           />
