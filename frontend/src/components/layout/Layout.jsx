@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -9,7 +9,6 @@ const navItems = [
   {
     to: "/",
     label: "Übersicht",
-    short: "Home",
     icon: Home,
     testId: "nav-home-link",
     color: "from-yellow-400 to-orange-500",
@@ -17,7 +16,6 @@ const navItems = [
   {
     to: "/kalender",
     label: "Kalender",
-    short: "Kalender",
     icon: CalendarDays,
     testId: "nav-calendar-link",
     color: "from-teal-400 to-emerald-400",
@@ -25,7 +23,6 @@ const navItems = [
   {
     to: "/anleitungen",
     label: "Anleitungen",
-    short: "Anleitungen",
     icon: BookOpen,
     testId: "nav-manuals-link",
     color: "from-pink-500 to-rose-500",
@@ -33,7 +30,6 @@ const navItems = [
   {
     to: "/berlin",
     label: "Berlin",
-    short: "Berlin",
     icon: MapPin,
     testId: "nav-berlin-link",
     color: "from-orange-500 to-red-500",
@@ -41,7 +37,6 @@ const navItems = [
   {
     to: "/einstellungen",
     label: "Einstellungen",
-    short: "Info",
     icon: Settings,
     testId: "nav-settings-link",
     color: "from-purple-500 to-pink-500",
@@ -58,10 +53,46 @@ export const Layout = ({ children }) => {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [titleVisible, setTitleVisible] = useState(true);
+  const mobilePanelRef = useRef(null);
+  const mobileToggleRef = useRef(null);
 
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  // Escape schließt das Menü; beim Öffnen landet der Fokus im Panel,
+  // beim Schließen zurück auf dem Toggle
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const toggleEl = mobileToggleRef.current;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMobileNavOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const panel = mobilePanelRef.current;
+      if (!panel) return;
+      const focusable = panel.querySelectorAll("a, button");
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    const firstLink = mobilePanelRef.current?.querySelector("a");
+    firstLink?.focus();
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      toggleEl?.focus();
+    };
+  }, [mobileNavOpen]);
 
   // Hide title bar on scroll
   useEffect(() => {
@@ -91,13 +122,6 @@ export const Layout = ({ children }) => {
         }}
       />
 
-      {/* Decorative Elements - CSS parallax: fixed so they stay while content scrolls */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
-        <div className="absolute -top-20 left-1/4 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-20" />
-        <div className="absolute top-1/3 right-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />
-      </div>
-
       {/* Combined Title + Navigation Bar - Desktop only */}
       <header 
         className={`fixed inset-x-0 z-40 hidden border-b-4 border-black bg-white transition-all duration-300 overflow-hidden min-[755px]:block ${
@@ -106,7 +130,8 @@ export const Layout = ({ children }) => {
         data-testid="desktop-header"
       >
         {/* Scrolling Ticker - Background layer, full height behind nav */}
-        <div 
+        <div
+          aria-hidden="true"
           className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${
             titleVisible ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
@@ -166,6 +191,7 @@ export const Layout = ({ children }) => {
         <div className="relative py-3 overflow-hidden">
           {/* Scrolling Ticker */}
           <div
+            aria-hidden="true"
             className="flex whitespace-nowrap animate-ticker"
           >
             {[...Array(20)].map((_, i) => (
@@ -189,6 +215,8 @@ export const Layout = ({ children }) => {
         onClick={toggleMobileNav}
         aria-label={mobileNavOpen ? "Menü schließen" : "Menü öffnen"}
         aria-expanded={mobileNavOpen}
+        aria-controls="mobile-nav-panel"
+        ref={mobileToggleRef}
         className="fixed right-2 top-1.5 z-[60] flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] min-[755px]:hidden"
         data-testid="mobile-nav-toggle"
       >
@@ -220,6 +248,11 @@ export const Layout = ({ children }) => {
         {mobileNavOpen && (
           <motion.div
             key="mobile-nav-panel"
+            id="mobile-nav-panel"
+            ref={mobilePanelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
             className="fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
             data-testid="mobile-nav-panel"
             variants={slideInRight}

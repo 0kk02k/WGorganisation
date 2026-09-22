@@ -52,7 +52,7 @@ export default function ChatReplyList({
       {replies.map((reply) => (
         <div
           key={reply.id}
-          className="border-4 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          className="border-2 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3"
           data-testid={`chat-reply-${messageId}-${reply.id}`}
         >
           <div className="flex items-start justify-between gap-2">

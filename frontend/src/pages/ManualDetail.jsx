@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Camera, Pencil, Trash2 } from "lucide-react";
+import { ManualPlaceholder } from "@/components/manuals/ManualPlaceholder";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,7 +166,7 @@ export default function ManualDetail() {
 
   if (!manual || !form) {
     return (
-      <div 
+      <div
         className="text-lg text-gray-500 p-8"
         style={{ fontFamily: "'Nunito', sans-serif" }}
         data-testid="manual-loading"
@@ -175,17 +176,14 @@ export default function ManualDetail() {
     );
   }
 
-  const imageSrc =
-    form.image_data ||
-    form.image_url ||
-    "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
+  const imageSrc = form.image_data || form.image_url || "";
 
   return (
     <div className="min-h-screen relative" data-testid="manual-detail-page">
       <div className="relative z-10 space-y-6">
         {/* Back Button */}
-        <Button 
-          asChild 
+        <Button
+          asChild
           className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
         >
           <Link to="/anleitungen" data-testid="manual-back-link">
@@ -196,34 +194,54 @@ export default function ManualDetail() {
         {/* Main Card */}
         <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
           {/* Image with edit overlay */}
-          <div 
-            className={`relative aspect-video overflow-hidden border-b-4 border-black bg-gray-100 ${isEditing ? 'cursor-pointer' : ''}`}
-            onClick={handleImageClick}
-            data-testid="manual-detail-image"
-          >
-            <img
-              src={imageSrc}
-              alt={form.title}
-              className="h-full w-full object-cover"
-            />
-            {/* Edit overlay when in editing mode */}
-            {isEditing && (
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center hover:bg-black/50 transition-colors">
-                <div className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          {isEditing ? (
+            <button
+              type="button"
+              onClick={handleImageClick}
+              className="relative block w-full aspect-video overflow-hidden border-b-4 border-black bg-gray-100 cursor-pointer"
+              aria-label="Bild für diese Anleitung ändern"
+              data-testid="manual-detail-image"
+            >
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt={form.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <ManualPlaceholder title={form.title} />
+              )}
+              <span className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <span className="bg-white p-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                   <Camera className="h-8 w-8 text-gray-800" />
-                </div>
-              </div>
-            )}
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
-              data-testid="manual-edit-image-file"
-            />
-          </div>
+                </span>
+              </span>
+            </button>
+          ) : (
+            <div
+              className="relative aspect-video overflow-hidden border-b-4 border-black bg-gray-100"
+              data-testid="manual-detail-image"
+            >
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
+                  alt={form.title}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <ManualPlaceholder title={form.title} />
+              )}
+            </div>
+          )}
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+            data-testid="manual-edit-image-file"
+          />
           
           {/* Header */}
           <CardHeader className="bg-gradient-to-r from-teal-700 to-emerald-700 border-b-4 border-black p-4">
@@ -234,6 +252,7 @@ export default function ManualDetail() {
                     className="text-sm font-bold text-white"
                     style={{ textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                     data-testid="manual-edit-title-label"
+              htmlFor="manual-edit-title"
                   >
                     Titel
                   </label>
@@ -243,7 +262,8 @@ export default function ManualDetail() {
                       setForm((prev) => ({ ...prev, title: event.target.value }))
                     }
                     className="bg-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800"
-                    data-testid="manual-edit-title"
+                    id="manual-edit-title"
+              data-testid="manual-edit-title"
                   />
                 </div>
               ) : (

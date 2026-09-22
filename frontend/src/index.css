@@ -5,9 +5,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Bewusste Globalskalierung: alle rem-Einheiten von Tailwind liegen 12,5% höher */
+/* Bewusste Globalskalierung: 112,5 % respektiert die Browser-Textgröße des Nutzers */
 html {
-    font-size: 18px;
+    font-size: 112.5%;
 }
 
 body {

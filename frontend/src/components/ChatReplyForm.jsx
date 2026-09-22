@@ -11,7 +11,7 @@ export default function ChatReplyForm({
   onCancel,
 }) {
   return (
-    <div className="mt-4 space-y-3 border-4 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+    <div className="mt-4 space-y-3 border-2 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3">
       <Input
         value={replyForm.name}
         onChange={(event) => onNameChange(event.target.value)}

@@ -93,6 +93,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
+          aria-label={triggerLabel || "Neue Belegung anlegen"}
+          title={triggerLabel || "Neue Belegung anlegen"}
           className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
           data-testid={triggerTestId}
         >
@@ -117,6 +119,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             <label
               className="text-sm font-bold text-gray-800"
               data-testid="stay-form-occupant-label"
+              htmlFor="stay-form-occupant-input"
             >
               Name der Person
             </label>
@@ -130,6 +133,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               }
               placeholder="z.B. Lea oder Ben"
               className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              id="stay-form-occupant-input"
               data-testid="stay-form-occupant-input"
             />
           </div>
@@ -138,6 +142,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-room-label"
+              htmlFor="stay-form-room-select"
               >
                 Zimmer
               </label>
@@ -148,7 +153,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }
               >
                 <SelectTrigger 
-                  data-testid="stay-form-room-select"
+                  id="stay-form-room-select"
+              data-testid="stay-form-room-select"
                 >
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
@@ -169,6 +175,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-start-label"
+              htmlFor="stay-form-start-date"
               >
                 Check-in
               </label>
@@ -182,7 +189,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   }))
                 }
                 className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-start-date"
+                id="stay-form-start-date"
+              data-testid="stay-form-start-date"
               />
             </div>
           </div>
@@ -191,6 +199,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-end-label"
+              htmlFor="stay-form-end-date"
               >
                 Check-out
               </label>
@@ -204,13 +213,15 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   }))
                 }
                 className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-end-date"
+                id="stay-form-end-date"
+              data-testid="stay-form-end-date"
               />
             </div>
             <div className="space-y-2">
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-notes-label"
+              htmlFor="stay-form-notes-input"
               >
                 Notiz
               </label>
@@ -225,7 +236,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }
                 placeholder="Ankunftszeit, Schlüsselort ..."
                 className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-notes-input"
+                id="stay-form-notes-input"
+              data-testid="stay-form-notes-input"
               />
             </div>
           </div>

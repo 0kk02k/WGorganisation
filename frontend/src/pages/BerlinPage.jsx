@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -51,6 +53,8 @@ const formatGermanDate = (value) => {
 export default function BerlinPage() {
   const [events, setEvents] = useState([]);
   const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
   const [form, setForm] = useState({
     title: "",
@@ -102,6 +106,7 @@ export default function BerlinPage() {
     : links;
 
   const loadData = async () => {
+    setLoadError(null);
     try {
       const [eventsData, linksData] = await Promise.all([
         eventsApi.list(),
@@ -111,6 +116,9 @@ export default function BerlinPage() {
       setLinks(linksData);
     } catch (error) {
       console.error("Failed to load data:", error);
+      setLoadError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -311,6 +319,7 @@ export default function BerlinPage() {
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-title-label"
+              htmlFor="berlin-title-input"
                   >
                     Titel
                   </label>
@@ -319,13 +328,15 @@ export default function BerlinPage() {
                     onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
                     placeholder="z.B. Jazz Night"
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-title-input"
+                    id="berlin-title-input"
+              data-testid="berlin-title-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-date-label"
+              htmlFor="berlin-date-input"
                   >
                     Datum
                   </label>
@@ -334,7 +345,8 @@ export default function BerlinPage() {
                     value={form.date}
                     onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-date-input"
+                    id="berlin-date-input"
+              data-testid="berlin-date-input"
                   />
                 </div>
               </div>
@@ -343,6 +355,7 @@ export default function BerlinPage() {
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-location-label"
+              htmlFor="berlin-location-input"
                   >
                     Ort
                   </label>
@@ -353,13 +366,15 @@ export default function BerlinPage() {
                     }
                     placeholder="z.B. Kreuzberg"
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-location-input"
+                    id="berlin-location-input"
+              data-testid="berlin-location-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-description-label"
+              htmlFor="berlin-description-input"
                   >
                     Beschreibung
                   </label>
@@ -371,7 +386,8 @@ export default function BerlinPage() {
                     }
                     placeholder="Was lohnt sich?"
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-description-input"
+                    id="berlin-description-input"
+              data-testid="berlin-description-input"
                   />
                 </div>
               </div>
@@ -379,6 +395,7 @@ export default function BerlinPage() {
                 <label 
                   className="text-sm font-bold text-gray-800"
                   data-testid="berlin-hashtags-label"
+              htmlFor="berlin-hashtags-input"
                 >
                   Hashtags
                 </label>
@@ -387,7 +404,8 @@ export default function BerlinPage() {
                   onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
                   placeholder="#club, #openair"
                   className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                  data-testid="berlin-hashtags-input"
+                  id="berlin-hashtags-input"
+              data-testid="berlin-hashtags-input"
                 />
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -462,6 +480,7 @@ export default function BerlinPage() {
                 <label 
                   className="text-sm font-bold text-gray-800"
                   data-testid="berlin-link-description-label"
+              htmlFor="berlin-link-description-input"
                 >
                   Beschreibung
                 </label>
@@ -473,7 +492,8 @@ export default function BerlinPage() {
                   }
                   placeholder="Warum ist der Link hilfreich?"
                   className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                  data-testid="berlin-link-description-input"
+                  id="berlin-link-description-input"
+              data-testid="berlin-link-description-input"
                 />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -481,6 +501,7 @@ export default function BerlinPage() {
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-link-url-label"
+              htmlFor="berlin-link-url-input"
                   >
                     URL
                   </label>
@@ -491,13 +512,15 @@ export default function BerlinPage() {
                     }
                     placeholder="https://..."
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-link-url-input"
+                    id="berlin-link-url-input"
+              data-testid="berlin-link-url-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-link-hashtags-label"
+              htmlFor="berlin-link-hashtags-input"
                   >
                     Hashtags
                   </label>
@@ -508,7 +531,8 @@ export default function BerlinPage() {
                     }
                     placeholder="#tickets, #club"
                     className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-link-hashtags-input"
+                    id="berlin-link-hashtags-input"
+              data-testid="berlin-link-hashtags-input"
                   />
                 </div>
               </div>
@@ -649,7 +673,21 @@ export default function BerlinPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4 bg-red-500/10">
-              {filteredEvents.length === 0 ? (
+              {loadError ? (
+                <ErrorCard
+                  title="Tipps konnten nicht geladen werden."
+                  onRetry={() => {
+                    setLoading(true);
+                    loadData();
+                  }}
+                  testId="berlin-error"
+                />
+              ) : loading ? (
+                <div className="space-y-4" aria-hidden="true">
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                </div>
+              ) : filteredEvents.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
                     Noch keine Tipps vorhanden.
@@ -659,7 +697,7 @@ export default function BerlinPage() {
                 filteredEvents.map((event) => (
                   <div 
                     key={event.id} 
-                    className="relative border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-2 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     data-testid={`berlin-event-${event.id}`}
                   >
                     <button
@@ -721,17 +759,30 @@ export default function BerlinPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="berlin-links-section"
           >
-            <CardHeader className="bg-gradient-to-r from-cyan-700 to-blue-700 border-b-4 border-black p-4">
+            <CardHeader className="bg-white border-b-4 border-black p-4">
               <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                className="text-gray-800 text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
                 data-testid="berlin-links-title"
               >
                 Dauerhafte Links
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4 bg-cyan-400/10">
-              {filteredLinks.length === 0 ? (
+              {loadError ? (
+                <ErrorCard
+                  title="Links konnten nicht geladen werden."
+                  onRetry={() => {
+                    setLoading(true);
+                    loadData();
+                  }}
+                  testId="berlin-links-error"
+                />
+              ) : loading ? (
+                <div className="space-y-4" aria-hidden="true">
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                </div>
+              ) : filteredLinks.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
                     Noch keine Links vorhanden.
@@ -741,7 +792,7 @@ export default function BerlinPage() {
                 filteredLinks.map((link) => (
                   <div 
                     key={link.id} 
-                    className="relative border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-2 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     data-testid={`berlin-link-${link.id}`}
                   >
                     <button

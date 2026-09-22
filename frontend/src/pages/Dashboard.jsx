@@ -5,6 +5,8 @@ import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoomBadge } from "@/components/ui/RoomBadge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Droplet, ChevronDown, Search, Maximize2, Minimize2 } from "lucide-react";
@@ -37,6 +39,10 @@ export default function Dashboard() {
   const { settings, updateSettings } = useSettings();
   const [stays, setStays] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [loadingStays, setLoadingStays] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [staysError, setStaysError] = useState(null);
+  const [messagesError, setMessagesError] = useState(null);
   const [messageForm, setMessageForm] = useState({ name: readSavedChatName(), content: "" });
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
@@ -52,20 +58,29 @@ export default function Dashboard() {
   const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
+    setStaysError(null);
     try {
       const data = await staysApi.list();
       setStays(data);
     } catch (error) {
       console.error("Failed to load stays:", error);
+      setStaysError(error);
+    } finally {
+      setLoadingStays(false);
     }
   };
 
-  const loadMessages = async () => {
+  const loadMessages = async ({ silent = false } = {}) => {
+    if (!silent) setMessagesError(null);
     try {
       const data = await messagesApi.list();
       setMessages(data);
     } catch (error) {
       console.error("Failed to load messages:", error);
+      // Hintergrund-Polling schlägt leise fehl; nur der erste Ladevorgang zeigt einen Fehler
+      if (!silent) setMessagesError(error);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
@@ -76,7 +91,7 @@ export default function Dashboard() {
   // Nachrichten periodisch aktualisieren, damit Beiträge der Mitbewohner ankommen
   useEffect(() => {
     const interval = setInterval(() => {
-      loadMessages();
+      loadMessages({ silent: true });
     }, 15000);
     return () => clearInterval(interval);
   }, []);
@@ -87,8 +102,12 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    const el = chatContainerRef.current;
+    if (!el) return;
+    // Nur ans Ende springen, wenn der Nutzer ohnehin nahe am Ende ist
+    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceToBottom < 160) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages, showAllMessages]);
 
@@ -346,7 +365,18 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 bg-pink-500/10">
-                {activeStays.length === 0 ? (
+                {staysError ? (
+                  <ErrorCard
+                    title="Aufenthalte konnten nicht geladen werden."
+                    onRetry={loadStays}
+                    testId="dashboard-stays-error"
+                  />
+                ) : loadingStays ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : activeStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -359,7 +389,7 @@ export default function Dashboard() {
                     <Link
                       key={stay.id}
                       to={`/aufenthalte/${stay.id}`}
-                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      className="flex items-center justify-between border-2 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                       data-testid={`dashboard-active-link-${stay.id}`}
                     >
                       <div>
@@ -395,17 +425,27 @@ export default function Dashboard() {
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-upcoming-card"
             >
-              <CardHeader className="bg-gradient-to-r from-teal-600 to-cyan-700 border-b-4 border-black p-4">
+              <CardHeader className="bg-white border-b-4 border-black p-4">
                 <CardTitle 
-                  className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                  className="text-gray-800 text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="dashboard-upcoming-title"
                 >
                   Nächste Check-ins
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 bg-teal-400/10">
-                {upcomingStays.length === 0 ? (
+                {staysError ? (
+                  <ErrorCard
+                    title="Check-ins konnten nicht geladen werden."
+                    onRetry={loadStays}
+                    testId="dashboard-upcoming-error"
+                  />
+                ) : loadingStays ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : upcomingStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -418,7 +458,7 @@ export default function Dashboard() {
                     <Link
                       key={stay.id}
                       to={`/aufenthalte/${stay.id}`}
-                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      className="flex items-center justify-between border-2 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                       data-testid={`dashboard-upcoming-link-${stay.id}`}
                     >
                       <div>
@@ -454,10 +494,10 @@ export default function Dashboard() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
             data-testid="dashboard-plants-card"
           >
-            <CardHeader className="bg-gradient-to-r from-emerald-600 to-teal-600 border-b-4 border-black p-4">
+            <CardHeader className="bg-white border-b-4 border-black p-4">
               <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                className="text-gray-800 text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
               >
                 Pflanzen
               </CardTitle>
@@ -609,11 +649,11 @@ export default function Dashboard() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="dashboard-chat-card"
         >
-            <CardHeader className="bg-gradient-to-r from-purple-700 to-fuchsia-700 border-b-4 border-black p-4">
+            <CardHeader className="bg-white border-b-4 border-black p-4">
               <div className="flex items-center justify-between gap-4">
                 <CardTitle 
-                  className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                  className="text-gray-800 text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="dashboard-chat-title"
                 >
                   WG-Chat
@@ -637,7 +677,19 @@ export default function Dashboard() {
                 style={{ maxHeight: chatExpanded ? '800px' : '400px' }}
                 data-testid="chat-messages-list"
               >
-                {messages.length === 0 ? (
+                {messagesError ? (
+                  <ErrorCard
+                    title="Nachrichten konnten nicht geladen werden."
+                    onRetry={() => loadMessages()}
+                    testId="chat-error"
+                  />
+                ) : loadingMessages ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : messages.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}

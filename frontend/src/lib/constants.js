@@ -1,6 +1,3 @@
-export const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1639059851892-95c80412298c?crop=entropy&cs=srgb&fm=jpg&q=85";
-
 export const DEFAULT_ROOMS = [
   {
     id: "A",

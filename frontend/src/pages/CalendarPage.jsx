@@ -6,6 +6,8 @@ import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoomBadge } from "@/components/ui/RoomBadge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StayDialog } from "@/components/stays/StayDialog";
 import { StaysList } from "@/components/stays/StaysList";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -31,12 +33,15 @@ export default function CalendarPage() {
   const location = useLocation();
   const [stays, setStays] = useState([]);
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()));
   const [selectedDate, setSelectedDate] = useState(new Date());
   const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   useEffect(() => {
     const loadData = async () => {
+      setLoadError(null);
       try {
         const [staysData, eventsData] = await Promise.all([
           staysApi.list(),
@@ -46,6 +51,9 @@ export default function CalendarPage() {
         setEvents(eventsData);
       } catch (error) {
         console.error("Failed to load data:", error);
+        setLoadError(error);
+      } finally {
+        setLoading(false);
       }
     };
     loadData();
@@ -151,6 +159,25 @@ export default function CalendarPage() {
             </div>
           </CardHeader>
           <CardContent className="p-4 bg-teal-400/10">
+            {loadError ? (
+              <ErrorCard
+                title="Kalenderdaten konnten nicht geladen werden."
+                onRetry={() => {
+                  setLoading(true);
+                  loadData();
+                }}
+                testId="calendar-error"
+              />
+            ) : loading ? (
+              <div className="space-y-3" aria-hidden="true">
+                <div className="grid grid-cols-7 gap-2">
+                  {Array.from({ length: 35 }).map((_, i) => (
+                    <Skeleton key={i} className="h-[60px] rounded-none bg-gray-200" />
+                  ))}
+                </div>
+              </div>
+            ) : (
+            <>
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 gap-2 mb-2">
               {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((label) => (
@@ -213,7 +240,7 @@ export default function CalendarPage() {
                         ? `, ${dayStays.length} Belegung${dayStays.length > 1 ? "en" : ""}`
                         : ", keine Belegung"
                     }${hasEvents ? ", Veranstaltungstipp" : ""}`}
-                    className={`relative border-4 border-black p-2 text-left text-sm transition-all duration-150 min-h-[60px] ${
+                    className={`relative border-4 border-black p-2 text-left text-sm transition-all duration-150 min-h-[60px] hover:z-10 ${
                       isSelected
                         ? "bg-gradient-to-r from-pink-600 to-orange-600 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         : "bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
@@ -225,18 +252,20 @@ export default function CalendarPage() {
                     data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                     {...calendarCellHover}
                   >
-                    {/* Room indicators - gestapelte Farbbalken, eines pro Zimmer */}
+                    {/* Room indicators - gestapelte Farbbalken mit Zimmer-Initial */}
                     {activeRooms.map((room, index) => (
                       <span
                         key={room.id}
-                        className="absolute left-1 right-1 h-2 border-2 border-black"
+                        className="absolute left-1 right-1 h-3 border-2 border-black flex items-center justify-center text-[9px] font-bold leading-none text-gray-900"
                         style={{
-                          top: `${4 + index * 10}px`,
+                          top: `${3 + index * 16}px`,
                           backgroundColor: room.color,
                         }}
                         data-testid={`calendar-room-bar-${room.id}-${format(day, "yyyy-MM-dd")}`}
                         aria-hidden="true"
-                      />
+                      >
+                        {(room.name || "?").trim().charAt(0).toUpperCase()}
+                      </span>
                     ))}
                     <div className="flex items-center justify-center gap-1 mt-2">
                       <span
@@ -262,6 +291,8 @@ export default function CalendarPage() {
                 );
               })}
             </div>
+            </>
+            )}
           </CardContent>
         </Card>
         </motion.div>
@@ -272,10 +303,10 @@ export default function CalendarPage() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-selected-card"
         >
-          <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-600 border-b-4 border-black p-4">
+          <CardHeader className="bg-white border-b-4 border-black p-4">
             <CardTitle
-              className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+              className="text-gray-800 text-2xl"
+              style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="calendar-selected-title"
             >
               {format(selectedDate, "EEEE, dd.MM.yyyy", { locale: de })}
@@ -295,7 +326,7 @@ export default function CalendarPage() {
                 <Link
                   key={stay.id}
                   to={`/aufenthalte/${stay.id}`}
-                  className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                  className="flex items-center justify-between border-2 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                   data-testid={`calendar-stay-link-${stay.id}`}
                 >
                   <div>
@@ -333,7 +364,7 @@ export default function CalendarPage() {
                   <Link
                     key={event.id}
                     to="/berlin"
-                    className="block border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-teal-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="block border-2 border-black p-4 bg-gradient-to-r from-cyan-50 to-teal-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     data-testid={`calendar-event-link-${event.id}`}
                   >
                     <p 

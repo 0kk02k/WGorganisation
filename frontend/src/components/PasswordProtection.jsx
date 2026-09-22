@@ -115,7 +115,7 @@ export function PasswordProtection({ children }) {
               style={{ fontFamily: "'Nunito', sans-serif" }}
             >
               {error
-                ? "Falsches Passwort. Bitte versuche es erneut - bei Problemen frag im WG-Chat oder bei der Hausverwaltung nach."
+                ? "Falsches Passwort. Bitte versuche es erneut - bei Problemen wende dich an die WG-Verwaltung."
                 : ""}
             </p>
 

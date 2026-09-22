@@ -3,19 +3,28 @@ import { Link } from "react-router-dom";
 import { manualsApi } from "@/lib/api";
 import { ManualDialog } from "@/components/manuals/ManualDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ManualPlaceholder } from "@/components/manuals/ManualPlaceholder";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, fadeInUp, scaleIn } from "@/lib/motion";
 
 export default function ManualsPage() {
   const [manuals, setManuals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
     const loadManuals = async () => {
+      setLoadError(null);
       try {
         const data = await manualsApi.list();
         setManuals(data);
       } catch (error) {
         console.error("Failed to load manuals:", error);
+        setLoadError(error);
+      } finally {
+        setLoading(false);
       }
     };
     loadManuals();
@@ -32,12 +41,12 @@ export default function ManualsPage() {
         {/* Header */}
         <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
-            <h1 
+            <h1
               className="text-4xl tracking-wide text-gray-800"
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="manuals-title"
             >
-              How to.....
+              Anleitungen
             </h1>
             <div className="h-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 mt-2" />
           </div>
@@ -52,7 +61,22 @@ export default function ManualsPage() {
           initial="hidden"
           animate="visible"
         >
-          {manuals.length === 0 ? (
+          {loadError ? (
+            <div className="col-span-full">
+              <ErrorCard
+                title="Anleitungen konnten nicht geladen werden."
+                onRetry={() => {
+                  setLoading(true);
+                  loadManuals();
+                }}
+                testId="manuals-error"
+              />
+            </div>
+          ) : loading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-64 rounded-none bg-gray-200" aria-hidden="true" />
+            ))
+          ) : manuals.length === 0 ? (
             <Card 
               className="border-4 border-dashed border-gray-300 rounded-none bg-white col-span-full"
               data-testid="manuals-empty"
@@ -68,10 +92,7 @@ export default function ManualsPage() {
             </Card>
           ) : (
             manuals.map((manual) => {
-              const imageSrc =
-                manual.image_data ||
-                manual.image_url ||
-                "https://images.unsplash.com/photo-1607273177147-e7304c4d5d6c?crop=entropy&cs=srgb&fm=jpg&q=85";
+              const imageSrc = manual.image_data || manual.image_url || "";
               return (
                 <motion.div
                   key={manual.id}
@@ -83,15 +104,19 @@ export default function ManualsPage() {
                   data-testid={`manual-card-${manual.id}`}
                 >
                   <Card className="bg-white border-4 border-black rounded-none shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150">
-                    <div 
-                      className="aspect-video overflow-hidden border-b-4 border-black bg-gray-100" 
+                    <div
+                      className="aspect-video overflow-hidden border-b-4 border-black bg-gray-100"
                       data-testid={`manual-image-${manual.id}`}
                     >
-                      <img
-                        src={imageSrc}
-                        alt={manual.title}
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {imageSrc ? (
+                        <img
+                          src={imageSrc}
+                          alt={manual.title}
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <ManualPlaceholder title={manual.title} />
+                      )}
                     </div>
                     <CardHeader className="p-4 bg-gradient-to-r from-amber-100 to-yellow-100">
                       <CardTitle 

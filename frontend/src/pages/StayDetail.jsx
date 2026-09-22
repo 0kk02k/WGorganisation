@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { staysApi } from "@/lib/api";
 import { DEFAULT_ROOMS } from "@/lib/constants";
@@ -6,6 +6,8 @@ import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StayEditDialog } from "@/components/stays/StayEditDialog";
 import { StayChecklistSection } from "@/components/stays/StayChecklistSection";
 import {
@@ -33,22 +35,26 @@ export default function StayDetail() {
   const navigate = useNavigate();
   const [stay, setStay] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [newCheckin, setNewCheckin] = useState("");
   const [newCheckout, setNewCheckout] = useState("");
 
-  useEffect(() => {
-    const loadStay = async () => {
-      try {
-        const data = await staysApi.get(id);
-        setStay(data);
-      } catch (error) {
-        console.error("Failed to load stay:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadStay();
+  const loadStay = useCallback(async () => {
+    setLoadError(null);
+    try {
+      const data = await staysApi.get(id);
+      setStay(data);
+    } catch (error) {
+      console.error("Failed to load stay:", error);
+      setLoadError(error);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    loadStay();
+  }, [loadStay]);
 
   const updateStay = async (payload) => {
     const data = await staysApi.update(id, payload);
@@ -87,6 +93,33 @@ export default function StayDetail() {
     }
   };
 
+  const handleDeleteItem = async (listKey, itemId) => {
+    if (!stay) return;
+    const previousList = stay[listKey];
+    const updatedList = previousList.filter((item) => item.id !== itemId);
+    setStay({ ...stay, [listKey]: updatedList });
+    try {
+      await updateStay({ [listKey]: updatedList });
+    } catch (error) {
+      console.error("Failed to delete checklist item:", error);
+      setStay((prev) => (prev ? { ...prev, [listKey]: previousList } : prev));
+      toast.error("Punkt konnte nicht gelöscht werden. Bitte erneut versuchen.");
+    }
+  };
+
+  const handleRenameItem = async (listKey, itemId, text) => {
+    if (!stay) return;
+    const updatedList = stay[listKey].map((item) =>
+      item.id === itemId ? { ...item, text } : item,
+    );
+    try {
+      await updateStay({ [listKey]: updatedList });
+    } catch (error) {
+      console.error("Failed to rename checklist item:", error);
+      toast.error("Punkt konnte nicht geändert werden. Bitte erneut versuchen.");
+    }
+  };
+
   const handleDelete = async () => {
     await staysApi.delete(id);
     toast.success("Aufenthalt gelöscht.");
@@ -95,12 +128,35 @@ export default function StayDetail() {
 
   if (loading) {
     return (
-      <div 
-        className="text-lg text-gray-500 p-8"
-        style={{ fontFamily: "'Nunito', sans-serif" }}
+      <Card
+        className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 max-w-xl"
         data-testid="stay-loading"
       >
-        Aufenthalt wird geladen...
+        <div className="space-y-3" aria-hidden="true">
+          <Skeleton className="h-8 w-2/3 rounded-none bg-gray-200" />
+          <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+        </div>
+        <p
+          className="sr-only"
+          style={{ fontFamily: "'Nunito', sans-serif" }}
+        >
+          Aufenthalt wird geladen...
+        </p>
+      </Card>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="max-w-xl" data-testid="stay-load-error">
+        <ErrorCard
+          title="Aufenthalt konnte nicht geladen werden."
+          message="Prüfe die Verbindung und versuche es erneut."
+          onRetry={() => {
+            setLoading(true);
+            loadStay();
+          }}
+        />
       </div>
     );
   }
@@ -120,7 +176,7 @@ export default function StayDetail() {
           className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
         >
           <Link to="/kalender" data-testid="stay-back-link">
-            Zurück zur Übersicht
+            Zurück zum Kalender
           </Link>
         </Button>
       </div>
@@ -176,10 +232,10 @@ export default function StayDetail() {
 
         {/* Notes Card */}
         <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-          <CardHeader className="bg-gradient-to-r from-amber-600 to-orange-700 border-b-4 border-black p-4">
+          <CardHeader className="bg-white border-b-4 border-black p-4">
             <CardTitle 
-              className="text-white text-2xl"
-              style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+              className="text-gray-800 text-2xl"
+              style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="stay-notes-title"
             >
               Notiz
@@ -208,6 +264,8 @@ export default function StayDetail() {
               handleAddItem("checklist_in", newCheckin);
               setNewCheckin("");
             }}
+            onDeleteItem={(itemId) => handleDeleteItem("checklist_in", itemId)}
+            onEditItem={(itemId, text) => handleRenameItem("checklist_in", itemId, text)}
             inputValue={newCheckin}
             setInputValue={setNewCheckin}
             testPrefix="stay-checkin"
@@ -222,6 +280,8 @@ export default function StayDetail() {
               handleAddItem("checklist_out", newCheckout);
               setNewCheckout("");
             }}
+            onDeleteItem={(itemId) => handleDeleteItem("checklist_out", itemId)}
+            onEditItem={(itemId, text) => handleRenameItem("checklist_out", itemId, text)}
             inputValue={newCheckout}
             setInputValue={setNewCheckout}
             testPrefix="stay-checkout"

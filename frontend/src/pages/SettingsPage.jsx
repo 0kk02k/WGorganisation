@@ -81,7 +81,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen relative" data-testid="settings-page">
-      <div className="relative z-10 space-y-8 p-6">
+      <div className="relative z-10 space-y-8">
         {/* Header mit Pop-Art Unterstrich */}
         <div className="relative inline-block">
           <h1 
