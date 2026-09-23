@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, slideInRight, overlayFade } from "@/lib/motion";
+import { logout } from "@/components/PasswordProtection";
 
 const navItems = [
   {
@@ -22,7 +23,7 @@ const navItems = [
   },
   {
     to: "/anleitungen",
-    label: "Anleitungen",
+    label: "How to",
     icon: BookOpen,
     testId: "nav-manuals-link",
     color: "from-pink-500 to-rose-500",
@@ -39,8 +40,17 @@ const navItems = [
     label: "Einstellungen",
     icon: Settings,
     testId: "nav-settings-link",
-    color: "from-purple-500 to-pink-500",
+    color: "from-rose-500 to-pink-500",
   },
+];
+
+// Seitentitel pro Route, damit Browser-Tabs und Verlauf sprechend sind
+const ROUTE_TITLES = [
+  ["/aufenthalte", "Aufenthalt"],
+  ["/anleitungen", "How to"],
+  ["/kalender", "Kalender"],
+  ["/berlin", "Berlin"],
+  ["/einstellungen", "Einstellungen"],
 ];
 
 const isNavItemActive = (item, pathname) => {
@@ -58,6 +68,16 @@ export const Layout = ({ children }) => {
 
   useEffect(() => {
     setMobileNavOpen(false);
+  }, [location.pathname]);
+
+  // Dokumenttitel an die Route koppeln
+  useEffect(() => {
+    const match = ROUTE_TITLES.find(([prefix]) =>
+      location.pathname.startsWith(prefix),
+    );
+    document.title = match
+      ? `${match[1]} · BODDIN14 WG-HUB`
+      : "BODDIN14 WG-HUB";
   }, [location.pathname]);
 
   // Escape schließt das Menü; beim Öffnen landet der Fokus im Panel,
@@ -151,6 +171,16 @@ export const Layout = ({ children }) => {
         
         {/* Navigation - always visible, positioned at bottom */}
         <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8`}>
+          <button
+            type="button"
+            onClick={logout}
+            className="absolute right-4 top-2 z-20 flex items-center gap-1.5 border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-colors hover:bg-gray-100"
+            data-testid="logout-button"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Abmelden
+          </button>
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
             {navItems.map((item) => {
               const active = isNavItemActive(item, location.pathname);
@@ -253,7 +283,7 @@ export const Layout = ({ children }) => {
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
-            className="fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
+            className="fixed right-0 top-0 z-50 flex h-full w-64 flex-col border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
             data-testid="mobile-nav-panel"
             variants={slideInRight}
             initial="hidden"
@@ -290,6 +320,16 @@ export const Layout = ({ children }) => {
                 );
               })}
             </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="mt-auto flex min-h-[44px] items-center justify-center gap-2 border-4 border-black bg-white px-4 py-2.5 text-sm font-bold text-gray-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-colors hover:bg-gray-100"
+              data-testid="mobile-logout-button"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              <LogOut className="h-4 w-4" />
+              Abmelden
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

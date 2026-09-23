@@ -1,18 +1,32 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { manualsApi } from "@/lib/api";
 import { ManualDialog } from "@/components/manuals/ManualDialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ErrorCard } from "@/components/ui/ErrorCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { ManualPlaceholder } from "@/components/manuals/ManualPlaceholder";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem, fadeInUp, scaleIn } from "@/lib/motion";
+import { Search, X } from "lucide-react";
 
 export default function ManualsPage() {
   const [manuals, setManuals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // ?q= wird von den Gäste-Chips des Dashboards gesetzt; lokal synchron halten
+  const [search, setSearch] = useState(searchParams.get("q") ?? "");
+
+  useEffect(() => {
+    setSearch(searchParams.get("q") ?? "");
+  }, [searchParams]);
+
+  const applySearch = (value) => {
+    setSearch(value);
+    setSearchParams(value.trim() ? { q: value.trim() } : {}, { replace: true });
+  };
 
   useEffect(() => {
     const loadManuals = async () => {
@@ -30,6 +44,15 @@ export default function ManualsPage() {
     loadManuals();
   }, []);
 
+  const query = search.trim().toLowerCase();
+  const filteredManuals = query
+    ? manuals.filter((manual) =>
+        [manual.title, manual.description, manual.steps].some((field) =>
+          field?.toLowerCase().includes(query),
+        ),
+      )
+    : manuals;
+
   return (
     <div className="min-h-screen relative" data-testid="manuals-page">
       <motion.div
@@ -46,11 +69,41 @@ export default function ManualsPage() {
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="manuals-title"
             >
-              Anleitungen
+              How to.....
             </h1>
+            <p
+              className="mt-1 text-sm text-gray-500"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              Geräte bedienen, Hausregeln kennen — ohne fragen zu müssen.
+            </p>
             <div className="h-2 bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 mt-2" />
           </div>
           <ManualDialog onCreated={(manual) => setManuals((prev) => [manual, ...prev])} />
+        </motion.div>
+
+        {/* Suche */}
+        <motion.div variants={fadeInUp} className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" aria-hidden="true" />
+          <Input
+            value={search}
+            onChange={(event) => applySearch(event.target.value)}
+            placeholder="How to suchen (z.B. Waschmaschine, WLAN, Müll)"
+            aria-label="How tos durchsuchen"
+            className="h-11 border-4 border-black rounded-none bg-white pl-9 pr-10 text-gray-800 placeholder:text-gray-500"
+            data-testid="manuals-search-input"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => applySearch("")}
+              aria-label="Suche zurücksetzen"
+              className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center border-2 border-black bg-white text-gray-800 hover:bg-gray-100 transition-colors"
+              data-testid="manuals-search-clear"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </motion.div>
 
         {/* Manuals Grid */}
@@ -77,7 +130,7 @@ export default function ManualsPage() {
               <Skeleton key={i} className="h-64 rounded-none bg-gray-200" aria-hidden="true" />
             ))
           ) : manuals.length === 0 ? (
-            <Card 
+            <Card
               className="border-4 border-dashed border-gray-300 rounded-none bg-white col-span-full"
               data-testid="manuals-empty"
             >
@@ -86,12 +139,26 @@ export default function ManualsPage() {
                   className="text-gray-500 text-lg"
                   style={{ fontFamily: "'Nunito', sans-serif" }}
                 >
-                  Noch keine Anleitungen. Tippe oben rechts auf +, um die erste anzulegen.
+                  Noch keine How tos. Tippe oben rechts auf +, um das erste anzulegen.
+                </p>
+              </CardContent>
+            </Card>
+          ) : filteredManuals.length === 0 ? (
+            <Card
+              className="border-4 border-dashed border-gray-300 rounded-none bg-white col-span-full"
+              data-testid="manuals-search-empty"
+            >
+              <CardContent className="py-12 text-center">
+                <p
+                  className="text-gray-500 text-lg"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  Kein How to für „{search.trim()}“ gefunden. Frag im WG-Chat — oder lege es oben rechts neu an.
                 </p>
               </CardContent>
             </Card>
           ) : (
-            manuals.map((manual) => {
+            filteredManuals.map((manual) => {
               const imageSrc = manual.image_data || manual.image_url || "";
               return (
                 <motion.div

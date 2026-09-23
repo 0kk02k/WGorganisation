@@ -70,7 +70,7 @@ export default function ChatReplyList({
                     variant="ghost"
                     onClick={() => startEdit(reply)}
                     aria-label="Antwort bearbeiten"
-                    className="h-8 w-8 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                     data-testid={`reply-edit-button-${reply.id}`}
                   >
                     <Pencil className="h-4 w-4" />
@@ -81,7 +81,7 @@ export default function ChatReplyList({
                         size="icon"
                         variant="ghost"
                         aria-label="Antwort löschen"
-                        className="h-8 w-8 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
+                        className="h-11 w-11 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
                         data-testid={`reply-delete-button-${reply.id}`}
                       >
                         <Trash2 className="h-4 w-4" />

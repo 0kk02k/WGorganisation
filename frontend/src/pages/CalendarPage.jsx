@@ -76,6 +76,21 @@ export default function CalendarPage() {
   const eventsForDate = (date) =>
     events.filter((event) => isSameDay(parseISO(event.date), date));
 
+  // Mobile Agenda: Tage des Monats mit mindestens einer Belegung oder einem Tipp
+  const agendaDays = useMemo(() => {
+    return eachDayOfInterval({
+      start: startOfMonth(currentMonth),
+      end: endOfMonth(currentMonth),
+    })
+      .map((day) => ({
+        day,
+        stays: staysForDate(day),
+        events: eventsForDate(day),
+      }))
+      .filter(({ stays: dayStays, events: dayEvents }) => dayStays.length > 0 || dayEvents.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentMonth, stays, events]);
+
   const selectedStays = staysForDate(selectedDate);
   const selectedEvents = eventsForDate(selectedDate);
 
@@ -169,21 +184,26 @@ export default function CalendarPage() {
                 testId="calendar-error"
               />
             ) : loading ? (
-              <div className="space-y-3" aria-hidden="true">
-                <div className="grid grid-cols-7 gap-2">
+              <div aria-hidden="true">
+                <div className="hidden md:grid grid-cols-7 gap-2">
                   {Array.from({ length: 35 }).map((_, i) => (
-                    <Skeleton key={i} className="h-[60px] rounded-none bg-gray-200" />
+                    <Skeleton key={`grid-${i}`} className="h-[72px] rounded-none bg-gray-200" />
+                  ))}
+                </div>
+                <div className="md:hidden space-y-3">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <Skeleton key={`agenda-${i}`} className="h-16 rounded-none bg-gray-200" />
                   ))}
                 </div>
               </div>
             ) : (
             <>
-            {/* Weekday Headers */}
-            <div className="grid grid-cols-7 gap-2 mb-2">
+            {/* Weekday Headers (nur Grid-Layout ab Tablet) */}
+            <div className="hidden md:grid grid-cols-7 gap-2 mb-2">
               {["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((label) => (
-                <div 
-                  key={label} 
-                  className="text-center text-sm font-bold text-gray-800 border-4 border-black bg-yellow-400 py-2"
+                <div
+                  key={label}
+                  className="text-center text-sm font-bold text-black border-4 border-black bg-yellow-400 py-2"
                   style={{ fontFamily: "'Nunito', sans-serif" }}
                   data-testid={`calendar-weekday-${label}`}
                 >
@@ -217,9 +237,21 @@ export default function CalendarPage() {
                   </span>
                 </span>
               ))}
+              <span className="flex items-center gap-2">
+                <span
+                  className="h-3 w-3 rounded-full bg-cyan-400 border-2 border-black"
+                  aria-hidden="true"
+                />
+                <span
+                  className="text-sm text-gray-800"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  Veranstaltungstipp
+                </span>
+              </span>
             </div>
-            {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-2">
+            {/* Calendar Days (Grid ab Tablet) */}
+            <div className="hidden md:grid grid-cols-7 gap-2">
               {calendarDays.map((day) => {
                 const inMonth = isSameMonth(day, currentMonth);
                 const isCurrentDay = isToday(day);
@@ -235,44 +267,47 @@ export default function CalendarPage() {
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
                     aria-pressed={isSelected}
+                    aria-current={isCurrentDay ? "date" : undefined}
                     aria-label={`${format(day, "EEEE, dd.MM.yyyy", { locale: de })}${
                       dayStays.length > 0
                         ? `, ${dayStays.length} Belegung${dayStays.length > 1 ? "en" : ""}`
                         : ", keine Belegung"
                     }${hasEvents ? ", Veranstaltungstipp" : ""}`}
-                    className={`relative border-4 border-black p-2 text-left text-sm transition-all duration-150 min-h-[60px] hover:z-10 ${
+                    className={`flex flex-col border-4 border-black p-1.5 text-left text-sm transition-all duration-150 min-h-[72px] hover:z-10 ${
                       isSelected
                         ? "bg-gradient-to-r from-pink-600 to-orange-600 text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         : "bg-white hover:bg-gray-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                    } ${!inMonth ? "opacity-40" : "opacity-100"} ${
-                      isCurrentDay && !isSelected
-                        ? "ring-4 ring-yellow-400"
-                        : ""
-                    }`}
+                    } ${!inMonth ? "opacity-40" : "opacity-100"}`}
                     data-testid={`calendar-day-${format(day, "yyyy-MM-dd")}`}
                     {...calendarCellHover}
                   >
-                    {/* Room indicators - gestapelte Farbbalken mit Zimmer-Initial */}
-                    {activeRooms.map((room, index) => (
+                    {/* Room indicators - Farbbalken im Textfluss, über der Tageszahl */}
+                    <span className="flex w-full flex-col gap-[3px] min-h-[12px]" aria-hidden="true">
+                      {activeRooms.map((room) => (
+                        <span
+                          key={room.id}
+                          className="flex h-3 w-full items-center justify-center border-2 border-black text-[9px] font-bold leading-none text-gray-900"
+                          style={{ backgroundColor: room.color }}
+                          data-testid={`calendar-room-bar-${room.id}-${format(day, "yyyy-MM-dd")}`}
+                        >
+                          {(room.name || "?").trim().charAt(0).toUpperCase()}
+                        </span>
+                      ))}
+                    </span>
+                    <div className="mt-auto flex items-center justify-center gap-1 pt-1.5">
                       <span
-                        key={room.id}
-                        className="absolute left-1 right-1 h-3 border-2 border-black flex items-center justify-center text-[9px] font-bold leading-none text-gray-900"
-                        style={{
-                          top: `${3 + index * 16}px`,
-                          backgroundColor: room.color,
-                        }}
-                        data-testid={`calendar-room-bar-${room.id}-${format(day, "yyyy-MM-dd")}`}
-                        aria-hidden="true"
-                      >
-                        {(room.name || "?").trim().charAt(0).toUpperCase()}
-                      </span>
-                    ))}
-                    <div className="flex items-center justify-center gap-1 mt-2">
-                      <span
-                        className={`font-bold ${isSelected ? "text-white" : "text-gray-800"}`}
+                        className={`font-bold leading-tight ${
+                          isSelected
+                            ? isCurrentDay
+                              ? "border-2 border-black bg-white px-1 text-black"
+                              : "text-white"
+                            : isCurrentDay
+                              ? "border-2 border-black bg-yellow-400 px-1 text-black"
+                              : "text-gray-800"
+                        }`}
                         style={{
                           fontFamily: "'Nunito', sans-serif",
-                          ...(isSelected
+                          ...(isSelected && !isCurrentDay
                             ? { textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }
                             : {}),
                         }}
@@ -291,14 +326,116 @@ export default function CalendarPage() {
                 );
               })}
             </div>
+            {/* Mobile Agenda: nur Tage mit Inhalt, jede Zeile self-suffizient verlinkt */}
+            <div className="md:hidden space-y-4" data-testid="calendar-mobile-agenda">
+              {agendaDays.length === 0 ? (
+                <p
+                  className="text-sm text-gray-500"
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                  data-testid="calendar-agenda-empty"
+                >
+                  Keine Belegungen oder Veranstaltungstipps im{" "}
+                  {format(currentMonth, "MMMM", { locale: de })}.
+                </p>
+              ) : (
+                agendaDays.map(({ day, stays: dayStays, events: dayEvents }) => {
+                  const isCurrentDay = isToday(day);
+                  const activeRooms = rooms.filter((room) =>
+                    dayStays.some((stay) => stay.room === room.id),
+                  );
+                  return (
+                    <div
+                      key={day.toISOString()}
+                      className="border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                      data-testid={`calendar-agenda-day-${format(day, "yyyy-MM-dd")}`}
+                    >
+                      <div
+                        className={`flex items-center justify-between gap-2 border-b-4 border-black px-3 py-2 ${
+                          isCurrentDay ? "bg-yellow-400" : "bg-gray-100"
+                        }`}
+                      >
+                        <span
+                          className="text-sm font-bold text-black"
+                          style={{ fontFamily: "'Nunito', sans-serif" }}
+                        >
+                          {format(day, "EEEE, dd.MM.", { locale: de })}
+                          {isCurrentDay ? " · Heute" : ""}
+                        </span>
+                        <span className="flex items-center gap-1" aria-hidden="true">
+                          {activeRooms.map((room) => (
+                            <span
+                              key={room.id}
+                              className="flex h-5 items-center border-2 border-black px-1 text-[10px] font-bold leading-none text-gray-900"
+                              style={{ backgroundColor: room.color }}
+                            >
+                              {(room.name || "?").trim().charAt(0).toUpperCase()}
+                            </span>
+                          ))}
+                          {dayEvents.length > 0 && (
+                            <span className="h-3 w-3 rounded-full bg-cyan-400 border-2 border-black" />
+                          )}
+                        </span>
+                      </div>
+                      <div className="divide-y-2 divide-gray-200">
+                        {dayStays.map((stay) => (
+                          <Link
+                            key={stay.id}
+                            to={`/aufenthalte/${stay.id}`}
+                            className="flex min-h-[44px] items-center justify-between gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors duration-150"
+                            data-testid={`calendar-agenda-stay-${stay.id}`}
+                          >
+                            <span>
+                              <span
+                                className="block text-base font-bold text-gray-800"
+                                style={{ fontFamily: "'Nunito', sans-serif" }}
+                              >
+                                {stay.occupant_name}
+                              </span>
+                              <span className="block text-sm text-gray-500">
+                                {format(parseISO(stay.start_date), "dd.MM.")}
+                                {" – "}
+                                {format(parseISO(stay.end_date), "dd.MM.yyyy")}
+                              </span>
+                            </span>
+                            <RoomBadge roomId={stay.room} testId={`calendar-agenda-room-${stay.id}`} />
+                          </Link>
+                        ))}
+                        {dayEvents.map((event) => (
+                          <Link
+                            key={event.id}
+                            to="/berlin"
+                            className="flex min-h-[44px] items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors duration-150"
+                            data-testid={`calendar-agenda-event-${event.id}`}
+                          >
+                            <span
+                              className="h-3 w-3 rounded-full bg-cyan-400 border-2 border-black flex-shrink-0"
+                              aria-hidden="true"
+                            />
+                            <span>
+                              <span
+                                className="block text-base font-bold text-gray-800"
+                                style={{ fontFamily: "'Nunito', sans-serif" }}
+                              >
+                                {event.title}
+                              </span>
+                              <span className="block text-sm text-gray-500">{event.location}</span>
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
             </>
             )}
           </CardContent>
         </Card>
         </motion.div>
 
-        {/* Selected Date Card */}
-        <motion.div variants={staggerItem}>
+        {/* Selected Date Card (nur Grid-Layout ab Tablet; mobil übernimmt die Agenda) */}
+        <motion.div variants={staggerItem} className="hidden md:block">
         <Card 
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="calendar-selected-card"

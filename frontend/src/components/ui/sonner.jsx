@@ -10,6 +10,9 @@ const Toaster = ({
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-white group-[.toaster]:text-gray-800 group-[.toaster]:border-4 group-[.toaster]:border-black group-[.toaster]:rounded-none group-[.toaster]:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-[.toaster]:font-bold",
+          // Erfolg/Fehler am Rahmen erkennbar (richColors würde von bg-white neutralisiert)
+          success: "group-[.toast]:border-emerald-500",
+          error: "group-[.toast]:border-red-500",
           description: "group-[.toast]:text-gray-600 group-[.toast]:font-semibold",
           actionButton:
             "group-[.toast]:bg-black group-[.toast]:text-white group-[.toast]:rounded-none group-[.toast]:border-2 group-[.toast]:border-black",

@@ -68,7 +68,7 @@ export default function ChatMessage({
                 onClick={onReply}
                 aria-label={`Auf die Nachricht von ${message.name} antworten`}
                 title="Antworten"
-                className="h-8 w-8 bg-teal-100 hover:bg-teal-200 text-teal-700 border-2 border-black rounded-none"
+                className="h-11 w-11 bg-teal-100 hover:bg-teal-200 text-teal-700 border-2 border-black rounded-none"
                 data-testid={`chat-reply-button-${message.id}`}
               >
                 <MessageCircle className="h-4 w-4" />
@@ -79,7 +79,7 @@ export default function ChatMessage({
                 onClick={onEdit}
                 aria-label={`Nachricht von ${message.name} bearbeiten`}
                 title="Bearbeiten"
-                className="h-8 w-8 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
+                className="h-11 w-11 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                 data-testid={`chat-edit-button-${message.id}`}
               >
                 <Pencil className="h-4 w-4" />
@@ -91,7 +91,7 @@ export default function ChatMessage({
                     variant="ghost"
                     aria-label={`Nachricht von ${message.name} löschen`}
                     title="Löschen"
-                    className="h-8 w-8 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
                     data-testid={`chat-delete-button-${message.id}`}
                   >
                     <Trash2 className="h-4 w-4" />

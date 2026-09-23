@@ -97,13 +97,7 @@ export const StaysList = ({
               
               <CardContent className="p-0">
                 <div className="flex">
-                  {/* Left side - Room color accent */}
-                  <div 
-                    className="w-3 min-h-[100px] border-r-4 border-black"
-                    style={{ backgroundColor: roomColor }}
-                  />
-                  
-                  {/* Main content */}
+                  {/* Main content — Zimmerfarbe trägt der Balken oben */}
                   <div className="flex-1 p-4 pr-16">
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">

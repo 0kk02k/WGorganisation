@@ -20,9 +20,6 @@ export const StayChecklistSection = ({
   const headerGradientClass = isCheckin
     ? "from-teal-600 to-emerald-600"
     : "from-rose-600 to-pink-700";
-  const buttonGradientClass = isCheckin
-    ? "from-teal-400 to-emerald-400"
-    : "from-rose-400 to-pink-400";
   const barColorClass = isCheckin ? "bg-teal-600" : "bg-rose-600";
   const bgClass = isCheckin
     ? "bg-teal-400/10"
@@ -131,7 +128,7 @@ export const StayChecklistSection = ({
                     variant="ghost"
                     onClick={() => saveEdit(item)}
                     aria-label="Änderung speichern"
-                    className="h-8 w-8 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 border-2 border-black rounded-none"
                     data-testid={`${testPrefix}-edit-save-${item.id}`}
                   >
                     <Check className="h-4 w-4" />
@@ -141,7 +138,7 @@ export const StayChecklistSection = ({
                     variant="ghost"
                     onClick={cancelEdit}
                     aria-label="Bearbeiten abbrechen"
-                    className="h-8 w-8 bg-gray-100 hover:bg-gray-200 text-gray-800 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-gray-100 hover:bg-gray-200 text-gray-800 border-2 border-black rounded-none"
                     data-testid={`${testPrefix}-edit-cancel-${item.id}`}
                   >
                     <X className="h-4 w-4" />
@@ -153,12 +150,12 @@ export const StayChecklistSection = ({
                 <Checkbox
                   checked={item.done}
                   onCheckedChange={(checked) => onToggle(item.id, checked)}
-                  aria-label={`${item.text} als erledigt markieren`}
-                  className="border-2 border-black data-[state=checked]:bg-black data-[state=checked]:text-white mt-0.5 justify-self-start"
+                  aria-label={`${item.text} — ${item.done ? "wieder öffnen" : "als erledigt markieren"}`}
+                  className="h-6 w-6 border-2 border-black data-[state=checked]:bg-black data-[state=checked]:text-white mt-0.5 justify-self-start"
                   data-testid={`${testPrefix}-toggle-${item.id}`}
                 />
                 <span
-                  className={`text-gray-800 ${item.done ? "line-through text-gray-400" : ""}`}
+                  className={`text-gray-800 ${item.done ? "line-through text-gray-600" : ""}`}
                   style={{ fontFamily: "'Nunito', sans-serif" }}
                   data-testid={`${testPrefix}-text-${item.id}`}
                 >
@@ -170,7 +167,7 @@ export const StayChecklistSection = ({
                     variant="ghost"
                     onClick={() => startEdit(item)}
                     aria-label={`"${item.text}" bearbeiten`}
-                    className="h-8 w-8 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                     data-testid={`${testPrefix}-edit-${item.id}`}
                   >
                     <Pencil className="h-4 w-4" />
@@ -180,7 +177,7 @@ export const StayChecklistSection = ({
                     variant="ghost"
                     onClick={() => onDeleteItem?.(item.id)}
                     aria-label={`"${item.text}" löschen`}
-                    className="h-8 w-8 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
+                    className="h-11 w-11 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
                     data-testid={`${testPrefix}-delete-${item.id}`}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -202,12 +199,12 @@ export const StayChecklistSection = ({
             }}
             placeholder="Neuer Punkt"
             aria-label={`Neuer Punkt für ${title}`}
-            className="border-2 border-black rounded-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-shadow duration-150"
+            className="border-2 border-black rounded-none"
             data-testid={`${testPrefix}-input`}
           />
           <Button
             onClick={onAdd}
-            className={`bg-gradient-to-r ${buttonGradientClass} hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150`}
+            className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid={`${testPrefix}-add`}
           >
             Hinzufügen

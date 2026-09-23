@@ -12,11 +12,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { manualsApi } from "@/lib/api";
+import { compressImageFile, IMAGE_DATA_MAX_BYTES } from "@/lib/image";
 import { Plus, Camera } from "lucide-react";
 import { ManualPlaceholder } from "@/components/manuals/ManualPlaceholder";
 
 export const ManualDialog = ({ onCreated }) => {
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     title: "",
     steps: "",
@@ -35,15 +37,19 @@ export const ManualDialog = ({ onCreated }) => {
     });
   }, [open]);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setForm((prev) => ({ ...prev, image_data: reader.result }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Komprimieren wie im Detail-Edit, damit große Handyfotos nicht scheitern
+      const dataUrl = await compressImageFile(file);
+      setForm((prev) => ({ ...prev, image_data: dataUrl }));
+    } catch (error) {
+      toast.error(error.message || "Bild konnte nicht verarbeitet werden.");
+    } finally {
+      // Input zurücksetzen, damit dieselbe Datei erneut gewählt werden kann
+      event.target.value = "";
+    }
   };
 
   const handleImageClick = () => {
@@ -51,11 +57,17 @@ export const ManualDialog = ({ onCreated }) => {
   };
 
   const handleSubmit = async () => {
+    if (saving) return;
     if (!form.title || !form.steps) {
       toast.error("Bitte Titel und Schritte ergänzen.");
       return;
     }
+    if (form.image_data && form.image_data.length > IMAGE_DATA_MAX_BYTES) {
+      toast.error("Bild ist zu groß. Bitte wähle ein kleineres Bild.");
+      return;
+    }
 
+    setSaving(true);
     try {
       const stepsArray = form.steps.split("\n").filter(s => s.trim());
       const data = await manualsApi.create({
@@ -65,11 +77,13 @@ export const ManualDialog = ({ onCreated }) => {
         image_url: form.image_url,
         image_data: form.image_data,
       });
-      toast.success("Anleitung gespeichert.");
+      toast.success("How to gespeichert.");
       onCreated?.(data);
       setOpen(false);
     } catch (error) {
       toast.error(`Speichern fehlgeschlagen: ${error.message || "Unbekannter Fehler"}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -79,8 +93,8 @@ export const ManualDialog = ({ onCreated }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          aria-label="Neue Anleitung anlegen"
-          title="Neue Anleitung anlegen"
+          aria-label="Neues How to anlegen"
+          title="Neues How to anlegen"
           className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
           data-testid="manual-dialog-trigger"
         >
@@ -97,7 +111,7 @@ export const ManualDialog = ({ onCreated }) => {
             style={{ fontFamily: "'Bangers', cursive" }}
             data-testid="manual-dialog-title"
           >
-            Neue Bedienungsanleitung
+            Neues How to
           </DialogTitle>
         </DialogHeader>
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
@@ -147,7 +161,7 @@ export const ManualDialog = ({ onCreated }) => {
                 setForm((prev) => ({ ...prev, title: event.target.value }))
               }
               placeholder="z.B. Geschirrspüler"
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800 bg-white"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800 bg-white"
               id="manual-form-title-input"
               data-testid="manual-form-title-input"
             />
@@ -167,7 +181,7 @@ export const ManualDialog = ({ onCreated }) => {
                 setForm((prev) => ({ ...prev, steps: event.target.value }))
               }
               placeholder="1. Gerät einschalten..."
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800 bg-white"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800 bg-white"
               id="manual-form-steps-input"
               data-testid="manual-form-steps-input"
             />
@@ -183,10 +197,12 @@ export const ManualDialog = ({ onCreated }) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 bg-amber-500 hover:bg-amber-600 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            disabled={saving}
+            aria-busy={saving}
+            className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="manual-dialog-submit"
           >
-            Speichern
+            {saving ? "Speichern…" : "Speichern"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
   const [chatExpanded, setChatExpanded] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   // Bewahrte Entwürfe, wenn Bearbeiten/Antworten quer gewechselt wird
   const [stashedReply, setStashedReply] = useState(null);
   const [stashedEdit, setStashedEdit] = useState(null);
@@ -111,7 +112,12 @@ export default function Dashboard() {
     }
   }, [messages, showAllMessages]);
 
-  const today = useMemo(() => new Date(), []);
+  // today folgt dem Minuten-Ticker, damit aktiv/anstehend um Mitternacht korrekt kippen
+  const today = useMemo(() => {
+    const d = new Date(now);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [now]);
   const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   const activeStays = useMemo(
@@ -163,10 +169,12 @@ export default function Dashboard() {
   };
 
   const handleSendMessage = async () => {
+    if (sendingMessage) return;
     if (!messageForm.name.trim() || !messageForm.content.trim()) {
       toast.error("Bitte Name und Nachricht ausfüllen.");
       return;
     }
+    setSendingMessage(true);
     try {
       const data = await messagesApi.create({
         name: messageForm.name.trim(),
@@ -181,6 +189,8 @@ export default function Dashboard() {
       setMessageForm((prev) => ({ name: prev.name, content: "" }));
     } catch (error) {
       toast.error("Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setSendingMessage(false);
     }
   };
 
@@ -343,8 +353,60 @@ export default function Dashboard() {
           >
             Übersicht
           </h1>
+          <p
+            className="mt-1 text-sm text-gray-500"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            Wer gerade da ist, was ansteht und wer die Pflanzen gießen muss.
+          </p>
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
         </motion.div>
+        {/* Guest Onboarding: der Einstieg für Gäste ohne Vorwissen */}
+        <motion.section variants={staggerItem} data-testid="dashboard-guest-module">
+          <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-yellow-400 to-orange-400 border-b-4 border-black p-4">
+              <CardTitle
+                className="text-black text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="dashboard-guest-title"
+              >
+                Neu hier?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 bg-amber-500/10">
+              <p
+                className="text-sm text-gray-800"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              >
+                Alles, was du im Haus wissen musst — ohne fragen zu müssen:
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {[
+                  ["WLAN", "wlan"],
+                  ["Waschmaschine", "waschmaschine"],
+                  ["Müll", "müll"],
+                  ["Notfall", "notfall"],
+                ].map(([label, query]) => (
+                  <Link
+                    key={query}
+                    to={`/anleitungen?q=${encodeURIComponent(query)}`}
+                    className="flex min-h-[44px] items-center border-2 border-black bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                    data-testid={`dashboard-guest-topic-${query}`}
+                  >
+                    {label}
+                  </Link>
+                ))}
+                <Link
+                  to="/anleitungen"
+                  className="flex min-h-[44px] items-center border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white shadow-[3px_3px_0px_0px_rgba(250,204,21,1)] transition-all duration-150 hover:shadow-[1px_1px_0px_0px_rgba(250,204,21,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                  data-testid="dashboard-guest-topic-all"
+                >
+                  Alle How tos
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.section>
         {/* Top Row: Stays + Plants */}
         <motion.section variants={staggerItem} className="grid gap-6 lg:grid-cols-2">
           {/* Left Column: Active Stays + Upcoming Check-ins stacked */}
@@ -631,7 +693,7 @@ export default function Dashboard() {
               
               <Button
                 onClick={handleResetWatered}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
                 data-testid="dashboard-plants-reset"
               >
@@ -650,27 +712,28 @@ export default function Dashboard() {
           data-testid="dashboard-chat-card"
         >
             <CardHeader className="bg-white border-b-4 border-black p-4">
-              <div className="flex items-center justify-between gap-4">
-                <CardTitle 
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <CardTitle
                   className="text-gray-800 text-2xl"
                   style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="dashboard-chat-title"
                 >
                   WG-Chat
                 </CardTitle>
-                <div className="relative w-64">
+                <div className="relative w-full sm:w-64 sm:flex-shrink-0">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <Input
                     value={chatSearch}
                     onChange={(e) => setChatSearch(e.target.value)}
                     placeholder="Suchen..."
-                    className="pl-9 h-10 border-4 border-black rounded-none bg-white text-gray-800 placeholder:text-gray-400"
+                    aria-label="Nachrichten durchsuchen"
+                    className="pl-9 h-10 border-4 border-black rounded-none bg-white text-gray-800 placeholder:text-gray-500"
                     data-testid="chat-search-input"
                   />
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4 space-y-4 bg-purple-500/10">
+            <CardContent className="p-4 space-y-4 bg-amber-400/10">
               <div
                 ref={chatContainerRef}
                 className="space-y-3 overflow-y-auto pr-2 transition-all duration-300"
@@ -766,8 +829,10 @@ export default function Dashboard() {
               <div className="flex justify-center">
                 <button
                   onClick={() => setChatExpanded(!chatExpanded)}
-                  className="p-2 bg-purple-500 hover:bg-purple-600 text-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150"
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center bg-orange-500 hover:bg-orange-600 text-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150"
                   title={chatExpanded ? "Chat verkleinern" : "Chat erweitern"}
+                  aria-label={chatExpanded ? "Chat verkleinern" : "Chat erweitern"}
+                  aria-expanded={chatExpanded}
                   data-testid="chat-expand-button"
                 >
                   {chatExpanded ? (
@@ -800,7 +865,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, name: event.target.value }))
                     }
                     placeholder="z.B. Lea"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
+                    className="border-4 border-black rounded-none text-gray-800 placeholder:text-gray-500 bg-white"
                     data-testid="chat-name-input"
                   />
                 </div>
@@ -821,7 +886,7 @@ export default function Dashboard() {
                       setMessageForm((prev) => ({ ...prev, content: event.target.value }))
                     }
                     placeholder="Kurze Info für alle (Strg+Enter sendet)"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
+                    className="border-4 border-black rounded-none text-gray-800 placeholder:text-gray-500 bg-white"
                     data-testid="chat-message-input"
                     onKeyDown={(event) => {
                       if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
@@ -834,11 +899,13 @@ export default function Dashboard() {
                 <div className="flex items-end">
                   <Button
                     type="submit"
+                    disabled={sendingMessage}
+                    aria-busy={sendingMessage}
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-send-button"
                   >
-                    Senden
+                    {sendingMessage ? "Senden…" : "Senden"}
                   </Button>
                 </div>
               </form>

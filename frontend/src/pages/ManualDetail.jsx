@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { manualsApi } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { compressImageFile, IMAGE_DATA_MAX_BYTES } from "@/lib/image";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ErrorCard } from "@/components/ui/ErrorCard";
 import { toast } from "sonner";
 import { Camera, Pencil, Trash2 } from "lucide-react";
 import { ManualPlaceholder } from "@/components/manuals/ManualPlaceholder";
@@ -27,20 +29,24 @@ export default function ManualDetail() {
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [loadError, setLoadError] = useState(null);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    const loadManual = async () => {
-      try {
-        const data = await manualsApi.get(id);
-        setManual(data);
-        setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
-      } catch (error) {
-        console.error("Failed to load manual:", error);
-      }
-    };
-    loadManual();
+  const loadManual = useCallback(async () => {
+    setLoadError(null);
+    try {
+      const data = await manualsApi.get(id);
+      setManual(data);
+      setForm({ ...data, steps: Array.isArray(data.steps) ? data.steps.join("\n") : "" });
+    } catch (error) {
+      console.error("Failed to load manual:", error);
+      setLoadError(error);
+    }
   }, [id]);
+
+  useEffect(() => {
+    loadManual();
+  }, [loadManual]);
 
   const steps = useMemo(() => {
     if (!form?.steps) return [];
@@ -48,43 +54,19 @@ export default function ManualDetail() {
     return stepsStr.split("\n").filter((line) => line.trim().length > 0);
   }, [form]);
 
-  const handleFileChange = (event) => {
+  const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    
-    // Bild komprimieren bevor es gespeichert wird
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        // Maximal 1200px Breite/Höhe
-        const maxSize = 1200;
-        let width = img.width;
-        let height = img.height;
-        
-        if (width > maxSize || height > maxSize) {
-          if (width > height) {
-            height = (height / width) * maxSize;
-            width = maxSize;
-          } else {
-            width = (width / height) * maxSize;
-            height = maxSize;
-          }
-        }
-        
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Als JPEG mit 80% Qualität
-        const compressedData = canvas.toDataURL('image/jpeg', 0.8);
-        setForm((prev) => ({ ...prev, image_data: compressedData }));
-      };
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
+    try {
+      // Bild komprimieren bevor es gespeichert wird (wie im Anlegen-Dialog)
+      const dataUrl = await compressImageFile(file);
+      setForm((prev) => ({ ...prev, image_data: dataUrl }));
+    } catch (error) {
+      toast.error(error.message || "Bild konnte nicht verarbeitet werden.");
+    } finally {
+      // Input zurücksetzen, damit dieselbe Datei erneut gewählt werden kann
+      event.target.value = "";
+    }
   };
 
   const handleImageClick = () => {
@@ -106,8 +88,7 @@ export default function ManualDetail() {
         : form.steps;
       
       // Prüfe Bildgröße (max 5MB nach Base64)
-      const maxImageSize = 5 * 1024 * 1024; // 5MB
-      if (form.image_data && form.image_data.length > maxImageSize) {
+      if (form.image_data && form.image_data.length > IMAGE_DATA_MAX_BYTES) {
         toast.error("Bild ist zu groß. Bitte wähle ein kleineres Bild.");
         setSaving(false);
         return false;
@@ -165,6 +146,22 @@ export default function ManualDetail() {
   };
 
   if (!manual || !form) {
+    // Fehler beim Laden: sichtbarer Fehlerzustand mit Retry statt endlosem "wird geladen"
+    if (loadError) {
+      return (
+        <div className="max-w-xl" data-testid="manual-load-error">
+          <ErrorCard
+            title="Anleitung konnte nicht geladen werden."
+            message="Prüfe die Verbindung und versuche es erneut."
+            onRetry={() => {
+              setManual(null);
+              setForm(null);
+              loadManual();
+            }}
+          />
+        </div>
+      );
+    }
     return (
       <div
         className="text-lg text-gray-500 p-8"
@@ -267,13 +264,13 @@ export default function ManualDetail() {
                   />
                 </div>
               ) : (
-                <CardTitle 
+                <h1
                   className="text-white text-2xl"
                   style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
                   data-testid="manual-detail-title"
                 >
                   {manual.title}
-                </CardTitle>
+                </h1>
               )}
               <div className="flex items-center gap-2">
                 <Button
@@ -297,6 +294,7 @@ export default function ManualDetail() {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
+                          aria-label="Anleitung löschen"
                           className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
                           data-testid="manual-delete-button"
                         >
@@ -358,7 +356,7 @@ export default function ManualDetail() {
                   onChange={(event) =>
                     setForm((prev) => ({ ...prev, steps: event.target.value }))
                   }
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800 bg-white"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-gray-800 bg-white"
                   data-testid="manual-edit-steps"
                 />
               </div>

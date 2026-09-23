@@ -16,14 +16,14 @@ export default function ChatReplyForm({
         value={replyForm.name}
         onChange={(event) => onNameChange(event.target.value)}
         placeholder="Dein Name"
-        className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800"
+        className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 text-gray-800"
         data-testid={`chat-reply-name-${messageId}`}
       />
       <Textarea
         value={replyForm.content}
         onChange={(event) => onContentChange(event.target.value)}
         placeholder="Antwort schreiben"
-        className="min-h-[70px] border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800"
+        className="min-h-[70px] border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 text-gray-800"
         data-testid={`chat-reply-content-${messageId}`}
       />
       <div className="flex flex-wrap items-center gap-2">

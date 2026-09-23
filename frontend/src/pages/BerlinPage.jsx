@@ -72,6 +72,7 @@ export default function BerlinPage() {
   const [postType, setPostType] = useState("event");
   const [editingType, setEditingType] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const availableTags = useMemo(() => {
     const tagSet = new Set();
@@ -170,10 +171,12 @@ export default function BerlinPage() {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!form.title || !form.date || !form.location || !form.description) {
       toast.error("Bitte alle Felder ausfüllen.");
       return;
     }
+    setIsSubmitting(true);
     try {
       if (editingType === "event" && editingId) {
         // Update existing event
@@ -203,7 +206,9 @@ export default function BerlinPage() {
       setEditingType(null);
       setEditingId(null);
     } catch (error) {
-      toast.error("Tipp konnte nicht gespeichert werden.");
+      toast.error("Tipp konnte nicht gespeichert werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -221,10 +226,12 @@ export default function BerlinPage() {
   };
 
   const handleLinkSubmit = async () => {
+    if (isSubmitting) return;
     if (!linkForm.url || !linkForm.description) {
       toast.error("Bitte Link und Beschreibung ausfüllen.");
       return;
     }
+    setIsSubmitting(true);
     try {
       if (editingType === "link" && editingId) {
         // Update existing link
@@ -250,7 +257,9 @@ export default function BerlinPage() {
       setEditingType(null);
       setEditingId(null);
     } catch (error) {
-      toast.error("Link konnte nicht gespeichert werden.");
+      toast.error("Link konnte nicht gespeichert werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -300,7 +309,7 @@ export default function BerlinPage() {
               </TabsTrigger>
               <TabsTrigger
                 value="link"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-700 data-[state=active]:to-blue-700 data-[state=active]:text-white font-bold rounded-none"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-700 data-[state=active]:to-teal-700 data-[state=active]:text-white font-bold rounded-none"
                 data-testid="berlin-tab-link"
               >
                 Link
@@ -327,7 +336,7 @@ export default function BerlinPage() {
                     value={form.title}
                     onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
                     placeholder="z.B. Jazz Night"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-title-input"
               data-testid="berlin-title-input"
                   />
@@ -344,7 +353,7 @@ export default function BerlinPage() {
                     type="date"
                     value={form.date}
                     onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-date-input"
               data-testid="berlin-date-input"
                   />
@@ -365,7 +374,7 @@ export default function BerlinPage() {
                       setForm((prev) => ({ ...prev, location: event.target.value }))
                     }
                     placeholder="z.B. Kreuzberg"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-location-input"
               data-testid="berlin-location-input"
                   />
@@ -385,7 +394,7 @@ export default function BerlinPage() {
                       setForm((prev) => ({ ...prev, description: event.target.value }))
                     }
                     placeholder="Was lohnt sich?"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-description-input"
               data-testid="berlin-description-input"
                   />
@@ -403,7 +412,7 @@ export default function BerlinPage() {
                   value={form.hashtags}
                   onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
                   placeholder="#club, #openair"
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                   id="berlin-hashtags-input"
               data-testid="berlin-hashtags-input"
                 />
@@ -411,10 +420,16 @@ export default function BerlinPage() {
               <div className="flex flex-wrap items-center gap-3">
                  <Button
                    type="submit"
-                   className="bg-gradient-to-r from-pink-600 to-orange-700 hover:from-pink-700 hover:to-orange-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   disabled={isSubmitting}
+                   aria-busy={isSubmitting}
+                   className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-submit-button"
                  >
-                   {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
+                   {isSubmitting
+                     ? "Speichern…"
+                     : editingType === "event"
+                       ? "Aktualisieren"
+                       : "Tipp posten"}
                  </Button>
                 {editingType === "event" && (
                   <AlertDialog>
@@ -491,7 +506,7 @@ export default function BerlinPage() {
                     setLinkForm((prev) => ({ ...prev, description: event.target.value }))
                   }
                   placeholder="Warum ist der Link hilfreich?"
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                   id="berlin-link-description-input"
               data-testid="berlin-link-description-input"
                 />
@@ -511,7 +526,7 @@ export default function BerlinPage() {
                       setLinkForm((prev) => ({ ...prev, url: event.target.value }))
                     }
                     placeholder="https://..."
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-link-url-input"
               data-testid="berlin-link-url-input"
                   />
@@ -530,7 +545,7 @@ export default function BerlinPage() {
                       setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
                     }
                     placeholder="#tickets, #club"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     id="berlin-link-hashtags-input"
               data-testid="berlin-link-hashtags-input"
                   />
@@ -539,10 +554,16 @@ export default function BerlinPage() {
               <div className="flex flex-wrap items-center gap-3">
                  <Button
                    type="submit"
-                   className="bg-gradient-to-r from-cyan-700 to-blue-700 hover:from-cyan-800 hover:to-blue-800 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   disabled={isSubmitting}
+                   aria-busy={isSubmitting}
+                   className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-link-submit-button"
                  >
-                   {editingType === "link" ? "Aktualisieren" : "Link speichern"}
+                   {isSubmitting
+                     ? "Speichern…"
+                     : editingType === "link"
+                       ? "Aktualisieren"
+                       : "Link speichern"}
                  </Button>
                 {editingType === "link" && (
                   <AlertDialog>
@@ -609,17 +630,24 @@ export default function BerlinPage() {
         {/* Header */}
         <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
-            <h1 
+            <h1
               className="text-4xl tracking-wide text-gray-800"
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="berlin-title"
             >
               Berlin
             </h1>
+            <p
+              className="mt-1 text-sm text-gray-500"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              Tipps und Adressen aus dem Kiez — gesammelt von allen hier im Haus.
+            </p>
             <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-400 mt-2" />
           </div>
           <Button
             onClick={openCreateModal}
+            aria-label="Neuen Beitrag posten"
             className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
             data-testid="berlin-open-modal-button"
           >
@@ -646,7 +674,7 @@ export default function BerlinPage() {
                 variant={selectedTag === tag ? "default" : "outline"}
                 onClick={() => setSelectedTag(tag)}
                 className={`font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
-                  selectedTag === tag ? "bg-pink-500 text-white" : "bg-white text-gray-800"
+                  selectedTag === tag ? "bg-pink-600 text-white" : "bg-white text-gray-800"
                 }`}
                 data-testid={`berlin-tag-${index}`}
               >
@@ -690,7 +718,9 @@ export default function BerlinPage() {
               ) : filteredEvents.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
-                    Noch keine Tipps vorhanden.
+                    {selectedTag
+                      ? "Keine Tipps mit diesem Hashtag."
+                      : "Noch keine Tipps vorhanden. Tippe oben rechts auf +, um den ersten zu posten."}
                   </p>
                 </div>
               ) : (
@@ -706,7 +736,7 @@ export default function BerlinPage() {
                         openEditEvent(event);
                       }}
                       aria-label={`Tipp "${event.title}" bearbeiten`}
-                      className="absolute bottom-0 right-0 p-2 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      className="absolute bottom-0 right-0 flex h-11 w-11 items-center justify-center bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-event-edit-${event.id}`}
                       title="Bearbeiten"
                     >
@@ -740,7 +770,7 @@ export default function BerlinPage() {
                         {safeTags(event.hashtags).map((tag, index) => (
                           <Badge
                             key={`${event.id}-${tag}`}
-                            className="bg-yellow-400 text-black font-bold border-2 border-black rounded-none"
+                            className="bg-amber-200 text-gray-800 font-semibold border-2 border-transparent rounded-none"
                             data-testid={`berlin-event-tag-${event.id}-${index}`}
                           >
                             {tag}
@@ -785,7 +815,9 @@ export default function BerlinPage() {
               ) : filteredLinks.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
-                    Noch keine Links vorhanden.
+                    {selectedTag
+                      ? "Keine Links mit diesem Hashtag."
+                      : "Noch keine Links vorhanden. Tippe oben rechts auf +, um den ersten zu speichern."}
                   </p>
                 </div>
               ) : (
@@ -801,7 +833,7 @@ export default function BerlinPage() {
                         openEditLink(link);
                       }}
                       aria-label={`Link "${link.description}" bearbeiten`}
-                      className="absolute bottom-0 right-0 p-2 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      className="absolute bottom-0 right-0 flex h-11 w-11 items-center justify-center bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-link-edit-${link.id}`}
                       title="Bearbeiten"
                     >
@@ -818,7 +850,7 @@ export default function BerlinPage() {
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-teal-600 hover:text-teal-800 font-semibold underline"
+                      className="text-sm text-teal-700 hover:text-teal-900 font-semibold underline"
                       data-testid={`berlin-link-url-${link.id}`}
                     >
                       {link.url}
@@ -831,7 +863,7 @@ export default function BerlinPage() {
                         {safeTags(link.hashtags).map((tag, index) => (
                           <Badge
                             key={`${link.id}-${tag}`}
-                            className="bg-teal-400 text-black font-bold border-2 border-black rounded-none"
+                            className="bg-teal-200 text-gray-800 font-semibold border-2 border-transparent rounded-none"
                             data-testid={`berlin-link-tag-${link.id}-${index}`}
                           >
                             {tag}

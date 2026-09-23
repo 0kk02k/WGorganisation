@@ -26,7 +26,7 @@ export default function ChatEditForm({
       <Textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-[80px] border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150 text-gray-800"
+        className="min-h-[80px] border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 text-gray-800"
         data-testid={`chat-edit-input-${messageId}`}
       />
       <div className="flex flex-wrap items-center gap-2">

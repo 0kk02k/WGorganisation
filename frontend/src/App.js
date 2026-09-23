@@ -33,7 +33,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/" replace />} />
                 </Routes>
               </Layout>
-              <Toaster richColors position="top-right" />
+              <Toaster position="bottom-right" />
             </SettingsProvider>
           </BrowserRouter>
         </MotionConfig>

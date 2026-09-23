@@ -95,7 +95,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
               onChange={(event) =>
                 setForm((prev) => ({ ...prev, occupant_name: event.target.value }))
               }
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
               data-testid="stay-edit-name"
             />
           </div>
@@ -144,7 +144,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, start_date: event.target.value }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 data-testid="stay-edit-start"
               />
             </div>
@@ -163,7 +163,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, end_date: event.target.value }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 data-testid="stay-edit-end"
               />
             </div>
@@ -179,7 +179,7 @@ export const StayEditDialog = ({ stay, onSave }) => {
                 onChange={(event) =>
                   setForm((prev) => ({ ...prev, notes: event.target.value }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 data-testid="stay-edit-notes"
               />
             </div>

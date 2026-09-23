@@ -9,6 +9,16 @@ const SITE_PASSWORD =
   process.env.REACT_APP_SITE_PASSWORD ||
   (process.env.NODE_ENV !== "production" ? "boddin-dev" : undefined);
 
+// Abmelden: Sitzung verwerfen und zurück zum Passwort-Gate
+export function logout() {
+  try {
+    sessionStorage.removeItem("wg_authenticated");
+  } catch {
+    /* sessionStorage nicht verfügbar */
+  }
+  window.location.reload();
+}
+
 export function PasswordProtection({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
@@ -102,7 +112,7 @@ export function PasswordProtection({ children }) {
                 placeholder="Passwort"
                 aria-invalid={error || undefined}
                 aria-describedby={error ? "gate-password-error" : undefined}
-                className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400"
+                className="border-4 border-black rounded-none text-gray-800 placeholder:text-gray-500"
                 autoFocus
                 ref={inputRef}
               />

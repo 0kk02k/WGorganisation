@@ -80,16 +80,18 @@ export default function StayDetail() {
   };
 
   const handleAddItem = async (listKey, text) => {
-    if (!stay || !text.trim()) return;
+    if (!stay || !text.trim()) return false;
     const updatedList = [
       ...stay[listKey],
       { id: createId(), text: text.trim(), done: false },
     ];
     try {
       await updateStay({ [listKey]: updatedList });
+      return true;
     } catch (error) {
       console.error("Failed to add checklist item:", error);
       toast.error("Punkt konnte nicht hinzugefügt werden. Bitte erneut versuchen.");
+      return false;
     }
   };
 
@@ -121,9 +123,14 @@ export default function StayDetail() {
   };
 
   const handleDelete = async () => {
-    await staysApi.delete(id);
-    toast.success("Aufenthalt gelöscht.");
-    navigate("/kalender");
+    try {
+      await staysApi.delete(id);
+      toast.success("Aufenthalt gelöscht.");
+      navigate("/kalender");
+    } catch (error) {
+      console.error("Failed to delete stay:", error);
+      toast.error("Löschen fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
+    }
   };
 
   if (loading) {
@@ -260,9 +267,11 @@ export default function StayDetail() {
             onToggle={(itemId, checked) =>
               handleToggle("checklist_in", itemId, checked)
             }
-            onAdd={() => {
-              handleAddItem("checklist_in", newCheckin);
-              setNewCheckin("");
+            onAdd={async () => {
+              // Input erst bei Erfolg leeren, damit der getippte Text bei einem
+              // API-Fehler nicht verloren geht
+              const success = await handleAddItem("checklist_in", newCheckin);
+              if (success) setNewCheckin("");
             }}
             onDeleteItem={(itemId) => handleDeleteItem("checklist_in", itemId)}
             onEditItem={(itemId, text) => handleRenameItem("checklist_in", itemId, text)}
@@ -276,9 +285,9 @@ export default function StayDetail() {
             onToggle={(itemId, checked) =>
               handleToggle("checklist_out", itemId, checked)
             }
-            onAdd={() => {
-              handleAddItem("checklist_out", newCheckout);
-              setNewCheckout("");
+            onAdd={async () => {
+              const success = await handleAddItem("checklist_out", newCheckout);
+              if (success) setNewCheckout("");
             }}
             onDeleteItem={(itemId) => handleDeleteItem("checklist_out", itemId)}
             onEditItem={(itemId, text) => handleRenameItem("checklist_out", itemId, text)}

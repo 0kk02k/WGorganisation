@@ -36,6 +36,13 @@ code {
     color: #1a1a1a;
 }
 
+/* Ein Fokus-System: sichtbarer Pop-Gelb-Ring überall, auch dort,
+   wo keine Ring-Utility greift (Nav-Links, Icon-Buttons, Listen-Links) */
+:focus-visible {
+    outline: 4px solid #facc15;
+    outline-offset: 2px;
+}
+
 @layer base {
     :root {
         /* Pop-Art-Palette: Papierweiß, Tinte-Schwarz, Gelb als Primärfarbe */
@@ -57,7 +64,8 @@ code {
         --destructive-foreground: 0 0% 100%;
         --border: 240 6% 10%;
         --input: 240 6% 10%;
-        --ring: 240 6% 10%;
+        /* Fokus-Ring in Pop-Gelb: auf Schwarzrändern sichtbar, ein System für alles */
+        --ring: 48 96% 53%;
         --chart-1: 48 96% 53%;
         --chart-2: 329 86% 55%;
         --chart-3: 173 80% 40%;

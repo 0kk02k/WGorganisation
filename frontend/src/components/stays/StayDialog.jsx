@@ -43,6 +43,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
   const checkoutTemplate =
     settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE;
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     occupant_name: "",
     room: "A",
@@ -64,6 +65,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
 
   const handleSubmit = async (event) => {
     event?.preventDefault?.();
+    if (saving) return;
     if (!form.occupant_name || !form.start_date || !form.end_date) {
       toast.error("Bitte Name und Datum ausfüllen.");
       return;
@@ -73,6 +75,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
       return;
     }
 
+    setSaving(true);
     try {
       const payload = {
         ...form,
@@ -86,6 +89,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     } catch (error) {
       console.error("Failed to create stay:", error);
       toast.error(`Anlegen fehlgeschlagen: ${error.message || "Unbekannter Fehler"}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -132,7 +137,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }))
               }
               placeholder="z.B. Lea oder Ben"
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
               id="stay-form-occupant-input"
               data-testid="stay-form-occupant-input"
             />
@@ -188,7 +193,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     start_date: event.target.value,
                   }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 id="stay-form-start-date"
               data-testid="stay-form-start-date"
               />
@@ -212,7 +217,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     end_date: event.target.value,
                   }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 id="stay-form-end-date"
               data-testid="stay-form-end-date"
               />
@@ -235,7 +240,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   }))
                 }
                 placeholder="Ankunftszeit, Schlüsselort ..."
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                 id="stay-form-notes-input"
               data-testid="stay-form-notes-input"
               />
@@ -299,10 +304,12 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
           <Button
             type="submit"
             form="stay-create-form"
-            className="flex-1 bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            disabled={saving}
+            aria-busy={saving}
+            className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="stay-dialog-submit"
           >
-            Speichern
+            {saving ? "Speichern…" : "Speichern"}
           </Button>
         </DialogFooter>
       </DialogContent>
