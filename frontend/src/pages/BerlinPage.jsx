@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +14,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -40,6 +53,8 @@ const formatGermanDate = (value) => {
 export default function BerlinPage() {
   const [events, setEvents] = useState([]);
   const [links, setLinks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [selectedTag, setSelectedTag] = useState(null);
   const [form, setForm] = useState({
     title: "",
@@ -57,6 +72,7 @@ export default function BerlinPage() {
   const [postType, setPostType] = useState("event");
   const [editingType, setEditingType] = useState(null);
   const [editingId, setEditingId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const availableTags = useMemo(() => {
     const tagSet = new Set();
@@ -91,6 +107,7 @@ export default function BerlinPage() {
     : links;
 
   const loadData = async () => {
+    setLoadError(null);
     try {
       const [eventsData, linksData] = await Promise.all([
         eventsApi.list(),
@@ -100,6 +117,9 @@ export default function BerlinPage() {
       setLinks(linksData);
     } catch (error) {
       console.error("Failed to load data:", error);
+      setLoadError(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,10 +171,12 @@ export default function BerlinPage() {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
     if (!form.title || !form.date || !form.location || !form.description) {
       toast.error("Bitte alle Felder ausfüllen.");
       return;
     }
+    setIsSubmitting(true);
     try {
       if (editingType === "event" && editingId) {
         // Update existing event
@@ -184,7 +206,9 @@ export default function BerlinPage() {
       setEditingType(null);
       setEditingId(null);
     } catch (error) {
-      toast.error("Tipp konnte nicht gespeichert werden.");
+      toast.error("Tipp konnte nicht gespeichert werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -202,10 +226,12 @@ export default function BerlinPage() {
   };
 
   const handleLinkSubmit = async () => {
+    if (isSubmitting) return;
     if (!linkForm.url || !linkForm.description) {
       toast.error("Bitte Link und Beschreibung ausfüllen.");
       return;
     }
+    setIsSubmitting(true);
     try {
       if (editingType === "link" && editingId) {
         // Update existing link
@@ -231,7 +257,9 @@ export default function BerlinPage() {
       setEditingType(null);
       setEditingId(null);
     } catch (error) {
-      toast.error("Link konnte nicht gespeichert werden.");
+      toast.error("Link konnte nicht gespeichert werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -256,7 +284,7 @@ export default function BerlinPage() {
           className="max-w-2xl bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800"
           data-testid="berlin-create-modal"
         >
-          <DialogHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4 -m-6 mb-0">
+          <DialogHeader className="bg-gradient-to-r from-pink-600 to-orange-700 border-b-4 border-black p-4 -m-6 mb-0">
              <DialogTitle 
                className="text-white text-2xl"
                style={{ fontFamily: "'Bangers', cursive" }}
@@ -272,27 +300,35 @@ export default function BerlinPage() {
             data-testid="berlin-create-tabs"
           >
             <TabsList className="grid w-full grid-cols-2 bg-gray-100 border-4 border-black rounded-none h-12">
-              <TabsTrigger 
-                value="event" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-400 data-[state=active]:to-emerald-400 data-[state=active]:text-white font-bold rounded-none"
+              <TabsTrigger
+                value="event"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-teal-700 data-[state=active]:to-emerald-700 data-[state=active]:text-white font-bold rounded-none"
                 data-testid="berlin-tab-event"
               >
                 Veranstaltung
               </TabsTrigger>
-              <TabsTrigger 
-                value="link" 
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-400 data-[state=active]:to-blue-400 data-[state=active]:text-white font-bold rounded-none"
+              <TabsTrigger
+                value="link"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-700 data-[state=active]:to-teal-700 data-[state=active]:text-white font-bold rounded-none"
                 data-testid="berlin-tab-link"
               >
                 Link
               </TabsTrigger>
             </TabsList>
             <TabsContent value="event" className="space-y-4" data-testid="berlin-tab-event-content">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSubmit();
+                }}
+                className="space-y-4"
+              >
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-title-label"
+              htmlFor="berlin-title-input"
                   >
                     Titel
                   </label>
@@ -300,14 +336,16 @@ export default function BerlinPage() {
                     value={form.title}
                     onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
                     placeholder="z.B. Jazz Night"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-title-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-title-input"
+              data-testid="berlin-title-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-date-label"
+              htmlFor="berlin-date-input"
                   >
                     Datum
                   </label>
@@ -315,8 +353,9 @@ export default function BerlinPage() {
                     type="date"
                     value={form.date}
                     onChange={(event) => setForm((prev) => ({ ...prev, date: event.target.value }))}
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-date-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-date-input"
+              data-testid="berlin-date-input"
                   />
                 </div>
               </div>
@@ -325,6 +364,7 @@ export default function BerlinPage() {
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-location-label"
+              htmlFor="berlin-location-input"
                   >
                     Ort
                   </label>
@@ -334,14 +374,16 @@ export default function BerlinPage() {
                       setForm((prev) => ({ ...prev, location: event.target.value }))
                     }
                     placeholder="z.B. Kreuzberg"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-location-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-location-input"
+              data-testid="berlin-location-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-description-label"
+              htmlFor="berlin-description-input"
                   >
                     Beschreibung
                   </label>
@@ -352,8 +394,9 @@ export default function BerlinPage() {
                       setForm((prev) => ({ ...prev, description: event.target.value }))
                     }
                     placeholder="Was lohnt sich?"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-description-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-description-input"
+              data-testid="berlin-description-input"
                   />
                 </div>
               </div>
@@ -361,6 +404,7 @@ export default function BerlinPage() {
                 <label 
                   className="text-sm font-bold text-gray-800"
                   data-testid="berlin-hashtags-label"
+              htmlFor="berlin-hashtags-input"
                 >
                   Hashtags
                 </label>
@@ -368,35 +412,90 @@ export default function BerlinPage() {
                   value={form.hashtags}
                   onChange={(event) => setForm((prev) => ({ ...prev, hashtags: event.target.value }))}
                   placeholder="#club, #openair"
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                  data-testid="berlin-hashtags-input"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                  id="berlin-hashtags-input"
+              data-testid="berlin-hashtags-input"
                 />
               </div>
               <div className="flex flex-wrap items-center gap-3">
                  <Button
-                   onClick={handleSubmit}
-                   className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   type="submit"
+                   disabled={isSubmitting}
+                   aria-busy={isSubmitting}
+                   className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-submit-button"
                  >
-                   {editingType === "event" ? "Aktualisieren" : "Tipp posten"}
+                   {isSubmitting
+                     ? "Speichern…"
+                     : editingType === "event"
+                       ? "Aktualisieren"
+                       : "Tipp posten"}
                  </Button>
                 {editingType === "event" && (
-                  <Button
-                    onClick={handleDeleteEvent}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                    data-testid="berlin-delete-button"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Löschen
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                        data-testid="berlin-delete-button"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Löschen
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent
+                      className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                      data-testid="berlin-delete-dialog"
+                    >
+                      <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                        <AlertDialogTitle
+                          className="text-white text-2xl"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                          data-testid="berlin-delete-title"
+                        >
+                          Tipp wirklich löschen?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription
+                        className="text-gray-600 pt-8"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid="berlin-delete-description"
+                      >
+                        „{form.title}" wird dauerhaft entfernt.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter className="flex gap-2 mt-4">
+                        <AlertDialogCancel
+                          className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-delete-cancel"
+                        >
+                          Abbrechen
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteEvent}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-delete-confirm"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
+              </form>
             </TabsContent>
             <TabsContent value="link" className="space-y-4" data-testid="berlin-tab-link-content">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleLinkSubmit();
+                }}
+                className="space-y-4"
+              >
               <div className="space-y-2">
                 <label 
                   className="text-sm font-bold text-gray-800"
                   data-testid="berlin-link-description-label"
+              htmlFor="berlin-link-description-input"
                 >
                   Beschreibung
                 </label>
@@ -407,8 +506,9 @@ export default function BerlinPage() {
                     setLinkForm((prev) => ({ ...prev, description: event.target.value }))
                   }
                   placeholder="Warum ist der Link hilfreich?"
-                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                  data-testid="berlin-link-description-input"
+                  className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                  id="berlin-link-description-input"
+              data-testid="berlin-link-description-input"
                 />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
@@ -416,6 +516,7 @@ export default function BerlinPage() {
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-link-url-label"
+              htmlFor="berlin-link-url-input"
                   >
                     URL
                   </label>
@@ -425,14 +526,16 @@ export default function BerlinPage() {
                       setLinkForm((prev) => ({ ...prev, url: event.target.value }))
                     }
                     placeholder="https://..."
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-link-url-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-link-url-input"
+              data-testid="berlin-link-url-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label 
                     className="text-sm font-bold text-gray-800"
                     data-testid="berlin-link-hashtags-label"
+              htmlFor="berlin-link-hashtags-input"
                   >
                     Hashtags
                   </label>
@@ -442,30 +545,77 @@ export default function BerlinPage() {
                       setLinkForm((prev) => ({ ...prev, hashtags: event.target.value }))
                     }
                     placeholder="#tickets, #club"
-                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                    data-testid="berlin-link-hashtags-input"
+                    className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                    id="berlin-link-hashtags-input"
+              data-testid="berlin-link-hashtags-input"
                   />
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3">
                  <Button
-                   onClick={handleLinkSubmit}
-                   className="bg-gradient-to-r from-cyan-400 to-blue-500 hover:from-cyan-500 hover:to-blue-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
+                   type="submit"
+                   disabled={isSubmitting}
+                   aria-busy={isSubmitting}
+                   className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-6 py-3"
                    data-testid="berlin-link-submit-button"
                  >
-                   {editingType === "link" ? "Aktualisieren" : "Link speichern"}
+                   {isSubmitting
+                     ? "Speichern…"
+                     : editingType === "link"
+                       ? "Aktualisieren"
+                       : "Link speichern"}
                  </Button>
                 {editingType === "link" && (
-                  <Button
-                    onClick={handleDeleteLink}
-                    className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
-                    data-testid="berlin-link-delete-button"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Löschen
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150 px-4 py-3"
+                        data-testid="berlin-link-delete-button"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Löschen
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent
+                      className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+                      data-testid="berlin-link-delete-dialog"
+                    >
+                      <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                        <AlertDialogTitle
+                          className="text-white text-2xl"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                          data-testid="berlin-link-delete-title"
+                        >
+                          Link wirklich löschen?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription
+                        className="text-gray-600 pt-8"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                        data-testid="berlin-link-delete-description"
+                      >
+                        „{linkForm.description}" wird dauerhaft entfernt.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter className="flex gap-2 mt-4">
+                        <AlertDialogCancel
+                          className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-link-delete-cancel"
+                        >
+                          Abbrechen
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteLink}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                          data-testid="berlin-link-delete-confirm"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 )}
               </div>
+              </form>
             </TabsContent>
           </Tabs>
         </DialogContent>
@@ -480,17 +630,24 @@ export default function BerlinPage() {
         {/* Header */}
         <motion.div variants={fadeInUp} className="flex flex-wrap items-center justify-between gap-4">
           <div className="relative inline-block">
-            <h1 
+            <h1
               className="text-4xl tracking-wide text-gray-800"
               style={{ fontFamily: "'Bangers', cursive" }}
               data-testid="berlin-title"
             >
               Berlin
             </h1>
+            <p
+              className="mt-1 text-sm text-gray-500"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              Tipps und Adressen aus dem Kiez — gesammelt von allen hier im Haus.
+            </p>
             <div className="h-2 bg-gradient-to-r from-red-500 via-orange-500 to-yellow-400 mt-2" />
           </div>
           <Button
             onClick={openCreateModal}
+            aria-label="Neuen Beitrag posten"
             className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
             data-testid="berlin-open-modal-button"
           >
@@ -517,7 +674,7 @@ export default function BerlinPage() {
                 variant={selectedTag === tag ? "default" : "outline"}
                 onClick={() => setSelectedTag(tag)}
                 className={`font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150 ${
-                  selectedTag === tag ? "bg-pink-500 text-white" : "bg-white text-gray-800"
+                  selectedTag === tag ? "bg-pink-600 text-white" : "bg-white text-gray-800"
                 }`}
                 data-testid={`berlin-tag-${index}`}
               >
@@ -534,7 +691,7 @@ export default function BerlinPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="berlin-events-section"
           >
-            <CardHeader className="bg-gradient-to-r from-red-500 to-orange-500 border-b-4 border-black p-4">
+            <CardHeader className="bg-gradient-to-r from-red-600 to-orange-700 border-b-4 border-black p-4">
               <CardTitle 
                 className="text-white text-2xl"
                 style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -544,17 +701,33 @@ export default function BerlinPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4 bg-red-500/10">
-              {filteredEvents.length === 0 ? (
+              {loadError ? (
+                <ErrorCard
+                  title="Tipps konnten nicht geladen werden."
+                  onRetry={() => {
+                    setLoading(true);
+                    loadData();
+                  }}
+                  testId="berlin-error"
+                />
+              ) : loading ? (
+                <div className="space-y-4" aria-hidden="true">
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                </div>
+              ) : filteredEvents.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
-                    Noch keine Tipps vorhanden.
+                    {selectedTag
+                      ? "Keine Tipps mit diesem Hashtag."
+                      : "Noch keine Tipps vorhanden. Tippe oben rechts auf +, um den ersten zu posten."}
                   </p>
                 </div>
               ) : (
                 filteredEvents.map((event) => (
                   <div 
                     key={event.id} 
-                    className="relative border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-2 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     data-testid={`berlin-event-${event.id}`}
                   >
                     <button
@@ -562,11 +735,12 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditEvent(event);
                       }}
-                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      aria-label={`Tipp "${event.title}" bearbeiten`}
+                      className="absolute bottom-0 right-0 flex h-11 w-11 items-center justify-center bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-event-edit-${event.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-3 w-3 text-gray-600" />
+                      <Pencil className="h-4 w-4 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
@@ -596,7 +770,7 @@ export default function BerlinPage() {
                         {safeTags(event.hashtags).map((tag, index) => (
                           <Badge
                             key={`${event.id}-${tag}`}
-                            className="bg-yellow-400 text-black font-bold border-2 border-black rounded-none"
+                            className="bg-amber-200 text-gray-800 font-semibold border-2 border-transparent rounded-none"
                             data-testid={`berlin-event-tag-${event.id}-${index}`}
                           >
                             {tag}
@@ -615,27 +789,42 @@ export default function BerlinPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="berlin-links-section"
           >
-            <CardHeader className="bg-gradient-to-r from-cyan-400 to-blue-500 border-b-4 border-black p-4">
+            <CardHeader className="bg-white border-b-4 border-black p-4">
               <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                className="text-gray-800 text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
                 data-testid="berlin-links-title"
               >
                 Dauerhafte Links
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 space-y-4 bg-cyan-400/10">
-              {filteredLinks.length === 0 ? (
+              {loadError ? (
+                <ErrorCard
+                  title="Links konnten nicht geladen werden."
+                  onRetry={() => {
+                    setLoading(true);
+                    loadData();
+                  }}
+                  testId="berlin-links-error"
+                />
+              ) : loading ? (
+                <div className="space-y-4" aria-hidden="true">
+                  <Skeleton className="h-24 w-full rounded-none bg-gray-200" />
+                </div>
+              ) : filteredLinks.length === 0 ? (
                 <div className="border-4 border-dashed border-gray-300 p-8 text-center">
                   <p className="text-gray-500" style={{ fontFamily: "'Nunito', sans-serif" }}>
-                    Noch keine Links vorhanden.
+                    {selectedTag
+                      ? "Keine Links mit diesem Hashtag."
+                      : "Noch keine Links vorhanden. Tippe oben rechts auf +, um den ersten zu speichern."}
                   </p>
                 </div>
               ) : (
                 filteredLinks.map((link) => (
                   <div 
                     key={link.id} 
-                    className="relative border-4 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                    className="relative border-2 border-black p-4 bg-gradient-to-r from-cyan-50 to-blue-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                     data-testid={`berlin-link-${link.id}`}
                   >
                     <button
@@ -643,11 +832,12 @@ export default function BerlinPage() {
                         e.stopPropagation();
                         openEditLink(link);
                       }}
-                      className="absolute bottom-0 right-0 p-1 bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
+                      aria-label={`Link "${link.description}" bearbeiten`}
+                      className="absolute bottom-0 right-0 flex h-11 w-11 items-center justify-center bg-gray-100 hover:bg-white border-t-2 border-l-2 border-black transition-all duration-150"
                       data-testid={`berlin-link-edit-${link.id}`}
                       title="Bearbeiten"
                     >
-                      <Pencil className="h-3 w-3 text-gray-600" />
+                      <Pencil className="h-4 w-4 text-gray-600" />
                     </button>
                     <h3 
                       className="text-lg font-bold text-gray-800"
@@ -660,7 +850,7 @@ export default function BerlinPage() {
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-teal-600 hover:text-teal-800 font-semibold underline"
+                      className="text-sm text-teal-700 hover:text-teal-900 font-semibold underline"
                       data-testid={`berlin-link-url-${link.id}`}
                     >
                       {link.url}
@@ -673,7 +863,7 @@ export default function BerlinPage() {
                         {safeTags(link.hashtags).map((tag, index) => (
                           <Badge
                             key={`${link.id}-${tag}`}
-                            className="bg-teal-400 text-black font-bold border-2 border-black rounded-none"
+                            className="bg-teal-200 text-gray-800 font-semibold border-2 border-transparent rounded-none"
                             data-testid={`berlin-link-tag-${link.id}-${index}`}
                           >
                             {tag}

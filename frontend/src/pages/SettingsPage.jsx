@@ -53,7 +53,7 @@ export default function SettingsPage() {
       toast.success("Zimmer aktualisiert.");
       setEditingRooms(false);
     } catch (error) {
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error("Speichern fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
@@ -64,7 +64,7 @@ export default function SettingsPage() {
       toast.success("Check-in Vorlage gespeichert.");
       setEditingCheckin(false);
     } catch (error) {
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error("Speichern fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
@@ -75,22 +75,28 @@ export default function SettingsPage() {
       toast.success("Check-out Vorlage gespeichert.");
       setEditingCheckout(false);
     } catch (error) {
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error("Speichern fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
   return (
     <div className="min-h-screen relative" data-testid="settings-page">
-      <div className="relative z-10 space-y-8 p-6">
+      <div className="relative z-10 space-y-8">
         {/* Header mit Pop-Art Unterstrich */}
         <div className="relative inline-block">
-          <h1 
+          <h1
             className="text-4xl tracking-wide text-gray-800"
             style={{ fontFamily: "'Bangers', cursive" }}
             data-testid="settings-title"
           >
             Einstellungen & Vorlagen
           </h1>
+          <p
+            className="mt-1 text-sm text-gray-500"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            Zimmernamen, Farben und die Vorlagen für neue Checklisten anpassen.
+          </p>
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
         </div>
 
@@ -133,7 +139,7 @@ export default function SettingsPage() {
                   Abbrechen
                 </Button>
                 <Button
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                   onClick={handleSaveRooms}
                   data-testid="settings-rooms-save-button"
                 >
@@ -156,6 +162,7 @@ export default function SettingsPage() {
                   <div className="space-y-3 relative z-10">
                     <div className="space-y-2">
                       <label
+                        htmlFor={`settings-room-name-input-${room.id}`}
                         className="text-sm font-semibold text-gray-800"
                         style={{ fontFamily: "'Nunito', sans-serif" }}
                         data-testid={`settings-room-name-label-${room.id}`}
@@ -163,7 +170,8 @@ export default function SettingsPage() {
                         Name
                       </label>
                       <Input
-                        className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 focus:ring-offset-0 text-gray-800"
+                        id={`settings-room-name-input-${room.id}`}
+                        className="bg-white border-4 border-black rounded-none text-gray-800"
                         value={room.name}
                         onChange={(event) => {
                           const next = [...roomDraft];
@@ -175,6 +183,7 @@ export default function SettingsPage() {
                     </div>
                     <div className="space-y-2">
                       <label
+                        htmlFor={`settings-room-color-input-${room.id}`}
                         className="text-sm font-semibold text-gray-800"
                         style={{ fontFamily: "'Nunito', sans-serif" }}
                         data-testid={`settings-room-color-label-${room.id}`}
@@ -182,6 +191,7 @@ export default function SettingsPage() {
                         Farbcode
                       </label>
                       <Input
+                        id={`settings-room-color-input-${room.id}`}
                         type="color"
                         className="w-full h-12 bg-white border-4 border-black rounded-none cursor-pointer"
                         value={room.color}
@@ -231,8 +241,8 @@ export default function SettingsPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="settings-checkin-card"
           >
-            <CardHeader 
-              className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
+            <CardHeader
+              className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b-4 border-black flex flex-row items-center justify-between p-4"
             >
               <CardTitle 
                 className="text-white text-2xl"
@@ -265,7 +275,7 @@ export default function SettingsPage() {
                     Abbrechen
                   </Button>
                   <Button
-                    className="bg-teal-500 hover:bg-teal-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     onClick={handleSaveCheckin}
                     data-testid="settings-checkin-save-button"
                   >
@@ -276,19 +286,28 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-4 bg-teal-400/10">
                {editingCheckin ? (
-                <Textarea
-                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-teal-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
-                  rows={6}
-                  value={checkinDraft}
-                  onChange={(event) => setCheckinDraft(event.target.value)}
-                  data-testid="settings-checkin-textarea"
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    className="bg-white border-4 border-black rounded-none text-gray-800 min-h-[150px]"
+                    rows={6}
+                    value={checkinDraft}
+                    onChange={(event) => setCheckinDraft(event.target.value)}
+                    aria-label="Check-in Vorlage bearbeiten"
+                    data-testid="settings-checkin-textarea"
+                  />
+                  <p
+                    className="text-xs text-gray-600"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Eine Zeile = ein Punkt auf der Checkliste. Neue Aufenthalte bekommen diese Liste automatisch.
+                  </p>
+                </div>
               ) : (
                 <ul className="space-y-2">
                   {displayCheckin.split('\n').filter(Boolean).map((item, index) => (
                     <li
                       key={`checkin-${index}`}
-                      className="bg-gradient-to-r from-teal-50 to-emerald-50 border-l-8 border-teal-400 p-4 hover:from-teal-100 hover:to-emerald-100 transition-colors relative"
+                      className="bg-gradient-to-r from-teal-50 to-emerald-50 border-2 border-black p-4 pl-6 hover:from-teal-100 hover:to-emerald-100 transition-colors relative"
                       data-testid={`settings-checkin-item-${index}`}
                     >
                       {/* Nummerierter Kreis */}
@@ -313,8 +332,8 @@ export default function SettingsPage() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
             data-testid="settings-checkout-card"
           >
-            <CardHeader 
-              className="bg-gradient-to-r from-rose-400 to-pink-400 border-b-4 border-black flex flex-row items-center justify-between p-4"
+            <CardHeader
+              className="bg-gradient-to-r from-rose-600 to-pink-700 border-b-4 border-black flex flex-row items-center justify-between p-4"
             >
               <CardTitle 
                 className="text-white text-2xl"
@@ -347,7 +366,7 @@ export default function SettingsPage() {
                     Abbrechen
                   </Button>
                   <Button
-                    className="bg-rose-500 hover:bg-rose-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                    className="bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     onClick={handleSaveCheckout}
                     data-testid="settings-checkout-save-button"
                   >
@@ -358,19 +377,28 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent className="p-4 bg-rose-400/10">
                {editingCheckout ? (
-                <Textarea
-                  className="bg-white border-4 border-black rounded-none focus:ring-4 focus:ring-rose-400 focus:ring-offset-0 text-gray-800 min-h-[150px]"
-                  rows={6}
-                  value={checkoutDraft}
-                  onChange={(event) => setCheckoutDraft(event.target.value)}
-                  data-testid="settings-checkout-textarea"
-                />
+                <div className="space-y-2">
+                  <Textarea
+                    className="bg-white border-4 border-black rounded-none text-gray-800 min-h-[150px]"
+                    rows={6}
+                    value={checkoutDraft}
+                    onChange={(event) => setCheckoutDraft(event.target.value)}
+                    aria-label="Check-out Vorlage bearbeiten"
+                    data-testid="settings-checkout-textarea"
+                  />
+                  <p
+                    className="text-xs text-gray-600"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Eine Zeile = ein Punkt auf der Checkliste. Neue Aufenthalte bekommen diese Liste automatisch.
+                  </p>
+                </div>
               ) : (
                 <ul className="space-y-2">
                   {displayCheckout.split('\n').filter(Boolean).map((item, index) => (
                     <li
                       key={`checkout-${index}`}
-                      className="bg-gradient-to-r from-rose-50 to-pink-50 border-l-8 border-rose-400 p-4 hover:from-rose-100 hover:to-pink-100 transition-colors relative"
+                      className="bg-gradient-to-r from-rose-50 to-pink-50 border-2 border-black p-4 pl-6 hover:from-rose-100 hover:to-pink-100 transition-colors relative"
                       data-testid={`settings-checkout-item-${index}`}
                     >
                       {/* Nummerierter Kreis */}

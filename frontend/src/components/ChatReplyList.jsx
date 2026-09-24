@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Pencil, Trash2, X, Check } from "lucide-react";
 
 export default function ChatReplyList({
@@ -41,7 +52,7 @@ export default function ChatReplyList({
       {replies.map((reply) => (
         <div
           key={reply.id}
-          className="border-4 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+          className="border-2 border-black bg-gradient-to-r from-cyan-50 to-teal-50 p-3"
           data-testid={`chat-reply-${messageId}-${reply.id}`}
         >
           <div className="flex items-start justify-between gap-2">
@@ -58,20 +69,52 @@ export default function ChatReplyList({
                     size="icon"
                     variant="ghost"
                     onClick={() => startEdit(reply)}
-                    className="h-6 w-6 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
+                    aria-label="Antwort bearbeiten"
+                    className="h-11 w-11 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                     data-testid={`reply-edit-button-${reply.id}`}
                   >
-                    <Pencil className="h-3 w-3" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDelete(reply.id)}
-                    className="h-6 w-6 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
-                    data-testid={`reply-delete-button-${reply.id}`}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label="Antwort löschen"
+                        className="h-11 w-11 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
+                        data-testid={`reply-delete-button-${reply.id}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                      <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                        <AlertDialogTitle
+                          className="text-white text-2xl"
+                          style={{ fontFamily: "'Bangers', cursive" }}
+                        >
+                          Antwort wirklich löschen?
+                        </AlertDialogTitle>
+                      </AlertDialogHeader>
+                      <AlertDialogDescription
+                        className="text-gray-600 pt-8"
+                        style={{ fontFamily: "'Nunito', sans-serif" }}
+                      >
+                        Die Antwort von {reply.name} wird dauerhaft entfernt.
+                      </AlertDialogDescription>
+                      <AlertDialogFooter className="flex gap-2 mt-4">
+                        <AlertDialogCancel className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150">
+                          Abbrechen
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(reply.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                        >
+                          Löschen
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </>
               )}
             </div>

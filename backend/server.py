@@ -34,8 +34,8 @@ def now_iso() -> str:
 
 
 DEFAULT_ROOMS = [
-    {"id": "A", "name": "Zimmer A", "color": "#84cc16"},
-    {"id": "B", "name": "Zimmer B", "color": "#0ea5e9"},
+    {"id": "A", "name": "Zimmer A", "color": "#2dd4bf"},
+    {"id": "B", "name": "Zimmer B", "color": "#ec4899"},
 ]
 DEFAULT_CHECKIN_TEMPLATE = [
     "Schlüsselübergabe prüfen",

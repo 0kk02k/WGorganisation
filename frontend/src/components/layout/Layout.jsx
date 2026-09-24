@@ -1,15 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X } from "lucide-react";
+import { Home, CalendarDays, BookOpen, Settings, MapPin, Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, slideInRight, overlayFade } from "@/lib/motion";
+import { logout } from "@/components/PasswordProtection";
 
 const navItems = [
   {
     to: "/",
     label: "Übersicht",
-    short: "Home",
     icon: Home,
     testId: "nav-home-link",
     color: "from-yellow-400 to-orange-500",
@@ -17,15 +17,13 @@ const navItems = [
   {
     to: "/kalender",
     label: "Kalender",
-    short: "Kalender",
     icon: CalendarDays,
     testId: "nav-calendar-link",
     color: "from-teal-400 to-emerald-400",
   },
   {
     to: "/anleitungen",
-    label: "How to.....",
-    short: "How to",
+    label: "How to",
     icon: BookOpen,
     testId: "nav-manuals-link",
     color: "from-pink-500 to-rose-500",
@@ -33,7 +31,6 @@ const navItems = [
   {
     to: "/berlin",
     label: "Berlin",
-    short: "Berlin",
     icon: MapPin,
     testId: "nav-berlin-link",
     color: "from-orange-500 to-red-500",
@@ -41,21 +38,81 @@ const navItems = [
   {
     to: "/einstellungen",
     label: "Einstellungen",
-    short: "Info",
     icon: Settings,
     testId: "nav-settings-link",
-    color: "from-purple-500 to-pink-500",
+    color: "from-rose-500 to-pink-500",
   },
 ];
+
+// Seitentitel pro Route, damit Browser-Tabs und Verlauf sprechend sind
+const ROUTE_TITLES = [
+  ["/aufenthalte", "Aufenthalt"],
+  ["/anleitungen", "How to"],
+  ["/kalender", "Kalender"],
+  ["/berlin", "Berlin"],
+  ["/einstellungen", "Einstellungen"],
+];
+
+const isNavItemActive = (item, pathname) => {
+  if (item.to === "/kalender" && pathname.startsWith("/aufenthalte")) return true;
+  if (item.to === "/") return pathname === "/";
+  return pathname.startsWith(item.to);
+};
 
 export const Layout = ({ children }) => {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [titleVisible, setTitleVisible] = useState(true);
+  const mobilePanelRef = useRef(null);
+  const mobileToggleRef = useRef(null);
 
   useEffect(() => {
     setMobileNavOpen(false);
   }, [location.pathname]);
+
+  // Dokumenttitel an die Route koppeln
+  useEffect(() => {
+    const match = ROUTE_TITLES.find(([prefix]) =>
+      location.pathname.startsWith(prefix),
+    );
+    document.title = match
+      ? `${match[1]} · BODDIN14 WG-HUB`
+      : "BODDIN14 WG-HUB";
+  }, [location.pathname]);
+
+  // Escape schließt das Menü; beim Öffnen landet der Fokus im Panel,
+  // beim Schließen zurück auf dem Toggle
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const toggleEl = mobileToggleRef.current;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setMobileNavOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const panel = mobilePanelRef.current;
+      if (!panel) return;
+      const focusable = panel.querySelectorAll("a, button");
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    const firstLink = mobilePanelRef.current?.querySelector("a");
+    firstLink?.focus();
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      toggleEl?.focus();
+    };
+  }, [mobileNavOpen]);
 
   // Hide title bar on scroll
   useEffect(() => {
@@ -85,13 +142,6 @@ export const Layout = ({ children }) => {
         }}
       />
 
-      {/* Decorative Elements - CSS parallax: fixed so they stay while content scrolls */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
-        <div className="absolute -top-20 left-1/4 w-40 h-40 bg-yellow-400 rounded-full blur-3xl opacity-20" />
-        <div className="absolute top-1/3 right-0 w-32 h-32 bg-pink-500 rounded-full blur-3xl opacity-20" />
-        <div className="absolute bottom-20 left-0 w-36 h-36 bg-teal-400 rounded-full blur-3xl opacity-20" />
-      </div>
-
       {/* Combined Title + Navigation Bar - Desktop only */}
       <header 
         className={`fixed inset-x-0 z-40 hidden border-b-4 border-black bg-white transition-all duration-300 overflow-hidden min-[755px]:block ${
@@ -100,19 +150,20 @@ export const Layout = ({ children }) => {
         data-testid="desktop-header"
       >
         {/* Scrolling Ticker - Background layer, full height behind nav */}
-        <div 
+        <div
+          aria-hidden="true"
           className={`absolute inset-0 overflow-hidden transition-opacity duration-300 ${
             titleVisible ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
         >
           <div className="flex whitespace-nowrap animate-ticker h-full items-center">
             {[...Array(20)].map((_, i) => (
-              <span 
+              <span
                 key={i}
                 className="tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive", fontSize: '3.9rem' }}
               >
-                BODDINWG-HUB++++
+                BODDIN14 WG-HUB++++
               </span>
             ))}
           </div>
@@ -120,28 +171,44 @@ export const Layout = ({ children }) => {
         
         {/* Navigation - always visible, positioned at bottom */}
         <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto flex max-w-6xl items-center justify-center px-4 py-3 md:px-8`}>
+          <button
+            type="button"
+            onClick={logout}
+            className="absolute right-4 top-2 z-20 flex items-center gap-1.5 border-2 border-black bg-white px-2.5 py-1.5 text-xs font-bold text-gray-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-colors hover:bg-gray-100"
+            data-testid="logout-button"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Abmelden
+          </button>
           <nav className="flex w-full items-center justify-between gap-2" data-testid="top-nav">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) => {
-                  const calendarActive =
-                    item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                  return cn(
-                    "flex items-center gap-2 px-4 py-2 text-sm font-bold border-4 border-black rounded-none transition-all duration-150",
-                    isActive || calendarActive
-                      ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+            {navItems.map((item) => {
+              const active = isNavItemActive(item, location.pathname);
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  aria-current={active ? "page" : undefined}
+                  className={cn(
+                    "relative flex items-center gap-2 px-4 py-2 text-sm font-bold border-4 border-black rounded-none transition-all duration-150",
+                    active
+                      ? "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                       : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
-                  );
-                }}
-                data-testid={item.testId}
-                style={{ fontFamily: "'Nunito', sans-serif" }}
-              >
-                <item.icon className="h-4 w-4" />
-                <span data-testid={`${item.testId}-label`}>{item.label}</span>
-              </NavLink>
-            ))}
+                  )}
+                  data-testid={item.testId}
+                  style={{ fontFamily: "'Nunito', sans-serif" }}
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span data-testid={`${item.testId}-label`}>{item.label}</span>
+                  {active && (
+                    <span
+                      aria-hidden="true"
+                      className={`absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r ${item.color}`}
+                    />
+                  )}
+                </NavLink>
+              );
+            })}
           </nav>
         </div>
       </header>
@@ -153,35 +220,42 @@ export const Layout = ({ children }) => {
       >
         <div className="relative py-3 overflow-hidden">
           {/* Scrolling Ticker */}
-          <div 
+          <div
+            aria-hidden="true"
             className="flex whitespace-nowrap animate-ticker"
           >
             {[...Array(20)].map((_, i) => (
-              <span 
+              <span
                 key={i}
                 className="text-xl tracking-wide text-gray-800"
                 style={{ fontFamily: "'Bangers', cursive" }}
               >
-                BODDINWG-HUB++++
+                BODDIN14 WG-HUB++++
               </span>
             ))}
           </div>
         </div>
         <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400" />
-        {/* Hamburger Menu Button - positioned absolute within the bar */}
-        <button
-          type="button"
-          onClick={toggleMobileNav}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-50 flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-          data-testid="mobile-nav-toggle"
-        >
-          {mobileNavOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </button>
       </div>
+
+      {/* Hamburger/Close - root-level fixed mit z-[60], damit das geöffnete
+          Panel (z-50) den Button nicht überdecken kann */}
+      <button
+        type="button"
+        onClick={toggleMobileNav}
+        aria-label={mobileNavOpen ? "Menü schließen" : "Menü öffnen"}
+        aria-expanded={mobileNavOpen}
+        aria-controls="mobile-nav-panel"
+        ref={mobileToggleRef}
+        className="fixed right-2 top-1.5 z-[60] flex h-10 w-10 items-center justify-center border-4 border-black bg-yellow-400 text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] min-[755px]:hidden"
+        data-testid="mobile-nav-toggle"
+      >
+        {mobileNavOpen ? (
+          <X className="h-5 w-5" />
+        ) : (
+          <Menu className="h-5 w-5" />
+        )}
+      </button>
 
       {/* Mobile Navigation Overlay */}
       <AnimatePresence>
@@ -204,7 +278,12 @@ export const Layout = ({ children }) => {
         {mobileNavOpen && (
           <motion.div
             key="mobile-nav-panel"
-            className="fixed right-0 top-0 z-50 h-full w-64 border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
+            id="mobile-nav-panel"
+            ref={mobilePanelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navigation"
+            className="fixed right-0 top-0 z-50 flex h-full w-64 flex-col border-l-4 border-black bg-white p-6 pt-20 min-[755px]:hidden"
             data-testid="mobile-nav-panel"
             variants={slideInRight}
             initial="hidden"
@@ -212,29 +291,45 @@ export const Layout = ({ children }) => {
             exit="exit"
           >
             <div className="flex flex-col gap-3" data-testid="mobile-nav-links">
-              {navItems.map((item) => (
-                <NavLink
-                  key={`${item.to}-drawer`}
-                  to={item.to}
-                  onClick={() => setMobileNavOpen(false)}
-                  className={({ isActive }) => {
-                    const calendarActive =
-                      item.to === "/kalender" && location.pathname.startsWith("/aufenthalte");
-                    return cn(
-                      "flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
-                      isActive || calendarActive
-                        ? `bg-gradient-to-r ${item.color} text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]`
+              {navItems.map((item) => {
+                const active = isNavItemActive(item, location.pathname);
+                return (
+                  <NavLink
+                    key={`${item.to}-drawer`}
+                    to={item.to}
+                    onClick={() => setMobileNavOpen(false)}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex items-center gap-3 px-4 py-3 text-sm font-bold border-4 border-black rounded-none transition-all",
+                      active
+                        ? "bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                         : "bg-white text-gray-800 hover:bg-gray-100 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                    );
-                  }}
-                  data-testid={`mobile-${item.testId}`}
-                  style={{ fontFamily: "'Nunito', sans-serif" }}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.label}</span>
-                </NavLink>
-              ))}
+                    )}
+                    data-testid={`mobile-${item.testId}`}
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.label}</span>
+                    {active && (
+                      <span
+                        aria-hidden="true"
+                        className={`absolute inset-x-0 bottom-0 h-1.5 bg-gradient-to-r ${item.color}`}
+                      />
+                    )}
+                  </NavLink>
+                );
+              })}
             </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="mt-auto flex min-h-[44px] items-center justify-center gap-2 border-4 border-black bg-white px-4 py-2.5 text-sm font-bold text-gray-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-colors hover:bg-gray-100"
+              data-testid="mobile-logout-button"
+              style={{ fontFamily: "'Nunito', sans-serif" }}
+            >
+              <LogOut className="h-4 w-4" />
+              Abmelden
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

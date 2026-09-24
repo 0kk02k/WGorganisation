@@ -5,6 +5,8 @@ import { useSettings } from "@/context/SettingsContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoomBadge } from "@/components/ui/RoomBadge";
+import { ErrorCard } from "@/components/ui/ErrorCard";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Droplet, ChevronDown, Search, Maximize2, Minimize2 } from "lucide-react";
@@ -23,42 +25,76 @@ import { staggerContainer, staggerItem, fadeInUp, springHover, chatMessage, flip
 
 const INITIAL_VISIBLE_COUNT = 7;
 const EXPANDED_VISIBLE_COUNT = 15;
+const CHAT_NAME_KEY = "boddin-chat-name";
+
+const readSavedChatName = () => {
+  try {
+    return window.localStorage.getItem(CHAT_NAME_KEY) || "";
+  } catch {
+    return "";
+  }
+};
 
 export default function Dashboard() {
   const { settings, updateSettings } = useSettings();
   const [stays, setStays] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [messageForm, setMessageForm] = useState({ name: "", content: "" });
+  const [loadingStays, setLoadingStays] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [staysError, setStaysError] = useState(null);
+  const [messagesError, setMessagesError] = useState(null);
+  const [messageForm, setMessageForm] = useState({ name: readSavedChatName(), content: "" });
   const [editingMessageId, setEditingMessageId] = useState(null);
   const [editingContent, setEditingContent] = useState("");
   const [replyingToId, setReplyingToId] = useState(null);
-  const [replyForm, setReplyForm] = useState({ name: "", content: "" });
+  const [replyForm, setReplyForm] = useState({ name: readSavedChatName(), content: "" });
   const [now, setNow] = useState(new Date());
   const [showAllMessages, setShowAllMessages] = useState(false);
   const [chatSearch, setChatSearch] = useState("");
   const [chatExpanded, setChatExpanded] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  // Bewahrte Entwürfe, wenn Bearbeiten/Antworten quer gewechselt wird
+  const [stashedReply, setStashedReply] = useState(null);
+  const [stashedEdit, setStashedEdit] = useState(null);
   const chatContainerRef = useRef(null);
 
   const loadStays = async () => {
+    setStaysError(null);
     try {
       const data = await staysApi.list();
       setStays(data);
     } catch (error) {
       console.error("Failed to load stays:", error);
+      setStaysError(error);
+    } finally {
+      setLoadingStays(false);
     }
   };
 
-  const loadMessages = async () => {
+  const loadMessages = async ({ silent = false } = {}) => {
+    if (!silent) setMessagesError(null);
     try {
       const data = await messagesApi.list();
       setMessages(data);
     } catch (error) {
       console.error("Failed to load messages:", error);
+      // Hintergrund-Polling schlägt leise fehl; nur der erste Ladevorgang zeigt einen Fehler
+      if (!silent) setMessagesError(error);
+    } finally {
+      setLoadingMessages(false);
     }
   };
 
   useEffect(() => {
     Promise.all([loadStays(), loadMessages()]).catch(console.error);
+  }, []);
+
+  // Nachrichten periodisch aktualisieren, damit Beiträge der Mitbewohner ankommen
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadMessages({ silent: true });
+    }, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -67,12 +103,21 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    const el = chatContainerRef.current;
+    if (!el) return;
+    // Nur ans Ende springen, wenn der Nutzer ohnehin nahe am Ende ist
+    const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceToBottom < 160) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages, showAllMessages]);
 
-  const today = useMemo(() => new Date(), []);
+  // today folgt dem Minuten-Ticker, damit aktiv/anstehend um Mitternacht korrekt kippen
+  const today = useMemo(() => {
+    const d = new Date(now);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [now]);
   const rooms = settings?.rooms || DEFAULT_ROOMS;
 
   const activeStays = useMemo(
@@ -114,36 +159,55 @@ export default function Dashboard() {
   const handleResetWatered = async () => {
     try {
       const now = new Date();
-      const result = await updateSettings({ plantsWateredAt: now.toISOString() });
-      console.log("Settings updated:", result);
+      await updateSettings({ plantsWateredAt: now.toISOString() });
       setNow(now); // Update the now state to immediately show the counter
       toast.success("Gießzeit gespeichert.");
     } catch (error) {
       console.error("Failed to save watered time:", error);
-      toast.error("Speichern fehlgeschlagen.");
+      toast.error("Speichern fehlgeschlagen. Prüfe die Verbindung und versuche es erneut.");
     }
   };
 
   const handleSendMessage = async () => {
+    if (sendingMessage) return;
     if (!messageForm.name.trim() || !messageForm.content.trim()) {
       toast.error("Bitte Name und Nachricht ausfüllen.");
       return;
     }
+    setSendingMessage(true);
     try {
       const data = await messagesApi.create({
         name: messageForm.name.trim(),
         content: messageForm.content.trim(),
       });
       setMessages((prev) => [data, ...prev]);
-      setMessageForm({ name: "", content: "" });
+      try {
+        window.localStorage.setItem(CHAT_NAME_KEY, messageForm.name.trim());
+      } catch {
+        /* localStorage nicht verfügbar */
+      }
+      setMessageForm((prev) => ({ name: prev.name, content: "" }));
     } catch (error) {
-      toast.error("Nachricht konnte nicht gesendet werden.");
+      toast.error("Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es erneut.");
+    } finally {
+      setSendingMessage(false);
     }
   };
 
   const startEditMessage = (message) => {
+    if (replyingToId && replyForm.content.trim()) {
+      setStashedReply({
+        messageId: replyingToId,
+        name: replyForm.name,
+        content: replyForm.content,
+      });
+      toast.info("Antwort-Entwurf gemerkt.", {
+        description: "Tippe erneut auf Antworten bei derselben Nachricht, um weiterzuschreiben.",
+      });
+    }
+    const stashed = stashedEdit?.messageId === message.id ? stashedEdit : null;
     setEditingMessageId(message.id);
-    setEditingContent(message.content);
+    setEditingContent(stashed ? stashed.content : message.content);
     setReplyingToId(null);
   };
 
@@ -163,8 +227,9 @@ export default function Dashboard() {
       );
       setEditingMessageId(null);
       setEditingContent("");
+      setStashedEdit(null);
     } catch (error) {
-      toast.error("Nachricht konnte nicht gespeichert werden.");
+      toast.error("Nachricht konnte nicht gespeichert werden. Bitte erneut versuchen.");
     }
   };
 
@@ -185,8 +250,19 @@ export default function Dashboard() {
   };
 
   const startReply = (message) => {
+    if (editingMessageId && editingContent.trim()) {
+      setStashedEdit({ messageId: editingMessageId, content: editingContent });
+      toast.info("Bearbeiten-Entwurf gemerkt.", {
+        description: "Tippe erneut auf Bearbeiten, um weiterzuschreiben.",
+      });
+    }
+    const stashed = stashedReply?.messageId === message.id ? stashedReply : null;
     setReplyingToId(message.id);
-    setReplyForm({ name: messageForm.name || "", content: "" });
+    setReplyForm({
+      name: stashed?.name || messageForm.name || "",
+      content: stashed?.content || "",
+    });
+    setStashedReply(null);
     setEditingMessageId(null);
   };
 
@@ -212,9 +288,15 @@ export default function Dashboard() {
         prev.map((item) => (item.id === messageId ? data : item)),
       );
       setReplyingToId(null);
-      setReplyForm({ name: "", content: "" });
+      setReplyForm((prev) => ({ name: prev.name, content: "" }));
+      setStashedReply(null);
+      try {
+        window.localStorage.setItem(CHAT_NAME_KEY, replyForm.name.trim());
+      } catch {
+        /* localStorage nicht verfügbar */
+      }
     } catch (error) {
-      toast.error("Antwort konnte nicht gesendet werden.");
+      toast.error("Antwort konnte nicht gesendet werden. Bitte erneut versuchen.");
     }
   };
 
@@ -269,10 +351,62 @@ export default function Dashboard() {
             className="text-4xl tracking-wide text-gray-800"
             style={{ fontFamily: "'Bangers', cursive" }}
           >
-            Ubersicht
+            Übersicht
           </h1>
+          <p
+            className="mt-1 text-sm text-gray-500"
+            style={{ fontFamily: "'Nunito', sans-serif" }}
+          >
+            Wer gerade da ist, was ansteht und wer die Pflanzen gießen muss.
+          </p>
           <div className="h-2 bg-gradient-to-r from-yellow-400 via-pink-500 to-teal-400 mt-2" />
         </motion.div>
+        {/* Guest Onboarding: der Einstieg für Gäste ohne Vorwissen */}
+        <motion.section variants={staggerItem} data-testid="dashboard-guest-module">
+          <Card className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-yellow-400 to-orange-400 border-b-4 border-black p-4">
+              <CardTitle
+                className="text-black text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
+                data-testid="dashboard-guest-title"
+              >
+                Neu hier?
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 bg-amber-500/10">
+              <p
+                className="text-sm text-gray-800"
+                style={{ fontFamily: "'Nunito', sans-serif" }}
+              >
+                Alles, was du im Haus wissen musst — ohne fragen zu müssen:
+              </p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {[
+                  ["WLAN", "wlan"],
+                  ["Waschmaschine", "waschmaschine"],
+                  ["Müll", "müll"],
+                  ["Notfall", "notfall"],
+                ].map(([label, query]) => (
+                  <Link
+                    key={query}
+                    to={`/anleitungen?q=${encodeURIComponent(query)}`}
+                    className="flex min-h-[44px] items-center border-2 border-black bg-white px-4 py-2 text-sm font-bold text-gray-800 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150 hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                    data-testid={`dashboard-guest-topic-${query}`}
+                  >
+                    {label}
+                  </Link>
+                ))}
+                <Link
+                  to="/anleitungen"
+                  className="flex min-h-[44px] items-center border-2 border-black bg-black px-4 py-2 text-sm font-bold text-white shadow-[3px_3px_0px_0px_rgba(250,204,21,1)] transition-all duration-150 hover:shadow-[1px_1px_0px_0px_rgba(250,204,21,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
+                  data-testid="dashboard-guest-topic-all"
+                >
+                  Alle How tos
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.section>
         {/* Top Row: Stays + Plants */}
         <motion.section variants={staggerItem} className="grid gap-6 lg:grid-cols-2">
           {/* Left Column: Active Stays + Upcoming Check-ins stacked */}
@@ -283,7 +417,7 @@ export default function Dashboard() {
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-active-stays"
             >
-              <CardHeader className="bg-gradient-to-r from-pink-500 to-orange-500 border-b-4 border-black p-4">
+              <CardHeader className="bg-gradient-to-r from-pink-600 to-orange-700 border-b-4 border-black p-4">
                 <CardTitle 
                   className="text-white text-2xl"
                   style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
@@ -293,7 +427,18 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 bg-pink-500/10">
-                {activeStays.length === 0 ? (
+                {staysError ? (
+                  <ErrorCard
+                    title="Aufenthalte konnten nicht geladen werden."
+                    onRetry={loadStays}
+                    testId="dashboard-stays-error"
+                  />
+                ) : loadingStays ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : activeStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -306,7 +451,7 @@ export default function Dashboard() {
                     <Link
                       key={stay.id}
                       to={`/aufenthalte/${stay.id}`}
-                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      className="flex items-center justify-between border-2 border-black p-4 bg-gradient-to-r from-amber-50 to-orange-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                       data-testid={`dashboard-active-link-${stay.id}`}
                     >
                       <div>
@@ -342,17 +487,27 @@ export default function Dashboard() {
               className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
               data-testid="dashboard-upcoming-card"
             >
-              <CardHeader className="bg-gradient-to-r from-teal-400 to-cyan-400 border-b-4 border-black p-4">
+              <CardHeader className="bg-white border-b-4 border-black p-4">
                 <CardTitle 
-                  className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                  className="text-gray-800 text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="dashboard-upcoming-title"
                 >
-                  Nachste Check-ins
+                  Nächste Check-ins
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-3 bg-teal-400/10">
-                {upcomingStays.length === 0 ? (
+                {staysError ? (
+                  <ErrorCard
+                    title="Check-ins konnten nicht geladen werden."
+                    onRetry={loadStays}
+                    testId="dashboard-upcoming-error"
+                  />
+                ) : loadingStays ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-16 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : upcomingStays.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -365,7 +520,7 @@ export default function Dashboard() {
                     <Link
                       key={stay.id}
                       to={`/aufenthalte/${stay.id}`}
-                      className="flex items-center justify-between border-4 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
+                      className="flex items-center justify-between border-2 border-black p-4 bg-gradient-to-r from-teal-50 to-cyan-50 hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
                       data-testid={`dashboard-upcoming-link-${stay.id}`}
                     >
                       <div>
@@ -401,10 +556,10 @@ export default function Dashboard() {
             className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
             data-testid="dashboard-plants-card"
           >
-            <CardHeader className="bg-gradient-to-r from-emerald-400 to-teal-400 border-b-4 border-black p-4">
+            <CardHeader className="bg-white border-b-4 border-black p-4">
               <CardTitle 
-                className="text-white text-2xl"
-                style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+                className="text-gray-800 text-2xl"
+                style={{ fontFamily: "'Bangers', cursive" }}
               >
                 Pflanzen
               </CardTitle>
@@ -538,7 +693,7 @@ export default function Dashboard() {
               
               <Button
                 onClick={handleResetWatered}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
+                className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                 style={{ fontFamily: "'Nunito', sans-serif" }}
                 data-testid="dashboard-plants-reset"
               >
@@ -556,35 +711,48 @@ export default function Dashboard() {
           className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden"
           data-testid="dashboard-chat-card"
         >
-            <CardHeader className="bg-gradient-to-r from-purple-500 to-pink-500 border-b-4 border-black p-4">
-              <div className="flex items-center justify-between gap-4">
-                <CardTitle 
-                  className="text-white text-2xl"
-                  style={{ fontFamily: "'Bangers', cursive", textShadow: '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000' }}
+            <CardHeader className="bg-white border-b-4 border-black p-4">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <CardTitle
+                  className="text-gray-800 text-2xl"
+                  style={{ fontFamily: "'Bangers', cursive" }}
                   data-testid="dashboard-chat-title"
                 >
                   WG-Chat
                 </CardTitle>
-                <div className="relative w-64">
+                <div className="relative w-full sm:w-64 sm:flex-shrink-0">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                   <Input
                     value={chatSearch}
                     onChange={(e) => setChatSearch(e.target.value)}
                     placeholder="Suchen..."
-                    className="pl-9 h-10 border-4 border-black rounded-none bg-white text-gray-800 placeholder:text-gray-400"
+                    aria-label="Nachrichten durchsuchen"
+                    className="pl-9 h-10 border-4 border-black rounded-none bg-white text-gray-800 placeholder:text-gray-500"
                     data-testid="chat-search-input"
                   />
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4 space-y-4 bg-purple-500/10">
+            <CardContent className="p-4 space-y-4 bg-amber-400/10">
               <div
                 ref={chatContainerRef}
                 className="space-y-3 overflow-y-auto pr-2 transition-all duration-300"
                 style={{ maxHeight: chatExpanded ? '800px' : '400px' }}
                 data-testid="chat-messages-list"
               >
-                {messages.length === 0 ? (
+                {messagesError ? (
+                  <ErrorCard
+                    title="Nachrichten konnten nicht geladen werden."
+                    onRetry={() => loadMessages()}
+                    testId="chat-error"
+                  />
+                ) : loadingMessages ? (
+                  <div className="space-y-3" aria-hidden="true">
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                    <Skeleton className="h-20 w-full rounded-none bg-gray-200" />
+                  </div>
+                ) : messages.length === 0 ? (
                   <p 
                     className="text-sm text-gray-500"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
@@ -611,7 +779,7 @@ export default function Dashboard() {
                     if (filteredMessages.length === 0) {
                       return (
                         <p className="text-sm text-gray-500">
-                          Keine Nachrichten gefunden fur "{chatSearch}"
+                          Keine Nachrichten gefunden für "{chatSearch}"
                         </p>
                       );
                     }
@@ -649,7 +817,7 @@ export default function Dashboard() {
                             data-testid="chat-show-more"
                           >
                             <ChevronDown className="h-4 w-4 mr-2" />
-                            {filteredMessages.length - INITIAL_VISIBLE_COUNT} altere Nachrichten anzeigen
+                            {filteredMessages.length - INITIAL_VISIBLE_COUNT} ältere Nachrichten anzeigen
                           </Button>
                         )}
                       </>
@@ -661,8 +829,10 @@ export default function Dashboard() {
               <div className="flex justify-center">
                 <button
                   onClick={() => setChatExpanded(!chatExpanded)}
-                  className="p-2 bg-purple-500 hover:bg-purple-600 text-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150"
+                  className="flex min-h-[44px] min-w-[44px] items-center justify-center bg-orange-500 hover:bg-orange-600 text-white border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] transition-all duration-150"
                   title={chatExpanded ? "Chat verkleinern" : "Chat erweitern"}
+                  aria-label={chatExpanded ? "Chat verkleinern" : "Chat erweitern"}
+                  aria-expanded={chatExpanded}
                   data-testid="chat-expand-button"
                 >
                   {chatExpanded ? (
@@ -672,9 +842,16 @@ export default function Dashboard() {
                   )}
                 </button>
               </div>
-              <div className="grid gap-3 md:grid-cols-[1fr_2fr_auto]">
+              <form
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleSendMessage();
+                }}
+                className="grid gap-3 md:grid-cols-[1fr_2fr_auto]"
+              >
                 <div className="space-y-2">
                   <label
+                    htmlFor="chat-name-input"
                     className="text-sm font-semibold text-gray-800"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-name-label"
@@ -682,17 +859,19 @@ export default function Dashboard() {
                     Dein Name
                   </label>
                   <Input
+                    id="chat-name-input"
                     value={messageForm.name}
                     onChange={(event) =>
                       setMessageForm((prev) => ({ ...prev, name: event.target.value }))
                     }
                     placeholder="z.B. Lea"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
+                    className="border-4 border-black rounded-none text-gray-800 placeholder:text-gray-500 bg-white"
                     data-testid="chat-name-input"
                   />
                 </div>
                 <div className="space-y-2">
                   <label
+                    htmlFor="chat-message-input"
                     className="text-sm font-semibold text-gray-800"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-message-label"
@@ -700,27 +879,36 @@ export default function Dashboard() {
                     Nachricht
                   </label>
                   <Textarea
+                    id="chat-message-input"
                     rows={2}
                     value={messageForm.content}
                     onChange={(event) =>
                       setMessageForm((prev) => ({ ...prev, content: event.target.value }))
                     }
-                    placeholder="Kurze Info fur alle"
-                    className="border-4 border-black rounded-none focus:ring-4 focus:ring-yellow-400 text-gray-800 placeholder:text-gray-400 bg-white"
+                    placeholder="Kurze Info für alle (Strg+Enter sendet)"
+                    className="border-4 border-black rounded-none text-gray-800 placeholder:text-gray-500 bg-white"
                     data-testid="chat-message-input"
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+                        event.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
                   />
                 </div>
                 <div className="flex items-end">
                   <Button
-                    onClick={handleSendMessage}
+                    type="submit"
+                    disabled={sendingMessage}
+                    aria-busy={sendingMessage}
                     className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-150"
                     style={{ fontFamily: "'Nunito', sans-serif" }}
                     data-testid="chat-send-button"
                   >
-                    Senden
+                    {sendingMessage ? "Senden…" : "Senden"}
                   </Button>
                 </div>
-              </div>
+              </form>
             </CardContent>
         </Card>
         </motion.div>

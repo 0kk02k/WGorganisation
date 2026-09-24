@@ -39,13 +39,17 @@ export const StaysList = ({
     const today = new Date();
     const start = parseISO(stay.start_date);
     const end = parseISO(stay.end_date);
-    
+
     if (isWithinInterval(today, { start, end })) {
-      return { status: "active", label: "Gerade da", color: "from-emerald-400 to-teal-400" };
+      return { status: "active", label: "Gerade da", badgeClass: "bg-emerald-100 text-emerald-800" };
     } else if (isFuture(start)) {
-      return { status: "upcoming", label: "Bald", color: "from-blue-400 to-indigo-400" };
+      return {
+        status: "upcoming",
+        label: `Ab ${format(start, "dd.MM.", { locale: de })}`,
+        badgeClass: "bg-sky-100 text-sky-800",
+      };
     } else {
-      return { status: "past", label: "Vergangen", color: "from-gray-300 to-gray-400" };
+      return { status: "past", label: "Vergangen", badgeClass: "bg-gray-100 text-gray-700" };
     }
   };
 
@@ -93,13 +97,7 @@ export const StaysList = ({
               
               <CardContent className="p-0">
                 <div className="flex">
-                  {/* Left side - Room color accent */}
-                  <div 
-                    className="w-3 min-h-[100px] border-r-4 border-black"
-                    style={{ backgroundColor: roomColor }}
-                  />
-                  
-                  {/* Main content */}
+                  {/* Main content — Zimmerfarbe trägt der Balken oben */}
                   <div className="flex-1 p-4 pr-16">
                     <div className="space-y-3">
                       <div className="flex items-center gap-3">
@@ -112,8 +110,8 @@ export const StaysList = ({
                         </h3>
                         
                         {/* Status badge */}
-                        <span 
-                          className={`px-2 py-0.5 text-xs font-bold text-white border-2 border-black bg-gradient-to-r ${stayStatus.color}`}
+                        <span
+                          className={`px-2 py-0.5 text-xs font-bold border-2 border-black ${stayStatus.badgeClass}`}
                           style={{ fontFamily: "'Nunito', sans-serif" }}
                         >
                           {stayStatus.label}

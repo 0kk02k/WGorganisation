@@ -1,6 +1,17 @@
 import { format, parseISO } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Pencil } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { MessageCircle, Pencil, Trash2 } from "lucide-react";
 import ChatReplyList from "@/components/ChatReplyList";
 import ChatEditForm from "@/components/ChatEditForm";
 import ChatReplyForm from "@/components/ChatReplyForm";
@@ -27,7 +38,7 @@ export default function ChatMessage({
 }) {
   return (
     <motion.div
-      className="border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-4"
+      className="border-2 border-black bg-white p-4"
       data-testid={`chat-message-${message.id}`}
       variants={chatMessage}
       initial="initial"
@@ -55,7 +66,9 @@ export default function ChatMessage({
                 size="icon"
                 variant="ghost"
                 onClick={onReply}
-                className="h-8 w-8 bg-teal-100 hover:bg-teal-200 text-teal-700 border-2 border-black rounded-none"
+                aria-label={`Auf die Nachricht von ${message.name} antworten`}
+                title="Antworten"
+                className="h-11 w-11 bg-teal-100 hover:bg-teal-200 text-teal-700 border-2 border-black rounded-none"
                 data-testid={`chat-reply-button-${message.id}`}
               >
                 <MessageCircle className="h-4 w-4" />
@@ -64,11 +77,54 @@ export default function ChatMessage({
                 size="icon"
                 variant="ghost"
                 onClick={onEdit}
-                className="h-8 w-8 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
+                aria-label={`Nachricht von ${message.name} bearbeiten`}
+                title="Bearbeiten"
+                className="h-11 w-11 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 border-2 border-black rounded-none"
                 data-testid={`chat-edit-button-${message.id}`}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    aria-label={`Nachricht von ${message.name} löschen`}
+                    title="Löschen"
+                    className="h-11 w-11 bg-red-100 hover:bg-red-200 text-red-700 border-2 border-black rounded-none"
+                    data-testid={`chat-delete-button-${message.id}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                  <AlertDialogHeader className="bg-gradient-to-r from-red-500 to-rose-500 border-b-4 border-black p-4 -m-6 mb-0">
+                    <AlertDialogTitle
+                      className="text-white text-2xl"
+                      style={{ fontFamily: "'Bangers', cursive" }}
+                    >
+                      Nachricht wirklich löschen?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogDescription
+                    className="text-gray-600 pt-8"
+                    style={{ fontFamily: "'Nunito', sans-serif" }}
+                  >
+                    Die Nachricht von {message.name} und alle Antworten darauf werden dauerhaft entfernt.
+                  </AlertDialogDescription>
+                  <AlertDialogFooter className="flex gap-2 mt-4">
+                    <AlertDialogCancel className="bg-white hover:bg-gray-100 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150">
+                      Abbrechen
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={onDelete}
+                      className="bg-red-500 hover:bg-red-600 text-white font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+                    >
+                      Löschen
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </>
           )}
         </div>

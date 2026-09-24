@@ -43,6 +43,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
   const checkoutTemplate =
     settings?.checkout_template || DEFAULT_CHECKOUT_TEMPLATE;
   const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     occupant_name: "",
     room: "A",
@@ -62,12 +63,19 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     });
   }, [open, rooms]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event?.preventDefault?.();
+    if (saving) return;
     if (!form.occupant_name || !form.start_date || !form.end_date) {
       toast.error("Bitte Name und Datum ausfüllen.");
       return;
     }
+    if (form.end_date < form.start_date) {
+      toast.error("Check-out liegt vor dem Check-in. Bitte Datum prüfen.");
+      return;
+    }
 
+    setSaving(true);
     try {
       const payload = {
         ...form,
@@ -81,6 +89,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     } catch (error) {
       console.error("Failed to create stay:", error);
       toast.error(`Anlegen fehlgeschlagen: ${error.message || "Unbekannter Fehler"}`);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -88,6 +98,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
+          aria-label={triggerLabel || "Neue Belegung anlegen"}
+          title={triggerLabel || "Neue Belegung anlegen"}
           className="h-14 w-14 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-1 hover:-translate-y-1 transition-all duration-150"
           data-testid={triggerTestId}
         >
@@ -98,7 +110,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
         className="max-w-lg max-h-[95vh] overflow-hidden flex flex-col bg-white border-4 border-black rounded-none shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] text-gray-800 p-0"
         data-testid="stay-dialog"
       >
-        <DialogHeader className="bg-gradient-to-r from-teal-400 to-emerald-400 border-b-4 border-black p-4">
+        <DialogHeader className="bg-gradient-to-r from-teal-600 to-emerald-600 border-b-4 border-black p-4">
           <DialogTitle 
             className="text-white text-2xl"
             style={{ fontFamily: "'Bangers', cursive" }}
@@ -107,11 +119,12 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             Neue Belegung anlegen
           </DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <form id="stay-create-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6 space-y-4">
           <div className="space-y-2 pt-2">
             <label
               className="text-sm font-bold text-gray-800"
               data-testid="stay-form-occupant-label"
+              htmlFor="stay-form-occupant-input"
             >
               Name der Person
             </label>
@@ -124,7 +137,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }))
               }
               placeholder="z.B. Lea oder Ben"
-              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
+              className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+              id="stay-form-occupant-input"
               data-testid="stay-form-occupant-input"
             />
           </div>
@@ -133,6 +147,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-room-label"
+              htmlFor="stay-form-room-select"
               >
                 Zimmer
               </label>
@@ -143,7 +158,8 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                 }
               >
                 <SelectTrigger 
-                  data-testid="stay-form-room-select"
+                  id="stay-form-room-select"
+              data-testid="stay-form-room-select"
                 >
                   <SelectValue placeholder="Zimmer auswählen" />
                 </SelectTrigger>
@@ -164,6 +180,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-start-label"
+              htmlFor="stay-form-start-date"
               >
                 Check-in
               </label>
@@ -176,8 +193,9 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     start_date: event.target.value,
                   }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-start-date"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                id="stay-form-start-date"
+              data-testid="stay-form-start-date"
               />
             </div>
           </div>
@@ -186,6 +204,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-end-label"
+              htmlFor="stay-form-end-date"
               >
                 Check-out
               </label>
@@ -198,14 +217,16 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                     end_date: event.target.value,
                   }))
                 }
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-end-date"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                id="stay-form-end-date"
+              data-testid="stay-form-end-date"
               />
             </div>
             <div className="space-y-2">
               <label
                 className="text-sm font-bold text-gray-800"
                 data-testid="stay-form-notes-label"
+              htmlFor="stay-form-notes-input"
               >
                 Notiz
               </label>
@@ -219,8 +240,9 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
                   }))
                 }
                 placeholder="Ankunftszeit, Schlüsselort ..."
-                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all duration-150"
-                data-testid="stay-form-notes-input"
+                className="border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                id="stay-form-notes-input"
+              data-testid="stay-form-notes-input"
               />
             </div>
           </div>
@@ -270,7 +292,7 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
               </div>
             </div>
           </div>
-        </div>
+        </form>
         <DialogFooter className="flex-row items-center gap-2 p-4 border-t-4 border-black bg-gray-50">
           <Button
             className="flex-1 bg-white hover:bg-gray-100 text-gray-800 font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
@@ -280,11 +302,14 @@ export const StayDialog = ({ onCreated, triggerLabel, triggerTestId }) => {
             Abbrechen
           </Button>
           <Button
-            onClick={handleSubmit}
-            className="flex-1 bg-gradient-to-r from-teal-400 to-emerald-400 hover:opacity-90 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
+            type="submit"
+            form="stay-create-form"
+            disabled={saving}
+            aria-busy={saving}
+            className="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black font-bold border-4 border-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-x-0.5 hover:-translate-y-0.5 transition-all duration-150"
             data-testid="stay-dialog-submit"
           >
-            Speichern
+            {saving ? "Speichern…" : "Speichern"}
           </Button>
         </DialogFooter>
       </DialogContent>
